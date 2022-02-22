@@ -14,6 +14,14 @@ spring:
         format_sql: true
 server:
   port: 8080
+
+app:
+  host: http://localhost:8080
+  title: Entertainment Among Us
+  version: ver.0.1
+  help-email: continuedevelop@gmail.com
+
+#  token-available-period: 60
 #  host:
 #    api: http://localhost:8080
 #    front: https://banking-api.sample.com
