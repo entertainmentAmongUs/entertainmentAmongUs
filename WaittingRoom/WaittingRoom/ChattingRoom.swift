@@ -15,11 +15,10 @@ class ChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataSource
     /* MARK: Views */
     var chatTableView: UITableView?
     var chatTextField: UITextField?
-    var returnButton: UIButton?
     
     /* MARK: Others */
     let chatIdentifier = "chat"
-    var textFieldButtomConstraint: NSLayoutConstraint?
+    var textFieldBottomConstraint: NSLayoutConstraint?
     
     
     // MARK: - Method
@@ -28,18 +27,13 @@ class ChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataSource
         
         guard let textField = self.chatTextField else {return}
         
-        let table = UITableView(frame: .zero, style: .insetGrouped)
+        let table = UITableView(frame: .zero, style: .plain)
         
         self.view.addSubview(table)
         
         table.register(ChatCell.self, forCellReuseIdentifier: self.chatIdentifier)
         table.delegate = self
         table.dataSource = self
-    
-//        table.layer.cornerRadius = 3
-//        table.clipsToBounds = true
-//        table.backgroundColor = .systemGray5
-        
         table.separatorStyle = .singleLine
         table.allowsSelection = false
         
@@ -48,6 +42,8 @@ class ChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataSource
         table.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor,constant: 20).isActive = true
         table.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor,constant: -20).isActive = true
         table.bottomAnchor.constraint(equalTo: textField.topAnchor, constant: -10).isActive = true
+        table.setContentHuggingPriority(.defaultLow, for: .vertical)
+        table.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
         
         self.chatTableView = table
         
@@ -64,36 +60,29 @@ class ChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataSource
         textField.autocorrectionType = .no
         textField.autocapitalizationType = .none
         textField.enablesReturnKeyAutomatically = true
-        textField.font = UIFont.systemFont(ofSize: 20)
+        textField.font = UIFont.systemFont(ofSize: 18)
         textField.placeholder = "욕설이나 비방 채팅은 삼가주세요"
-        
         
         textField.translatesAutoresizingMaskIntoConstraints = false
         
+        /* 채팅 입력 필드의 하단 오토 레이아웃 저장 */
+        
         let bottom = textField.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor,constant: -20)
         bottom.isActive = true
-        self.textFieldButtomConstraint = bottom
+        self.textFieldBottomConstraint = bottom
         
         textField.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor,constant: 20).isActive = true
         textField.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor,constant: -20).isActive = true
-        textField.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        textField.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        textField.setContentHuggingPriority(.defaultHigh, for: .vertical)
         
         self.chatTextField = textField
         
     }
     
-    
-    /*
-    func addReturnButton() {
-        
-        let button = UIButton(type: .system)
-        
-        self.returnButton = button
-    }
-    */
-    
-    
     func reloadChattings(_ index: IndexPath) {
+        
+        /* WaittingRoom의 채팅 테이블 뷰 갱신 */
         
         guard let waittingRoom = self.presentingViewController as? WaittingRoom else {return}
         
@@ -111,15 +100,16 @@ class ChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataSource
     
     @objc func keyboardWillShow (_ noti: Notification) {
         
+        /* 키보드 높이에 맞춰 채팅 입력 필드의 오토 레이아웃 갱신 */
+        
         guard let keyboardSize = noti.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
         
         guard let duration = noti.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval else {return}
         
-        guard let bottom = self.textFieldButtomConstraint else {return}
+        guard let bottom = self.textFieldBottomConstraint else {return}
         
         UIView.animate(withDuration: duration) {
             bottom.constant = -(10 + keyboardSize.height - self.view.safeAreaInsets.bottom)
-            self.view.layoutIfNeeded()
         }
         
         
@@ -129,12 +119,21 @@ class ChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataSource
         
         guard let duration = noti.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval else {return}
         
-        guard let bottom = self.textFieldButtomConstraint else {return}
+        guard let bottom = self.textFieldBottomConstraint else {return}
         
         UIView.animate(withDuration: duration) {
             bottom.constant = -20
-            self.view.layoutIfNeeded()
         }
+        
+    }
+    
+    @objc func keyboardDidShow(_ noti: Notification) {
+        
+        /* 키보드 등장 후 테이블 뷰 스크롤을  맨 밑으로 이동 */
+        
+        guard let table = self.chatTableView else { return }
+        
+        table.scrollToRow(at: IndexPath(row: chattings.count-1, section: 0), at: .bottom, animated: true)
         
     }
     
@@ -187,14 +186,17 @@ class ChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataSource
     
     // MARK: - TextField Delegate
     
+    
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        guard let table = self.chatTableView else { return false }
         
+        /* 채팅 리스트에 새로운 채팅 추가 및 채팅 테이블 뷰 갱신 */
+        
+        guard let table = self.chatTableView else { return false }
         guard let message = textField.text else { return false }
         
         let count = chattings.count
         
-        let newChat = Chat(nickname: "초보입니다", message: message)
+        let newChat = Chat(nickname: myProfile.nickname, message: message)
         let index = IndexPath(row: count, section: 0)
         
         chattings.append(newChat)
@@ -218,6 +220,8 @@ class ChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataSource
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
+        /* 뷰 컨트롤러 설정 */
+        
         self.modalTransitionStyle = .coverVertical
         self.modalPresentationStyle = .pageSheet
         
@@ -225,6 +229,11 @@ class ChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataSource
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
         
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardDidShow(_:)), name: UIResponder.keyboardDidShowNotification, object: nil)
+    }
+    
+    deinit {
+        print("ChattingRoom deinit")
     }
 
 }

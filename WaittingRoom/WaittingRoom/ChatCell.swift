@@ -20,7 +20,7 @@ class ChatCell: UITableViewCell {
 
         self.contentView.addSubview(nickname)
         
-        nickname.font = UIFont.systemFont(ofSize: 15, weight: .medium)
+        nickname.font = UIFont.systemFont(ofSize: 18, weight: .medium)
         nickname.numberOfLines = 1
         nickname.lineBreakMode = .byTruncatingTail
         
@@ -45,7 +45,7 @@ class ChatCell: UITableViewCell {
         
         self.contentView.addSubview(chatting)
         
-        chatting.font = UIFont.systemFont(ofSize: 15)
+        chatting.font = UIFont.systemFont(ofSize: 18)
         chatting.numberOfLines = 0
         chatting.lineBreakMode = .byWordWrapping
         

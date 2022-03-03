@@ -12,6 +12,7 @@ class ProfileCell: UICollectionViewCell {
     var image: UIImageView?
     var nickname: UILabel?
     var isReady: Bool = false {
+        /* true면 셀 테두리에 준비 완료 표시 */
         willSet {
             if newValue {
                 self.contentView.layer.borderColor = UIColor.systemBlue.cgColor
@@ -23,6 +24,21 @@ class ProfileCell: UICollectionViewCell {
             }
         }
         
+    }
+    var isRoomMaster: Bool = false {
+        /* true면 프로필 이미지 테두리에 방장 표시 */
+        willSet {
+            guard let image = self.image else { return }
+            if newValue {
+                let color = UIColor.systemBlue.withAlphaComponent(0.7)
+                image.layer.borderColor = color.cgColor
+                image.layer.borderWidth = 2
+            }
+            else {
+                image.layer.borderColor = nil
+                image.layer.borderWidth = 0.0
+            }
+        }
     }
     
     func addImage(_ size: CGSize) {
@@ -37,8 +53,8 @@ class ProfileCell: UICollectionViewCell {
         image.layer.cornerRadius = size.width/4
         image.clipsToBounds = true
         
+        /* 셀 크기에 따라 이미지 크기 및 오토 레이아웃 설정 */
         image.translatesAutoresizingMaskIntoConstraints = false
-        
         image.topAnchor.constraint(equalTo: self.contentView.topAnchor, constant: 5).isActive = true
         image.centerXAnchor.constraint(equalTo: self.contentView.centerXAnchor).isActive = true
         image.widthAnchor.constraint(equalToConstant: size.width/2).isActive = true
@@ -55,12 +71,14 @@ class ProfileCell: UICollectionViewCell {
         let nickname = UILabel()
         
         self.contentView.addSubview(nickname)
-        nickname.text = "닉네임"
+        
         nickname.font = UIFont.systemFont(ofSize: 18, weight: .regular)
         nickname.backgroundColor = .white
         nickname.layer.cornerRadius = 10
         nickname.clipsToBounds = true
         nickname.textAlignment = .center
+        nickname.numberOfLines = 1
+        nickname.adjustsFontSizeToFitWidth = true
         
         nickname.translatesAutoresizingMaskIntoConstraints = false
         nickname.centerXAnchor.constraint(equalTo: self.contentView.centerXAnchor).isActive = true
@@ -69,15 +87,6 @@ class ProfileCell: UICollectionViewCell {
         nickname.widthAnchor.constraint(equalToConstant: size.width-10).isActive = true
         
         self.nickname = nickname
-        
-    }
-    
-    func blink() {
-        
-//        self.alpha = 0.0
-        UIView.animate(withDuration: 0.3, delay: 0.0,
-                       options: [.curveEaseInOut, .repeat, .autoreverse],
-                       animations: { [weak self] in self?.alpha = 0.0 })
         
     }
     
