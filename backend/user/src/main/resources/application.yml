@@ -2,8 +2,8 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/user?useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul
-    username: root
-    password: ssafy
+    username: ADMIN
+    password: entertainment
   jpa:
     show-sql: true
     hibernate:
@@ -12,8 +12,22 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  thymeleaf:
+    prefix: classpath:templates/
+    check-templates-location: true
+    suffix: .html
+    mode: HTML5
+    cache: false
+    order: 0
 server:
   port: 8080
+
+app:
+  host: http://localhost:8080
+  title: Entertainment Among Us
+  version: ver.0.1
+  help-email: continuedevelop@gmail.com
+#  token-available-period: 60
 #  host:
 #    api: http://localhost:8080
 #    front: https://banking-api.sample.com
