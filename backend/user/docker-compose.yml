@@ -1,0 +1,27 @@
+version : "3"
+services:
+  db:
+    container_name: entertainment-among-us
+    image: mysql
+    environment:
+      MYSQL_DATABASE: user
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ssafy
+      MYSQL_ROOT_PASSWORD: ssafy
+    volumes:
+      - ./db/data: /var/lib/mysql:rw
+    ports:
+      - "3306:3306"
+    restart: always
+  app:
+    container_name: entertainment-among-us
+    image: openjdk:8-jdk
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./app:/app
+    working_dir: /app
+    command: ["./gradlew", "bootrun"]
+    depends_on:
+      - db
+    restart: always

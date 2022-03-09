@@ -24,7 +24,13 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	implementation 'mysql:mysql-connector-java'
 	annotationProcessor 'org.projectlombok:lombok'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'com.google.code.gson:gson:2.8.5'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.12.3'
+	implementation group: 'org.springframework.amqp', name: 'spring-rabbit', version: '2.3.6'
 }
 
 tasks.named('test') {

@@ -3,12 +3,17 @@ package com.entertainment.user.controller;
 import com.entertainment.user.request.LoginReq;
 import com.entertainment.user.request.RegisterReq;
 import com.entertainment.user.entity.User;
+import com.entertainment.user.service.KakaoAPI;
 import com.entertainment.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpSession;
+import java.util.HashMap;
 
 @Slf4j
 @RestController
@@ -72,6 +77,40 @@ public class UserController {
 //        s = "\"님 환영합니다!\"";
 //        return ResponseEntity.status(HttpStatus.OK).body(user.getNickname()+s);
         return true;
+    }
+
+
+    //kakao 소셜 로그인
+    KakaoAPI kakaoApi = new KakaoAPI();
+
+    @RequestMapping(value="/kakaologin")
+    public ModelAndView login(@RequestParam("code") String code, HttpSession session) {
+        ModelAndView mav = new ModelAndView();
+        // 1번 인증코드 요청 전달
+        String accessToken = kakaoApi.getAccessToken(code);
+        // 2번 인증코드로 토큰 전달
+        HashMap<String, Object> userInfo = kakaoApi.getUserInfo(accessToken);
+
+        System.out.println("login info : " + userInfo.toString());
+
+        if(userInfo.get("email") != null) {
+            session.setAttribute("userId", userInfo.get("email"));
+            session.setAttribute("accessToken", accessToken);
+        }
+        mav.addObject("userId", userInfo.get("email"));
+        mav.setViewName("index");
+        return mav;
+    }
+
+    @RequestMapping(value="/kakaologout")
+    public ModelAndView logout(HttpSession session) {
+        ModelAndView mav = new ModelAndView();
+
+        kakaoApi.kakaoLogout((String)session.getAttribute("accessToken"));
+        session.removeAttribute("accessToken");
+        session.removeAttribute("userId");
+        mav.setViewName("index");
+        return mav;
     }
 
 }
