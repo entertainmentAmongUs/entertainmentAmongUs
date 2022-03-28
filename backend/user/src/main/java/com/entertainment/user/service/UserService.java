@@ -1,5 +1,6 @@
 package com.entertainment.user.service;
 
+import com.entertainment.user.request.ChangePwReq;
 import com.entertainment.user.request.RegisterReq;
 import com.entertainment.user.entity.User;
 import org.springframework.stereotype.Service;
@@ -13,4 +14,10 @@ public interface UserService {
     boolean validateAccount(String email, String password);
 
     User getUserNicknameByUserEmail(String email);
+    boolean deleteUser(int UserId);
+    public boolean sendMail(int userId);
+
+    boolean changePassword(int userId, ChangePwReq changePwReq);
+
+    boolean authorization(int userId, String code);
 }

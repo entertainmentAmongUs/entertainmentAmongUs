@@ -31,6 +31,9 @@ dependencies {
 
 	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.12.3'
 	implementation group: 'org.springframework.amqp', name: 'spring-rabbit', version: '2.3.6'
+
+	//이메일 인증
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
 }
 
 tasks.named('test') {
