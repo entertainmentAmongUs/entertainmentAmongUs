@@ -11,8 +11,8 @@ import javax.persistence.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "game_process")
-public class GameProcess {
+@Table(name = "game_room")
+public class GameRoom {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
