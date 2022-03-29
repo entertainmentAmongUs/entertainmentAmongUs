@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 
+/* 유저의 프로필 정보 */
 struct Profile {
     
     var userID: Int?
@@ -21,12 +22,14 @@ struct Profile {
     var loseCount: Int
 }
 
+/* 채팅 정보 */
 struct Chat {
     
     let nickname: String
     let message: String
 }
 
+/* 게임 진행에 필요한 데이터 */
 struct Process {
     
     let playerOrder: [Int]
@@ -51,16 +54,8 @@ var players: [Profile] = [
 
 var chattings: [Chat] = []
 
-let process = Process(playerOrder: [2,1,5,3,0,4,7,6], liarID: 99, keyword: "유재석")
+let process = Process(playerOrder: [2,1,5,3,0,4,7,6], liarID: 27, keyword: "유재석")
 
 var sections: [String] = []
 
-/*
-                         [Chat(nickname: "김깝심", message: "레디하세요"),
-                         Chat(nickname: "초보입니다", message: "이거 재밌나요?"),
-                         Chat(nickname: "랭킹1위", message: "할거없음 개노잼"),
-                         Chat(nickname: "거짓말못하는사람", message: "ㄹㄷㄹㄷㄹㄷㄹㄷ"),
-                         Chat(nickname: "김깝심", message: "레디하세요 다들"),
-                         Chat(nickname: "수현아사랑해", message: "미워도 사랑한다"),
-                         Chat(nickname: "트롤러", message: "이번판 제가 라이어임 ㅋㅋㅋㅋㅋㅋㅋ")]
- */
+var vote:[Int:Int] = [15:0, 51:0, 99:0, 114:0, 13:0, 43:0, 27:0, 8:0]

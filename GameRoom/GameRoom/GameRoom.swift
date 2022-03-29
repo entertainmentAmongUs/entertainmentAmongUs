@@ -293,6 +293,13 @@ class GameRoom: UIViewController, UITableViewDataSource, UITableViewDelegate, UI
         
     }
     
+    func endGame() {
+        
+        print("게임 종료")
+        
+        
+    }
+    
     func readyToDebate() {
         
         guard let chatField = self.chatTextField else { return }
@@ -385,7 +392,7 @@ class GameRoom: UIViewController, UITableViewDataSource, UITableViewDelegate, UI
         blink(announce)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-            announce.text = "투표 시작!"
+            announce.text = "아래에서 투표할 플레이어를 선택해주세요"
             self.blink(announce)
             
             collection.allowsSelection = true
@@ -396,7 +403,116 @@ class GameRoom: UIViewController, UITableViewDataSource, UITableViewDelegate, UI
     
     func startVoting() {
         
+        time = 30
         
+        let timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [unowned self] timer in
+            
+            if time < 0 {
+                
+                timer.invalidate()
+                self.endVoting()
+                return
+                
+            }
+            
+            guard let label = self.timeLabel else {return}
+            
+            label.text = "남은 시간: \(Int(time))"
+            
+            time -= 1
+        }
+        
+        RunLoop.current.add(timer, forMode: .common)
+        timer.fire()
+        
+    }
+    
+    func endVoting() {
+        
+        guard let collection = self.playerCollection else {return}
+        
+        
+        if let playerIndex = collection.indexPathsForSelectedItems {
+            
+            collection.allowsSelection = false
+            
+            let order = playerIndex[0].row
+            let player = players[process.playerOrder[order]]
+            
+            print("\(player.nickname)에게 투표했습니다.")
+            
+            vote[player.userID!]! += 1
+        }
+        
+        
+        /* 서버로 투표 결과를 보냄 */
+        
+        guard let announce = self.announcementLabel else {return}
+        guard let keyword = self.keywordLabel else {return}
+        
+        announce.text = "투표 결과 집계중..."
+        keyword.text = nil
+        
+        blink(announce)
+        
+        /* 서버로부터 투표 결과를 받음 */
+        
+        DispatchQueue.main.asyncAfter(deadline: .now()+5) {
+            self.doJudgement(self.findLiarCandidate())
+        }
+    }
+    
+    
+    func doJudgement(_ candidate: Int) {
+        
+        guard let announce = self.announcementLabel else {return}
+        guard let keyword = self.keywordLabel else {return}
+        
+        announce.text = "투표 결과 \(candidate)가 라이어로 지목됐습니다."
+        blink(announce)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now()+3) {
+            
+            if process.liarID == candidate {
+                
+                announce.text = "\(candidate)는 라이어였습니다!"
+                announce.textColor = .systemBlue
+                self.blink(announce)
+                
+            } else {
+                
+                announce.text = "\(candidate)는 라이어가 아니었습니다!"
+                announce.textColor = .systemRed
+                
+                keyword.text = "라이어는 \(process.liarID)번 이었습니다."
+                keyword.textColor = .black
+                
+                self.blink(announce)
+                self.blink(keyword)
+                
+            }
+            
+            self.endGame()
+            
+        }
+        
+    }
+    
+    func findLiarCandidate() -> Int {
+        
+        var max = 0
+        var candidate = 0
+        
+        for i in vote.keys {
+            if let value = vote[i] {
+                if value > max {
+                    max = value
+                    candidate = i
+                }
+            }
+        }
+        
+        return candidate
         
     }
     
@@ -439,7 +555,7 @@ class GameRoom: UIViewController, UITableViewDataSource, UITableViewDelegate, UI
     
     func updateCurrentPlayer() {
         
-        time = 2
+        time = 5
         
         /* 플레이어 순서를 레이블에 띄워주기 */
         showCurrentPlayer()
@@ -525,20 +641,17 @@ class GameRoom: UIViewController, UITableViewDataSource, UITableViewDelegate, UI
     
     func isMyTurn() -> Bool{
         
-        if self.currentOrder == players.count {
-            return false
+        if self.currentOrder < players.count {
+            
+            let order = process.playerOrder[currentOrder]
+            let currentPlayerID = players[order].userID
+            
+            if myProfile.userID == currentPlayerID {
+                return true
+            }
         }
         
-        let order = process.playerOrder[currentOrder]
-        let currentPlayerID = players[order].userID
-        
-        if myProfile.userID == currentPlayerID {
-            return true
-        }
-        else {
-            return false
-        }
-        
+        return false
     }
     
     func CheckHintInput() {
@@ -659,7 +772,7 @@ class GameRoom: UIViewController, UITableViewDataSource, UITableViewDelegate, UI
     }
     
     
-    // MARK: - CollectionView Datasource
+    // MARK: - CollectionView DataSource
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return players.count
@@ -687,6 +800,30 @@ class GameRoom: UIViewController, UITableViewDataSource, UITableViewDelegate, UI
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 1
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        
+        guard let label = self.keywordLabel else {return}
+        
+        let player = players[process.playerOrder[indexPath.row]]
+        
+        label.text = "\(player.nickname)님에게 투표하시겠습니까?"
+        
+        UIView.animate(withDuration: 0.1, delay: 0, options: [.autoreverse, .curveEaseInOut, .allowUserInteraction]) {
+            label.transform = CGAffineTransform(scaleX: 1.05, y: 1.05)
+        } completion: { _ in
+            label.transform = CGAffineTransform(scaleX: 1.0, y: 1.0)
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
+        
+        if myPlayerCell == collectionView.cellForItem(at: indexPath) {
+            return false
+        }
+        
+        return true
     }
     
     
