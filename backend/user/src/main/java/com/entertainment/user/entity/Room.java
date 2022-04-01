@@ -40,9 +40,11 @@ public class Room {
     @Column(nullable = false)
     private int room_status;        //방의 상태(1: 대기/2: 게임 중)
 
+    @Builder.Default
     @OneToMany(mappedBy = "room")
     private List<Profile> profileList = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "room")
     private List<Invitation> invitationList = new ArrayList<>();
 

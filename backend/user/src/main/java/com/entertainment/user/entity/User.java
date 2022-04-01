@@ -31,10 +31,14 @@ public class User {
     @Column(nullable = false)
     private String token;           //사용자의 토큰
 
+    @Column
+    private String code;            //사용자의 이메일 인증 코드
+
     public User(RegisterReq registerDto) {
         this.email = registerDto.getEmail();
         this.nickname = registerDto.getNickname();
         this.password = registerDto.getPassword();
         this.token = "Token"+this.nickname;
+        this.code="";
     }
 }
