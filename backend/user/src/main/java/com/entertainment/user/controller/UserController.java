@@ -69,7 +69,7 @@ public class UserController {
         return false;               //닉네임 중복 아닐 때
     }
 
-    @PutMapping("/users/login")
+    @PostMapping("/users/login")
 //    public ResponseEntity logIn(@RequestBody LoginReq loginDto){
     public boolean logIn(@RequestBody LoginReq loginDto){
         String s;
@@ -105,8 +105,9 @@ public class UserController {
         }
     }
 
-    @GetMapping("/emails/{userId}/code")
+    @PostMapping("/emails/{userId}/code")
     public boolean Authorization(@PathVariable(name = "userId") int userId, @RequestBody String code){
+
         if(userService.authorization(userId, code)){
             return true;
         }else{
