@@ -27,6 +27,7 @@ public class LiargameDepth2 {
     @JoinColumn(name = "liargame_depth1_id")
     private LiargameDepth1 liargameDepth1;
 
+    @Builder.Default
     @OneToMany(mappedBy = "liargameDepth2")
     private List<LiargameDepth3> liargameDepth3List = new ArrayList<>();
 

@@ -116,6 +116,8 @@ public class UserServiceImpl implements UserService{
         simpleMailMessage.setText("인증코드는 "+ePw+"입니다. \n홈페이지에서 인증코드를 입력하여 주시기 바랍니다.");
         //메일 발송
         javaMailSender.send(simpleMailMessage);
+        user.setCode(ePw);
+        userRepository.save(user);
         return false;
     }
 
@@ -126,15 +128,22 @@ public class UserServiceImpl implements UserService{
             myUser.setPassword(changePwReq.getPassword());
             userRepository.save(myUser);
             //System.out.println("password changed");
+            return true;
         }else{
             //System.out.println("password is not same");
+            return false;
         }
-        return false;
+        //return false;
     }
 
     @Override
     public boolean authorization(int userId, String code) {
-        if(code.equals(ePw)){
+
+        User user = userRepository.getById(userId);
+        //System.out.println((user.getId()+" "+user.getCode()));
+
+        System.out.println((code+" "+user.getCode()));
+        if(code.equals(user.getCode())){
             System.out.println("코드 승인 완료");
             return true;
         }else{

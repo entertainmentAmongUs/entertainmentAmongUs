@@ -45,6 +45,7 @@ public class Profile {
     @JoinColumn(name = "room_id")
     private Room room;            //사용자의 방 번호
 
+    @Builder.Default
     @OneToMany(mappedBy = "profile")
     private List<Friend> friendList = new ArrayList<>();
 

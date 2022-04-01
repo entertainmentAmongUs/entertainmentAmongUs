@@ -23,6 +23,7 @@ public class LiargameDepth1 {
     @Column(nullable = false)
     private String title;       //depth1의 주제
 
+    @Builder.Default
     @OneToMany(mappedBy = "liargameDepth1")
     private List<LiargameDepth2> liargameDepth2List = new ArrayList<>();
 
