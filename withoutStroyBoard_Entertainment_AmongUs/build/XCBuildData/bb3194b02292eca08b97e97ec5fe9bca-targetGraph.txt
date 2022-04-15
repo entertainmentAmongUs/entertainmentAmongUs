@@ -1,0 +1,6 @@
+Target dependency graph (3 targets)
+SideMenu in Pods, no dependencies
+Toast-Swift in Pods, no dependencies
+Pods-withoutStroyBoard_Entertainment_AmongUs in Pods, depends on:
+SideMenu in Pods (explicit)
+Toast-Swift in Pods (explicit)
