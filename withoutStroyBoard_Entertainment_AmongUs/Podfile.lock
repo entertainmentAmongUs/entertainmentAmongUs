@@ -1,0 +1,24 @@
+PODS:
+  - Alamofire (5.5.0)
+  - SideMenu (6.5.0)
+  - Toast-Swift (5.0.1)
+
+DEPENDENCIES:
+  - Alamofire (~> 5.5)
+  - SideMenu
+  - Toast-Swift (~> 5.0.1)
+
+SPEC REPOS:
+  trunk:
+    - Alamofire
+    - SideMenu
+    - Toast-Swift
+
+SPEC CHECKSUMS:
+  Alamofire: 1c4fb5369c3fe93d2857c780d8bbe09f06f97e7c
+  SideMenu: f583187d21c5b1dd04c72002be544b555a2627a2
+  Toast-Swift: 9b6a70f28b3bf0b96c40d46c0c4b9d6639846711
+
+PODFILE CHECKSUM: 899f905355c0466be5a32a50f648ed8302c92030
+
+COCOAPODS: 1.11.2
