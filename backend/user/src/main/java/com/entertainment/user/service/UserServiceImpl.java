@@ -1,12 +1,20 @@
 package com.entertainment.user.service;
 
+import com.entertainment.user.entity.Profile;
+import com.entertainment.user.repository.ProfileRepository;
 import com.entertainment.user.request.ChangePwReq;
+import com.entertainment.user.request.CodeReq;
+import com.entertainment.user.request.ProfileRegisterReq;
 import com.entertainment.user.request.RegisterReq;
 import com.entertainment.user.entity.User;
 import com.entertainment.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,10 +27,15 @@ public class UserServiceImpl implements UserService{
     @Autowired
     private UserRepository userRepository;
 
+
+    @Autowired
+    private ProfileRepository profileRepository;
+
     @Autowired
     private JavaMailSender javaMailSender;
 
     public static final String ePw = createKey();
+
 
     @Override
     public void registerUser(RegisterReq registerDto) {
@@ -30,6 +43,10 @@ public class UserServiceImpl implements UserService{
         User user = new User(registerDto);
         System.out.println(user.getEmail()+" "+user.getNickname()+" "+user.getPassword());
         userRepository.save(user);
+        ProfileRegisterReq profileRegisterReq=new ProfileRegisterReq(user.getId(),user.getNickname());
+        Profile profile = new Profile(profileRegisterReq);
+        profile.setUser(userRepository.getById(user.getId()));
+        profileRepository.save(profile);
     }
 
     @Override
@@ -59,6 +76,7 @@ public class UserServiceImpl implements UserService{
         List<User> userList = userRepository.findAll();
         for(User u: userList){
             if(u.getEmail().equals(email) && u.getPassword().equals(password)){
+
                 return true;
             }
         }
@@ -96,10 +114,18 @@ public class UserServiceImpl implements UserService{
         }
     }
 
-    public boolean sendMail(int userId){
-
-        User user = userRepository.getById(userId);
-
+    public boolean sendMail(String email){
+        List<User> userList = userRepository.findAll();
+        User user=new User(); //= userRepository.getById(userId);
+        user.setId(0);
+        for(User u: userList){
+            if(u.getEmail().equals(email)){
+                user = u;
+            }
+        }
+        if(user.getId()==0){
+            return false;       //이메일 존재 X
+        }
         //수신 대상을 담을 arraylist
         ArrayList<String> toUserList = new ArrayList<>();
         //수신 대상 추가
@@ -118,15 +144,28 @@ public class UserServiceImpl implements UserService{
         javaMailSender.send(simpleMailMessage);
         user.setCode(ePw);
         userRepository.save(user);
-        return false;
+        return true;
     }
 
     @Override
-    public boolean changePassword(int userId, ChangePwReq changePwReq) {
+    public boolean changePassword(String email, ChangePwReq changePwReq) {
         if(changePwReq.getPassword().equals(changePwReq.getPasswordCheck())){
-            User myUser = userRepository.getById(userId);
-            myUser.setPassword(changePwReq.getPassword());
-            userRepository.save(myUser);
+            List<User> userList = userRepository.findAll();
+            User user=new User(); //= userRepository.getById(userId);
+            user.setId(1);
+            for(User u: userList){
+                if(u.getEmail().equals(email)){
+                    System.out.println(email);
+                    user=u;
+                    break;
+                }
+            }
+            if(user.getId()==1){
+                return false;       //이메일 존재 X
+            }
+
+            user.setPassword(changePwReq.getPassword());
+            userRepository.save(user);
             //System.out.println("password changed");
             return true;
         }else{
@@ -137,13 +176,23 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public boolean authorization(int userId, String code) {
-
-        User user = userRepository.getById(userId);
+    public boolean authorization(CodeReq codeReq) {
+        List<User> userList = userRepository.findAll();
+        User user=new User(); //= userRepository.getById(userId);
+        user.setId(0);
+        for(User u: userList){
+            if(u.getEmail().equals(codeReq.getEmail())){
+                user = u;
+            }
+        }
+        if(user.getId()==0){
+            return false;       //이메일 존재 X
+        }
+        //User user = userRepository.getById(userId);
         //System.out.println((user.getId()+" "+user.getCode()));
 
-        System.out.println((code+" "+user.getCode()));
-        if(code.equals(user.getCode())){
+        System.out.println((codeReq.getCode()+" "+user.getCode()));
+        if(codeReq.getCode().equals(user.getCode())){
             System.out.println("코드 승인 완료");
             return true;
         }else{
@@ -151,6 +200,34 @@ public class UserServiceImpl implements UserService{
             return false;
         }
     }
+
+    @Override
+    public String showProfile(int profileId) {
+        List<Profile> list = profileRepository.findAll();
+        String s="";
+        for(Profile p : list){
+            if(p.getId()==profileId){
+                //"{\"code\": \"200, SUCCESS\", \"message\": "+"님 프로필이 조회되었습니다.}";
+                s+="{\"id\": "+p.getId()+", \"nickname\": \""+p.getNickname()+"\", \"score\": "+p.getScore()+", \"win_number\": "+p.getWin_number()+", \"lose_number\": "+p.getLose_number()+", \"user_id\": "+p.getUser().getId()+"}";
+                return s;
+            }
+        }
+        return s;
+    }
+
+//    @Override
+//    public String showProfile(String nickName) {
+//        List<Profile> list = profileRepository.findAll();
+//        String s="";
+//        for(Profile p : list){
+//            if(p.getNickname().equals(nickName)){
+//                //"{\"code\": \"200, SUCCESS\", \"message\": "+"님 프로필이 조회되었습니다.}";
+//                s+="{\n\t\"id\": "+p.getId()+",\n\t\"nickname\": \""+p.getNickname()+"\",\n\t\"score\": "+p.getScore()+",\n\t\"win_number\": "+p.getWin_number()+",\n\t\"lose_number\": "+p.getLose_number()+",\n\t\"user_id\": "+p.getUser().getId()+"\n}";
+//                return s;
+//            }
+//        }
+//        return s;
+//    }
 
     public static String createKey() {
         StringBuffer key = new StringBuffer();
@@ -175,5 +252,16 @@ public class UserServiceImpl implements UserService{
             }
         }
         return key.toString();
+    }
+
+    public void clearUser(){
+        userRepository.deleteAll();
+    }
+
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userRepository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
     }
 }
