@@ -1,5 +1,6 @@
 package com.entertainment.user.entity;
 
+import com.entertainment.user.request.ProfileRegisterReq;
 import lombok.*;
 
 import javax.persistence.*;
@@ -33,8 +34,9 @@ public class Profile {
     private int lose_number;       //사용자의 진 횟수
 
     // 이부분은 Spring Security 공부 후 추가 구현 필요//////////////
-    @Column(nullable = false)
-    private boolean login_status;   //로그인 유무
+    // Session을 사용하게 되면 변수가 필요없음.
+//    @Column(nullable = false)
+//    private boolean login_status;   //로그인 유무
     ///////////////////////////////////////////////////////////
 
     @OneToOne
@@ -49,11 +51,12 @@ public class Profile {
     @OneToMany(mappedBy = "profile")
     private List<Friend> friendList = new ArrayList<>();
 
-//    public Profile(ProfileReq profileReq) {
-//        this.id = profileReq.id;
-//        this.nickname = profileReq.nickname;
-//        this.score = 1000;
-//        this.win_number = 0;
-//        this.lose_number = 0;
-//    }
+    public Profile(ProfileRegisterReq profileRegisterReq) {
+        this.nickname = profileRegisterReq.getNickname();
+        this.id = profileRegisterReq.getId();
+        this.score = 1000;
+        this.win_number = 0;
+        this.lose_number = 0;
+        this.room=null;
+    }
 }
