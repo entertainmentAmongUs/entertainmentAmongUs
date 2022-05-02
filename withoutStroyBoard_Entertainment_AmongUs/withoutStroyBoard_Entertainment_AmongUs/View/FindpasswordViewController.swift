@@ -285,7 +285,7 @@ class FindpasswordViewController: UIViewController {
                 return
             }
             
-            let URL = "http://3.37.123.140:8080/emails/\(String(email!))/email"
+            let URL = "http://3.39.193.198:8080/emails/\(String(email!))/email"
             
             let param: Parameters = [
                 "email" : email!
@@ -341,7 +341,7 @@ class FindpasswordViewController: UIViewController {
                 return
             }
             
-            let URL = "http://3.37.123.140:8080/emails/email-code"
+            let URL = "http://3.39.193.198:8080/emails/email-code"
             
             let alamo = AF.request(URL, method: .post, parameters: param,encoding: JSONEncoding.default).validate(statusCode: 200..<300)
             //결과값으로 문자열을 받을 때 사용

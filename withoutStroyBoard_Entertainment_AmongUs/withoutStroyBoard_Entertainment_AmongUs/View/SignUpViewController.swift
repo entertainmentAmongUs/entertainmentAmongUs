@@ -496,7 +496,7 @@ class SignUpViewController: UIViewController {
             return
         }
 
-        let URL = "http://3.37.123.140:8080/users/new-user"
+        let URL = "http://3.39.193.198:8080/users/new-user"
         
         let param: Parameters = [
             "email" : email!,
@@ -585,7 +585,7 @@ class SignUpViewController: UIViewController {
             self.view.makeToast("이메일 형식이 잘못되었습니다.", duration: 1.0, position: .bottom)
             return
         }
-        let URL = "http://3.37.123.140:8080/users/checkEmail/\(String(email!))"
+        let URL = "http://3.39.193.198:8080/users/checkEmail/\(String(email!))"
         
         
 
@@ -637,7 +637,7 @@ class SignUpViewController: UIViewController {
         ]
         
         
-        let URL = "http://3.37.123.140:8080/users/checkNickname/\(String(nickname!))"
+        let URL = "http://3.39.193.198:8080/users/checkNickname/\(String(nickname!))"
 
         
         
