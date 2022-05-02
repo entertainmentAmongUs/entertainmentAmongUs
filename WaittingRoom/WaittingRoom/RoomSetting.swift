@@ -192,7 +192,7 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
             
             view.addSubview(infoLable)
             
-            infoLable.text = games[Myroom.gameType].info
+            infoLable.text = games[Myroom.gameType.rawValue].info
             infoLable.font = .systemFont(ofSize: 18, weight: .medium)
             infoLable.backgroundColor = .systemGray6
             infoLable.clipsToBounds = true
@@ -228,10 +228,10 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
                     picker.reloadComponent(0)
                 }
                 action.title = i.title
-                segment.insertSegment(action: action, at: i.gameId, animated: true)
+                segment.insertSegment(action: action, at: i.gameId.rawValue, animated: true)
             }
             
-            segment.selectedSegmentIndex = Myroom.gameType
+            segment.selectedSegmentIndex = Myroom.gameType.rawValue
             
             segment.translatesAutoresizingMaskIntoConstraints = false
             segment.leadingAnchor.constraint(equalTo: label.trailingAnchor, constant: 15).isActive = true
@@ -514,7 +514,7 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
 
         
         Myroom.roomTitle = title
-        Myroom.gameType = gameType
+        Myroom.gameType = GameType(rawValue: gameType)!
         Myroom.maxUserNumber = maxUserNumber + 3
         Myroom.category = Category(categoryID: subject.selectedRow(inComponent: 1), subjectID: subject.selectedRow(inComponent: 0))
         

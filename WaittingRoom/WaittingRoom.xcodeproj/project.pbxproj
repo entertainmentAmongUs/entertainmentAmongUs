@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0D9DBA6C2820623500CF93A0 /* Lobby.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D9DBA6B2820623500CF93A0 /* Lobby.swift */; };
+		0D9DBA6E282062B100CF93A0 /* LobbyModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D9DBA6D282062B100CF93A0 /* LobbyModel.swift */; };
+		0D9DBA70282062C200CF93A0 /* RoomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D9DBA6F282062C200CF93A0 /* RoomCell.swift */; };
+		0D9DBA722820641F00CF93A0 /* SocketIOManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D9DBA712820641F00CF93A0 /* SocketIOManager.swift */; };
 		0DD3623727C0D7AA00C206E0 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD3623627C0D7AA00C206E0 /* Model.swift */; };
 		0DD3623B27C26A6D00C206E0 /* ChattingRoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD3623A27C26A6D00C206E0 /* ChattingRoom.swift */; };
 		0DD3623D27C54B0E00C206E0 /* RoomSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD3623C27C54B0E00C206E0 /* RoomSetting.swift */; };
@@ -23,6 +27,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0D9DBA6B2820623500CF93A0 /* Lobby.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Lobby.swift; sourceTree = "<group>"; };
+		0D9DBA6D282062B100CF93A0 /* LobbyModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LobbyModel.swift; sourceTree = "<group>"; };
+		0D9DBA6F282062C200CF93A0 /* RoomCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RoomCell.swift; sourceTree = "<group>"; };
+		0D9DBA712820641F00CF93A0 /* SocketIOManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocketIOManager.swift; sourceTree = "<group>"; };
 		0DD3623627C0D7AA00C206E0 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 		0DD3623A27C26A6D00C206E0 /* ChattingRoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChattingRoom.swift; sourceTree = "<group>"; };
 		0DD3623C27C54B0E00C206E0 /* RoomSetting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomSetting.swift; sourceTree = "<group>"; };
@@ -77,11 +85,15 @@
 			children = (
 				0DD99D5F27BA9004009FAD3F /* WaittingRoom.swift */,
 				0DD3623C27C54B0E00C206E0 /* RoomSetting.swift */,
+				0D9DBA6B2820623500CF93A0 /* Lobby.swift */,
 				0DD3623A27C26A6D00C206E0 /* ChattingRoom.swift */,
 				0DD99D9327BE4B7B009FAD3F /* ProfileViewController.swift */,
+				0D9DBA6D282062B100CF93A0 /* LobbyModel.swift */,
+				0D9DBA6F282062C200CF93A0 /* RoomCell.swift */,
 				0DD99D9127BCFAD2009FAD3F /* ChatCell.swift */,
 				0DD99D8F27BC0156009FAD3F /* ProfileCell.swift */,
 				0DD3623627C0D7AA00C206E0 /* Model.swift */,
+				0D9DBA712820641F00CF93A0 /* SocketIOManager.swift */,
 				0DD99D5B27BA9004009FAD3F /* AppDelegate.swift */,
 				0DD99D5D27BA9004009FAD3F /* SceneDelegate.swift */,
 				0DD99D6127BA9004009FAD3F /* Main.storyboard */,
@@ -106,7 +118,6 @@
 				66E706B07F53DD33EBCF8006 /* Pods-WaittingRoom.debug.xcconfig */,
 				2D6CB041CA958D2FD7585836 /* Pods-WaittingRoom.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -231,9 +242,13 @@
 				0DD99D9427BE4B7B009FAD3F /* ProfileViewController.swift in Sources */,
 				0DD99D6027BA9004009FAD3F /* WaittingRoom.swift in Sources */,
 				0DD99D9027BC0156009FAD3F /* ProfileCell.swift in Sources */,
+				0D9DBA6C2820623500CF93A0 /* Lobby.swift in Sources */,
 				0DD99D5C27BA9004009FAD3F /* AppDelegate.swift in Sources */,
 				0DD99D9227BCFAD2009FAD3F /* ChatCell.swift in Sources */,
+				0D9DBA722820641F00CF93A0 /* SocketIOManager.swift in Sources */,
 				0DD99D5E27BA9004009FAD3F /* SceneDelegate.swift in Sources */,
+				0D9DBA70282062C200CF93A0 /* RoomCell.swift in Sources */,
+				0D9DBA6E282062B100CF93A0 /* LobbyModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

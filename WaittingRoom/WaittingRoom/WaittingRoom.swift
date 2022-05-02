@@ -388,6 +388,7 @@ class WaittingRoom: UIViewController, UICollectionViewDelegate, UICollectionView
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.view.backgroundColor = .white
         
         self.addWaittingUserView()
         self.addButtons()

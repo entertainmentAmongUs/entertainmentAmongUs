@@ -16,7 +16,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
-        guard let _ = (scene as? UIWindowScene) else { return }
+        guard let scene = (scene as? UIWindowScene) else { return }
+        
+        window = UIWindow(frame: scene.coordinateSpace.bounds)
+        window?.windowScene = scene
+        
+        let lobby = Lobby()
+        let navigationController = UINavigationController(rootViewController: lobby)
+        
+        window?.rootViewController = navigationController
+        window?.makeKeyAndVisible()
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -29,6 +38,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneDidBecomeActive(_ scene: UIScene) {
         // Called when the scene has moved from an inactive state to an active state.
         // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
+        
+        SocketIOManager.shared.establishConnection()
+        
     }
 
     func sceneWillResignActive(_ scene: UIScene) {
@@ -45,6 +57,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Called as the scene transitions from the foreground to the background.
         // Use this method to save data, release shared resources, and store enough scene-specific state information
         // to restore the scene back to its current state.
+        
+        SocketIOManager.shared.closeConnection()
+        
     }
 
 
