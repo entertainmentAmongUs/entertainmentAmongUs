@@ -277,7 +277,7 @@ class ChangePasswordViewController: UIViewController {
         }
         
         
-        let URL = "http://3.37.123.140:8080/users/\(String(email!))/password"
+        let URL = "http://3.39.193.198:8080/users/\(String(email!))/password"
         
         let alamo = AF.request(URL, method: .patch,parameters: param).validate(statusCode: 200..<300)
         

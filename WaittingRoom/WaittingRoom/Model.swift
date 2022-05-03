@@ -19,10 +19,17 @@ struct Friend {
 /* 게임 타입(라이어, 이미지)에 대한 정보 */
 struct Game {
     
-    let gameId: Int
+    let gameId: GameType
     let title: String
     let info: String
     let maxUserNumber: Int
+    
+}
+
+enum GameType: Int {
+    
+    case liar
+    case image
     
 }
 
@@ -41,8 +48,8 @@ struct Subject {
 /* 게임방에 대한 정보 */
 struct Room {
     
-    let roomID: Int
-    var gameType: Int
+    let roomID: String
+    var gameType: GameType
     var password: String?
     var category: Category
     var maxUserNumber: Int
@@ -51,6 +58,7 @@ struct Room {
     var roomTitle: String
     
 }
+
 
 /* 유저의 프로필 정보 */
 struct Profile {
@@ -84,7 +92,7 @@ struct FriendRequest {
 }
 
 /* 설정 가능한 게임 목록 */
-let games = [Game(gameId: 0, title: "라이어 게임", info: "거짓말하는 사람을 찾아내는 게임입니다.", maxUserNumber: 8), Game(gameId: 1, title: "이미지 게임", info: "이미지를 보고 무엇인지 맞추는 게임입니다.", maxUserNumber: 6)]
+let games = [Game(gameId: .liar, title: "라이어 게임", info: "거짓말하는 사람을 찾아내는 게임입니다.", maxUserNumber: 8), Game(gameId: .image, title: "이미지 게임", info: "이미지를 보고 무엇인지 맞추는 게임입니다.", maxUserNumber: 6)]
 
 /* 설정 가능한 주제 카테고리 목록 */
 let subjects = [Subject(title: "인물", category: ["배우", "가수", "유명인사", "아이돌"]), Subject(title: "문화", category: ["음악", "영화"])]
@@ -117,7 +125,7 @@ var myFriends: [Friend] = [
 var myFriendRequest: [FriendRequest] = []
 
 /* 현재 대기중인 방 정보 */
-var Myroom = Room(roomID: 100, gameType: 0, password: nil, category: Category(categoryID: 1, subjectID: 1), maxUserNumber: 6, masterUserID: 99, users: profiles, roomTitle: "즐겜합시다~")
+var Myroom = Room(roomID: "roomExample", gameType: .liar, password: nil, category: Category(categoryID: 1, subjectID: 1), maxUserNumber: 6, masterUserID: 99, users: profiles, roomTitle: "즐겜합시다~")
 
 /* 방에서 입력된 채팅 데이터 */
 var chattings: [Chat] = [Chat(nickname: "김깝심", message: "레디하세요"),

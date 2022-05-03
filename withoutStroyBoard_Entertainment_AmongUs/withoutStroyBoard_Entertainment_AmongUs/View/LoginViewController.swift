@@ -311,7 +311,7 @@ class LoginViewController: UIViewController {
             return
         }
         
-        let URL = "http://3.37.123.140:8080/users/login"
+        let URL = "http://3.39.193.198:8080/users/login"
         
         let param: Parameters = [
             "email":id!,
