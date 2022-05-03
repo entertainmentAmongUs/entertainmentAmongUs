@@ -135,11 +135,17 @@ class LobbyChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataS
         
         /* 키보드 등장 후 테이블 뷰 스크롤을  맨 밑으로 이동 */
         
-        /*
+        
         guard let table = self.chatTableView else { return }
         
-        table.scrollToRow(at: IndexPath(row: chattings.count-1, section: 0), at: .bottom, animated: true)
-        */
+        let chatCount = lobbyChattings.count
+        
+        if chatCount > 0 {
+            
+            table.scrollToRow(at: IndexPath(row: lobbyChattings.count-1, section: 0), at: .bottom, animated: true)
+            
+        }
+        
     }
     
     
@@ -151,6 +157,7 @@ class LobbyChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataS
         
         chatTableView?.reloadData()
         
+        chatTableView?.scrollToRow(at: IndexPath(row: lobbyChattings.count-1, section: 0), at: .bottom, animated: true)
         
     }
     

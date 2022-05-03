@@ -212,6 +212,8 @@ class Lobby: UIViewController  {
         
         chatTableView?.reloadData()
         
+        chatTableView?.scrollToRow(at: IndexPath(row: lobbyChattings.count-1, section: 0), at: .bottom, animated: true)
+        
         
     }
     
