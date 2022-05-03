@@ -12,7 +12,6 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
     
     // MARK: - Properties
     
-    
     /* MARK: Views */
     
     var contentView: UIView?

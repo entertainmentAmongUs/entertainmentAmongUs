@@ -220,7 +220,7 @@ class ProfileViewController: UIViewController {
     @objc func touchRequestFriendButton(_ sender: UIButton) {
         
         /* 친구 요청 객체 생성 */
-        let request = FriendRequest(senderID: myProfile.userID!, responderID: userProfile.userID!, status: 0)
+        let request = FriendRequest(senderID: myProfile.userID, responderID: userProfile.userID, status: 0)
         
         myFriendRequest.append(request)
         

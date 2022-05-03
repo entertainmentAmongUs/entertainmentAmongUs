@@ -9,6 +9,7 @@ import UIKit
 import SocketIO
 
 class SocketIOManager: NSObject {
+    
     static let shared = SocketIOManager()
     
 //    var manager = SocketManager(socketURL: URL(string: "http://localhost:8080")!)
@@ -19,9 +20,19 @@ class SocketIOManager: NSObject {
     
     var socket: SocketIOClient!
     
-    func establishConnection() {
+    func establishConnection(userId: Int, nickName: String) {
         
+        // 웹소켓 서버에 연결 시도
         socket.connect()
+        
+        // 연결 완료되면 서버로 내 정보를 담은 login 이벤트 발송
+        socket.on("connect") { [unowned self] _,_ in
+            
+            let userData: [String:Any] = ["userId":userId, "nickName":nickName]
+            
+            socket.emit("login", userData)
+            
+        }
         
     }
     
@@ -31,10 +42,42 @@ class SocketIOManager: NSObject {
         
     }
     
+    func getRoomList(completionHandler: @escaping (_ roomList: [[String:Any]]) -> Void) {
+        
+        socket.on("roomList") { dataArray, ack in
+            
+            completionHandler(dataArray[0] as! [[String:Any]])
+            
+        }
+        
+    }
+    
+    func getLobbyChatting() {
+        
+        socket.on("newLobbyChatMessage") { dataArray, ack in
+            
+            NotificationCenter.default.post(name: Notification.Name("newLobbyChatMessageNotification"), object: dataArray[0] as! [String: String])
+            
+        }
+        
+    }
+    
+    func getConnectedUserList() {
+        
+        
+        socket.on("connectedUserList") { dataArray, ack in
+            
+            NotificationCenter.default.post(name: Notification.Name("getConnectedUserListNotification"), object: dataArray[0] as! [[String: Any]])
+            
+        }
+        
+    }
+    
+    
     func sendMessage(message: String, nickname: String){
         
-//        socket.emit("chatMessage", nickname, message)
-        let chatData: [String: Any] = ["nickName": nickname, "message": message]
+        let chatData: [String: String] = ["nickName": nickname, "message": message]
+        
         socket.emit("lobbyChatMessage", chatData)
         
     }
@@ -87,31 +130,26 @@ class SocketIOManager: NSObject {
         }
     }
     
-    func connectToServerWithNickName(nickname: String, completionHandler: @escaping (_ userList: [[String: AnyObject]]) -> Void) {
-        
-//        socket.emit("connectUser", nickname)
-        let data: [String: Any] = ["userId": 150, "nickName": nickname]
-        socket.emit("login", data)
-        
-//        socket.emit("join", "room1")
+    func connectToServer(completionHandler: @escaping (_ userList: [[String: Any]]) -> Void) {
         
         /*
-        socket.on("userList") { dataArray, ack in
-            completionHandler(dataArray[0] as! [[String: AnyObject]])
-        }
-        */
+        let data: [String: Any] = ["userId": myProfile.userID, "nickName": myProfile.nickname]
+        
+        socket.emit("login", data)
+        
         
         socket.on("connectedUserList") { dataArray, ack in
-//            let userList: [[String:Any]] = dataArray[0] as! [[String:Any]]
-//            print(userList[0]["nickName"])
-            print("connectedUserList")
+
+            connectedUserList = dataArray[0] as! [[String:Any]]
         }
         
         socket.on("roomList") { dataArray, ack in
-            print("roomList")
+            
+            roomList = dataArray[0] as! [[String:Any]]
+         
         }
+        */
         
-//        listenForOtherMessage()
         
     }
     
@@ -163,13 +201,10 @@ class SocketIOManager: NSObject {
         
     }
     
-    override init(){
+    override private init(){
         super.init()
         
         socket = self.manager.socket(forNamespace: "/")
-        
-        
-//        socket.emit("join", "room1")
         
         
     }

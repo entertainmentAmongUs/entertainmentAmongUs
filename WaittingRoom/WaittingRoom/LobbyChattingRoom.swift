@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
+class LobbyChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
 
     
     // MARK: - Properties
@@ -19,6 +19,10 @@ class ChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataSource
     /* MARK: Others */
     let chatIdentifier = "chat"
     var textFieldBottomConstraint: NSLayoutConstraint?
+    
+    var myNickname: String
+    
+    var lobbyChattings: [[String:String]]
     
     
     // MARK: - Method
@@ -131,9 +135,22 @@ class ChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataSource
         
         /* 키보드 등장 후 테이블 뷰 스크롤을  맨 밑으로 이동 */
         
+        /*
         guard let table = self.chatTableView else { return }
         
         table.scrollToRow(at: IndexPath(row: chattings.count-1, section: 0), at: .bottom, animated: true)
+        */
+    }
+    
+    
+    @objc func getNewLobbyChatting(noti:Notification) {
+        
+        let newLobbyChat = noti.object as! [String:String]
+        
+        lobbyChattings.append(newLobbyChat)
+        
+        chatTableView?.reloadData()
+        
         
     }
     
@@ -165,18 +182,20 @@ class ChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataSource
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        return chattings.count
+        return lobbyChattings.count
     }
 
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
         let cell = tableView.dequeueReusableCell(withIdentifier: self.chatIdentifier, for: indexPath) as! ChatCell
         
-        let info = chattings[indexPath.row]
-        cell.nickname?.text = info.nickname
-        cell.chatting?.text = info.message
+        let chat = lobbyChattings[indexPath.row]
+        cell.nickname?.text = chat["nickName"]
+        cell.chatting?.text = chat["message"]
         
         return cell
+        
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -191,6 +210,7 @@ class ChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataSource
         
         /* 채팅 리스트에 새로운 채팅 추가 및 채팅 테이블 뷰 갱신 */
         
+        /*
         guard let table = self.chatTableView else { return false }
         guard let message = textField.text else { return false }
         
@@ -205,6 +225,12 @@ class ChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataSource
         textField.text = nil
         
         self.reloadChattings(index)
+        */
+        
+        guard let message = textField.text else { return false }
+        
+        SocketIOManager.shared.sendMessage(message: message, nickname: self.myNickname)
+        textField.text = nil
         
         return true
         
@@ -214,13 +240,15 @@ class ChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataSource
     // MARK: - Initialization
     
     required init?(coder: NSCoder) {
-        super.init(coder: coder)
+        fatalError("fatal Error")
     }
     
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+    init(nickName: String, chattings: [[String:String]]) {
         
-        /* 뷰 컨트롤러 설정 */
+        self.lobbyChattings = chattings
+        self.myNickname = nickName
+        
+        super.init(nibName: nil, bundle: nil)
         
         self.modalTransitionStyle = .coverVertical
         self.modalPresentationStyle = .pageSheet
@@ -230,10 +258,13 @@ class ChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataSource
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardDidShow(_:)), name: UIResponder.keyboardDidShowNotification, object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(getNewLobbyChatting(noti:)), name: Notification.Name("newLobbyChatMessageNotification"), object: nil)
+        
     }
     
     deinit {
-        print("ChattingRoom deinit")
+        print("LobbyChattingRoom deinit")
     }
 
 }
