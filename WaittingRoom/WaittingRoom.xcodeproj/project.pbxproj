@@ -11,6 +11,10 @@
 		0D9DBA6E282062B100CF93A0 /* LobbyModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D9DBA6D282062B100CF93A0 /* LobbyModel.swift */; };
 		0D9DBA70282062C200CF93A0 /* RoomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D9DBA6F282062C200CF93A0 /* RoomCell.swift */; };
 		0D9DBA722820641F00CF93A0 /* SocketIOManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D9DBA712820641F00CF93A0 /* SocketIOManager.swift */; };
+		0D9DBB5C2821A4B900CF93A0 /* SideMenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D9DBB5B2821A4B900CF93A0 /* SideMenuViewController.swift */; };
+		0D9DBB5E2821A96500CF93A0 /* Singleton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D9DBB5D2821A96500CF93A0 /* Singleton.swift */; };
+		0D9DBB602821B47500CF93A0 /* UserCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D9DBB5F2821B47500CF93A0 /* UserCell.swift */; };
+		0D9DBB622821CD5400CF93A0 /* RoomCreating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D9DBB612821CD5400CF93A0 /* RoomCreating.swift */; };
 		0DD3623727C0D7AA00C206E0 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD3623627C0D7AA00C206E0 /* Model.swift */; };
 		0DD3623B27C26A6D00C206E0 /* LobbyChattingRoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD3623A27C26A6D00C206E0 /* LobbyChattingRoom.swift */; };
 		0DD3623D27C54B0E00C206E0 /* RoomSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD3623C27C54B0E00C206E0 /* RoomSetting.swift */; };
@@ -31,6 +35,10 @@
 		0D9DBA6D282062B100CF93A0 /* LobbyModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LobbyModel.swift; sourceTree = "<group>"; };
 		0D9DBA6F282062C200CF93A0 /* RoomCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RoomCell.swift; sourceTree = "<group>"; };
 		0D9DBA712820641F00CF93A0 /* SocketIOManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocketIOManager.swift; sourceTree = "<group>"; };
+		0D9DBB5B2821A4B900CF93A0 /* SideMenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideMenuViewController.swift; sourceTree = "<group>"; };
+		0D9DBB5D2821A96500CF93A0 /* Singleton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Singleton.swift; sourceTree = "<group>"; };
+		0D9DBB5F2821B47500CF93A0 /* UserCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCell.swift; sourceTree = "<group>"; };
+		0D9DBB612821CD5400CF93A0 /* RoomCreating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomCreating.swift; sourceTree = "<group>"; };
 		0DD3623627C0D7AA00C206E0 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 		0DD3623A27C26A6D00C206E0 /* LobbyChattingRoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LobbyChattingRoom.swift; sourceTree = "<group>"; };
 		0DD3623C27C54B0E00C206E0 /* RoomSetting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomSetting.swift; sourceTree = "<group>"; };
@@ -85,7 +93,11 @@
 			children = (
 				0DD99D5F27BA9004009FAD3F /* WaittingRoom.swift */,
 				0DD3623C27C54B0E00C206E0 /* RoomSetting.swift */,
+				0D9DBB612821CD5400CF93A0 /* RoomCreating.swift */,
 				0D9DBA6B2820623500CF93A0 /* Lobby.swift */,
+				0D9DBB5B2821A4B900CF93A0 /* SideMenuViewController.swift */,
+				0D9DBB5F2821B47500CF93A0 /* UserCell.swift */,
+				0D9DBB5D2821A96500CF93A0 /* Singleton.swift */,
 				0DD3623A27C26A6D00C206E0 /* LobbyChattingRoom.swift */,
 				0DD99D9327BE4B7B009FAD3F /* ProfileViewController.swift */,
 				0D9DBA6D282062B100CF93A0 /* LobbyModel.swift */,
@@ -240,14 +252,18 @@
 				0DD3623D27C54B0E00C206E0 /* RoomSetting.swift in Sources */,
 				0DD3623B27C26A6D00C206E0 /* LobbyChattingRoom.swift in Sources */,
 				0DD99D9427BE4B7B009FAD3F /* ProfileViewController.swift in Sources */,
+				0D9DBB5C2821A4B900CF93A0 /* SideMenuViewController.swift in Sources */,
 				0DD99D6027BA9004009FAD3F /* WaittingRoom.swift in Sources */,
 				0DD99D9027BC0156009FAD3F /* ProfileCell.swift in Sources */,
 				0D9DBA6C2820623500CF93A0 /* Lobby.swift in Sources */,
+				0D9DBB602821B47500CF93A0 /* UserCell.swift in Sources */,
 				0DD99D5C27BA9004009FAD3F /* AppDelegate.swift in Sources */,
 				0DD99D9227BCFAD2009FAD3F /* ChatCell.swift in Sources */,
 				0D9DBA722820641F00CF93A0 /* SocketIOManager.swift in Sources */,
 				0DD99D5E27BA9004009FAD3F /* SceneDelegate.swift in Sources */,
 				0D9DBA70282062C200CF93A0 /* RoomCell.swift in Sources */,
+				0D9DBB5E2821A96500CF93A0 /* Singleton.swift in Sources */,
+				0D9DBB622821CD5400CF93A0 /* RoomCreating.swift in Sources */,
 				0D9DBA6E282062B100CF93A0 /* LobbyModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

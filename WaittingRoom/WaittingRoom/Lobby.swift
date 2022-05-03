@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SideMenu
 
 class Lobby: UIViewController  {
     
@@ -14,7 +15,6 @@ class Lobby: UIViewController  {
     var sideButton: UIButton?
     
     var roomListTableView: UITableView?
-    var roomListTableViewHeightConstraint: NSLayoutConstraint?
     let roomCellIdentifier = "roomCell"
     
     var roomCreateButton: UIButton?
@@ -34,11 +34,11 @@ class Lobby: UIViewController  {
     var lobbyChattings: [[String:String]] = []
     
     
-    lazy var rightButton: UIBarButtonItem = {
-            let button = UIBarButtonItem()
-            
-            return button
-        }()
+    lazy var sideMenuButton: UIBarButtonItem = {
+        let button = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(touchSideMenuButton(_:)))
+        
+        return button
+    }()
     
     
     
@@ -74,10 +74,10 @@ class Lobby: UIViewController  {
     func addButton(){
         
         guard let roomListTableView = self.roomListTableView else { return }
-
+        
         let searchButton = UIButton(type: .system)
         searchButton.setTitle("방 검색", for: .normal)
-        searchButton.titleLabel?.font = .systemFont(ofSize: 18,weight: .semibold)
+        searchButton.titleLabel?.font = .systemFont(ofSize: 20,weight: .regular)
         searchButton.addTarget(self, action: #selector(self.touchRoomSearchButton(_:)), for: .touchUpInside)
         searchButton.setTitleColor(.systemBlue, for: .normal)
         
@@ -86,7 +86,7 @@ class Lobby: UIViewController  {
         
         let createButton = UIButton(type: .system)
         createButton.setTitle("방 생성", for: .normal)
-        createButton.titleLabel?.font = UIFont.systemFont(ofSize: 18,weight: .semibold)
+        createButton.titleLabel?.font = UIFont.systemFont(ofSize: 20,weight: .regular)
         createButton.addTarget(self, action: #selector(self.touchRoomCreateButton(_:)), for: .touchUpInside)
         createButton.setTitleColor(.systemBlue, for: .normal)
         
@@ -94,7 +94,7 @@ class Lobby: UIViewController  {
         
         
         let stackView: UIStackView = {
-           let stackView = UIStackView(arrangedSubviews: [searchButton, createButton])
+            let stackView = UIStackView(arrangedSubviews: [searchButton, createButton])
             stackView.translatesAutoresizingMaskIntoConstraints = false
             stackView.axis = .horizontal
             stackView.alignment = .fill
@@ -116,7 +116,7 @@ class Lobby: UIViewController  {
     func addChatView(){
         
         guard let buttonStack = self.buttonStack else { return }
-
+        
         let textField = UITextField()
         
         self.view.addSubview(textField)
@@ -165,38 +165,54 @@ class Lobby: UIViewController  {
     
     // MARK: Action Method
     
-    /*
-    @objc func presentSideMenu(_ sender: UIButton) {
+    
+    @objc func touchSideMenuButton(_ sender: UIButton) {
         /* 그냥 처음에 대충 넣은 것.
-        let sideBar = SideMenuViewController()
-        self.navigationController?.pushViewController(SideBar, animated: true)
-        
-        이번엔 present이용해서 사용.
-        present(sideBar, animated: true, completion: nil)
+         let sideBar = SideMenuViewController()
+         self.navigationController?.pushViewController(SideBar, animated: true)
+         
+         이번엔 present이용해서 사용.
+         present(sideBar, animated: true, completion: nil)
          */
         
-        let SideMenuViewController = SideMenuViewController()
-        let CustomSideMenuNavi = CustomSideMenuNavigation(rootViewController: SideMenuViewController)
-
+        let sideMenuViewController = SideMenuViewController(userList: self.connectedUserList)
+        let sideMenuNavi = SideMenuNavigationController(rootViewController: sideMenuViewController)
         
-        present(CustomSideMenuNavi,animated: true,completion: nil)
+        sideMenuViewController.navigationItem.title = "사이드바"
+        
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithTransparentBackground()
+        
+        
+        sideMenuNavi.navigationBar.scrollEdgeAppearance = appearance
+        sideMenuNavi.navigationBar.standardAppearance = appearance
+        
+        present(sideMenuNavi,animated: true,completion: nil)
+        
     }
     
-    */
+    
     
     @objc func touchRoomCreateButton(_ sender: UIButton){
         
         /*
-        let roomCreateButtonView = RoomCreateButtonController()
-        roomCreateButtonView.modalTransitionStyle = .crossDissolve
-        roomCreateButtonView.modalPresentationStyle = .overCurrentContext
-        //present로 화면 전환 해보는 것 응용함.
-        present(roomCreateButtonView,animated: true, completion: nil)
-        */
+         let roomCreateButtonView = RoomCreateButtonController()
+         roomCreateButtonView.modalTransitionStyle = .crossDissolve
+         roomCreateButtonView.modalPresentationStyle = .overCurrentContext
+         //present로 화면 전환 해보는 것 응용함.
+         present(roomCreateButtonView,animated: true, completion: nil)
+         */
+        
+        guard let height = self.roomListTableView?.frame.height else { return }
+        guard let top = self.navigationController?.navigationBar.frame.height else { return }
+        
+        let roomSettingController = RoomCreating(height, top)
+        
+        present(roomSettingController, animated: true)
         
     }
     
-     
+    
     @objc func touchRoomSearchButton(_ sender: UIButton){
         
         //let SignUpView = SignUpViewController()
@@ -248,7 +264,7 @@ class Lobby: UIViewController  {
             
         }
     }
-   
+    
     // MARK: - LifeCycle
     
     override func viewDidLoad() {
@@ -256,7 +272,7 @@ class Lobby: UIViewController  {
         super.viewDidLoad()
         self.view.backgroundColor = .white
         self.navigationItem.title = "로비"
-        self.navigationItem.rightBarButtonItem = self.rightButton
+        self.navigationItem.rightBarButtonItem = self.sideMenuButton
         
         self.addRoomListTableView()
         self.addButton()
@@ -288,10 +304,10 @@ class Lobby: UIViewController  {
         NotificationCenter.default.addObserver(self, selector: #selector(getConnectedUserList(noti:)), name: Notification.Name("getConnectedUserListNotification"), object: nil)
         
     }
-        
+    
     
 }
-    
+
 // MARK: - Extension
 
 extension Lobby: UITableViewDelegate, UITableViewDataSource {
@@ -306,22 +322,29 @@ extension Lobby: UITableViewDelegate, UITableViewDataSource {
     
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        //3번
+        
         if tableView == roomListTableView {
             
             let cell = tableView.dequeueReusableCell(withIdentifier: self.roomCellIdentifier, for: indexPath) as! RoomCell
+            
             let room = roomList[indexPath.row]
-            //RoomCell 변수 = model 변수
+            
+            
             cell.gameTypeLabel?.text = "\(room["gameType"] as! Int)"
             
             cell.roomTitleLabel?.text = room["title"] as? String
             
-            if room["password"] as! String == "" {
-                cell.keyImageView?.image = UIImage(systemName: "")
+            cell.keyImageView?.image = UIImage(systemName: "key")
+            
+            if let _ = room["password"] as? String {
+                
+                
+                
+            } else {
+                
+                cell.keyImageView?.alpha = 0
             }
-            else {
-                cell.keyImageView?.image = UIImage(systemName: "key")
-            }
+            
             
             cell.userCountLabel?.text = "\(room["maxUser"] as! Int)명"
             
@@ -424,5 +447,5 @@ extension Lobby: UITextFieldDelegate {
         return false
         
     }
-
+    
 }

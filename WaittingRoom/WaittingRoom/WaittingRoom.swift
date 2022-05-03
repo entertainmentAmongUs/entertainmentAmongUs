@@ -279,9 +279,9 @@ class WaittingRoom: UIViewController, UICollectionViewDelegate, UICollectionView
             return
         }
 
-
+        guard let top = self.navigationController?.navigationBar.frame.height else { return }
         
-        let view = RoomSetting(constraint.constant)
+        let view = RoomSetting(constraint.constant, top)
         
         self.present(view, animated: true, completion: nil)
         
