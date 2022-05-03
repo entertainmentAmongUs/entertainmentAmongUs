@@ -63,7 +63,7 @@ struct Room {
 /* 유저의 프로필 정보 */
 struct Profile {
     
-    var userID: Int?
+    var userID: Int
     var image: UIImage?
     var nickname: String
     var score: Int

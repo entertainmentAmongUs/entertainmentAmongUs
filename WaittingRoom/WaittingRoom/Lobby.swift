@@ -25,6 +25,14 @@ class Lobby: UIViewController  {
     var chatTableView: UITableView?
     let chatIdentifier = "chat"
     
+    var myUserId: Int
+    var myNickName: String
+    
+    
+    var connectedUserList: [[String:Any]] = []
+    var roomList: [[String:Any]] = []
+    var lobbyChattings: [[String:String]] = []
+    
     
     lazy var rightButton: UIBarButtonItem = {
             let button = UIBarButtonItem()
@@ -195,6 +203,51 @@ class Lobby: UIViewController  {
         //self.navigationController?.pushViewController(SignUpView, animated: true)
         
     }
+    
+    @objc func getNewLobbyChatting(noti:Notification) {
+        
+        let newLobbyChat = noti.object as! [String:String]
+        
+        lobbyChattings.append(newLobbyChat)
+        
+        chatTableView?.reloadData()
+        
+        chatTableView?.scrollToRow(at: IndexPath(row: lobbyChattings.count-1, section: 0), at: .bottom, animated: true)
+        
+        
+    }
+    
+    @objc func getConnectedUserList(noti:Notification) {
+        
+        let userList = noti.object as! [[String: Any]]
+        
+        self.connectedUserList = userList
+        
+    }
+    
+    // MARK: Function Method
+    
+    func tryConnectionToWebSocketServer(){
+        
+        SocketIOManager.shared.establishConnection(userId: self.myUserId, nickName: self.myNickName)
+        
+        
+    }
+    
+    func getLobbyData(){
+        
+        SocketIOManager.shared.getConnectedUserList()
+        
+        SocketIOManager.shared.getLobbyChatting()
+        
+        SocketIOManager.shared.getRoomList { [weak self] roomList in
+            
+            self?.roomList = roomList
+            
+            self?.roomListTableView?.reloadData()
+            
+        }
+    }
    
     // MARK: - LifeCycle
     
@@ -208,7 +261,34 @@ class Lobby: UIViewController  {
         self.addRoomListTableView()
         self.addButton()
         self.addChatView()
+        
+        tryConnectionToWebSocketServer()
+        getLobbyData()
+        
     }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        
+        
+    }
+    
+    // MARK: - Initialize
+    
+    required init?(coder: NSCoder) {
+        fatalError("fatal Error")
+    }
+    
+    init(id: Int, nickName: String) {
+        self.myUserId = id
+        self.myNickName = nickName
+        super.init(nibName: nil, bundle: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(getNewLobbyChatting(noti:)), name: Notification.Name("newLobbyChatMessageNotification"), object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(getConnectedUserList(noti:)), name: Notification.Name("getConnectedUserListNotification"), object: nil)
+        
+    }
+        
     
 }
     
@@ -218,7 +298,7 @@ extension Lobby: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        let numberOfRows = tableView == roomListTableView ? roomList.count : chattings.count
+        let numberOfRows = tableView == roomListTableView ? roomList.count : lobbyChattings.count
         
         return numberOfRows
         
@@ -230,20 +310,20 @@ extension Lobby: UITableViewDelegate, UITableViewDataSource {
         if tableView == roomListTableView {
             
             let cell = tableView.dequeueReusableCell(withIdentifier: self.roomCellIdentifier, for: indexPath) as! RoomCell
-            let info = roomList[indexPath.row]
+            let room = roomList[indexPath.row]
             //RoomCell 변수 = model 변수
-            cell.gameTypeLabel?.text = info.gametype
+            cell.gameTypeLabel?.text = "\(room["gameType"] as! Int)"
             
-            cell.roomTitleLabel?.text = info.roomname
+            cell.roomTitleLabel?.text = room["title"] as? String
             
-            if info.password == "" {
+            if room["password"] as! String == "" {
                 cell.keyImageView?.image = UIImage(systemName: "")
             }
             else {
                 cell.keyImageView?.image = UIImage(systemName: "key")
             }
             
-            cell.userCountLabel?.text = info.roompersonNum
+            cell.userCountLabel?.text = "\(room["maxUser"] as! Int)명"
             
             return cell
             
@@ -251,11 +331,11 @@ extension Lobby: UITableViewDelegate, UITableViewDataSource {
         else {
             
             let cell = tableView.dequeueReusableCell(withIdentifier: self.chatIdentifier, for: indexPath) as! ChatCell
-            let info = chattings[indexPath.row]
+            let chat = lobbyChattings[indexPath.row]
             //RoomCell 변수 = model 변수
             
-            cell.nickname?.text = info.nickname
-            cell.chatting?.text = info.message
+            cell.nickname?.text = chat["nickName"]
+            cell.chatting?.text = chat["message"]
             
             return cell
             
@@ -338,7 +418,7 @@ extension Lobby: UITextFieldDelegate {
     
     func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
         
-        let chatRoom = ChattingRoom()
+        let chatRoom = LobbyChattingRoom(nickName: self.myNickName, chattings: self.lobbyChattings)
         self.present(chatRoom, animated: true, completion: nil)
         
         return false

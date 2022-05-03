@@ -21,7 +21,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window = UIWindow(frame: scene.coordinateSpace.bounds)
         window?.windowScene = scene
         
-        let lobby = Lobby()
+        let lobby = Lobby(id: 1, nickName: "허균")
         let navigationController = UINavigationController(rootViewController: lobby)
         
         window?.rootViewController = navigationController
@@ -39,7 +39,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Called when the scene has moved from an inactive state to an active state.
         // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
         
+        /*
         SocketIOManager.shared.establishConnection()
+        SocketIOManager.shared.socket.connect()
+        SocketIOManager.shared.socket.on("connect") { _, _ in
+            
+            let data: [String: Any] = ["userId":111, "nickName":"예시입니다"]
+            SocketIOManager.shared.socket.emit("login", data)
+            
+        }
+         */
         
     }
 

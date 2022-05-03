@@ -231,7 +231,7 @@ class WaittingRoom: UIViewController, UICollectionViewDelegate, UICollectionView
         
         guard let collection = self.waitUserCollection else { return }
         
-        let new = Profile(userID: nil, image: nil, nickname: "", score: 0, winCount: 0, loseCount: 0)
+        let new = Profile(userID: 0, image: nil, nickname: "", score: 0, winCount: 0, loseCount: 0)
         
         Myroom.users.insert(new, at: 8)
         collection.insertItems(at: [IndexPath(row: 8, section: 0)])
@@ -377,9 +377,11 @@ class WaittingRoom: UIViewController, UICollectionViewDelegate, UICollectionView
     
     func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
         
-        let chatRoom = ChattingRoom()
+        /*
+        let chatRoom = LobbyChattingRoom()
         
         self.present(chatRoom, animated: true, completion: nil)
+         */
         return false
     }
     
