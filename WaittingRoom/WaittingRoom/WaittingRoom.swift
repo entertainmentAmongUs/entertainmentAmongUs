@@ -28,6 +28,14 @@ class WaittingRoom: UIViewController, UICollectionViewDelegate, UICollectionView
     let chatIdentifier = "chat"
     var myProfileCell: ProfileCell?
     
+    var myNickName: String
+    var myUserId: Int
+    
+    
+    var roomInfo: Room
+    var userList: [[String: Any]] = []
+    var chattings: [[String:String]] = []
+    
     
     // MARK: - Method
     
@@ -36,20 +44,27 @@ class WaittingRoom: UIViewController, UICollectionViewDelegate, UICollectionView
     func addWaittingUserView() {
         
         let view = UIView()
+        let layoutGuide = self.view.safeAreaLayoutGuide
         
         self.view.addSubview(view)
         
         view.backgroundColor = .systemGray3
         
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: 20).isActive = true
-        view.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 20).isActive = true
-        view.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -20).isActive = true
+        view.topAnchor.constraint(equalTo: layoutGuide.topAnchor, constant: 0).isActive = true
+        view.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor, constant: 20).isActive = true
+        view.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor, constant: -20).isActive = true
+        view.bottomAnchor.constraint(equalTo: layoutGuide.bottomAnchor, constant: -layoutGuide.layoutFrame.height/3).isActive = true
         
+        /*
+         
         let height = view.heightAnchor.constraint(equalToConstant: 2*self.view.safeAreaLayoutGuide.layoutFrame.size.height/3)
         height.isActive = true
         
         self.waitUserViewHeightConstraint = height
+         
+         */
+        
         self.waitUserView = view
         
     }
@@ -92,7 +107,7 @@ class WaittingRoom: UIViewController, UICollectionViewDelegate, UICollectionView
         setting.setTitle("방 설정", for: .normal)
         setting.addTarget(self, action: #selector(self.touchSettingButton(_:)), for: .touchUpInside)
         setting.titleLabel?.font = UIFont.systemFont(ofSize: 20, weight: .medium)
-        setting.isEnabled = Bool(myProfile.userID == Myroom.masterUserID)
+//        setting.isEnabled = Bool(myProfile.userID == Myroom.masterUserID)
         
         self.roomSettingButton = setting
         
@@ -162,6 +177,7 @@ class WaittingRoom: UIViewController, UICollectionViewDelegate, UICollectionView
         // ChattingTextField Setting
         
         let textField = UITextField()
+        let layoutGuide = self.view.safeAreaLayoutGuide
         
         self.view.addSubview(textField)
         
@@ -170,9 +186,9 @@ class WaittingRoom: UIViewController, UICollectionViewDelegate, UICollectionView
         textField.delegate = self
         
         textField.translatesAutoresizingMaskIntoConstraints = false
-        textField.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor).isActive = true
-        textField.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 20).isActive = true
-        textField.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant:  -20).isActive = true
+        textField.bottomAnchor.constraint(equalTo: layoutGuide.bottomAnchor).isActive = true
+        textField.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor, constant: 20).isActive = true
+        textField.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor, constant:  -20).isActive = true
 //        textField.heightAnchor.constraint(equalToConstant: 30).isActive = true
         textField.setContentHuggingPriority(.defaultHigh, for: .vertical)
         
@@ -199,8 +215,8 @@ class WaittingRoom: UIViewController, UICollectionViewDelegate, UICollectionView
         /* 채팅 테이블 뷰 오토 레이아웃 */
         table.translatesAutoresizingMaskIntoConstraints = false
         table.topAnchor.constraint(equalTo: buttons.bottomAnchor, constant: 10).isActive = true
-        table.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 20).isActive = true
-        table.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -20).isActive = true
+        table.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor, constant: 20).isActive = true
+        table.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor, constant: -20).isActive = true
         table.bottomAnchor.constraint(equalTo: textField.topAnchor, constant: -5 ).isActive = true
         table.setContentHuggingPriority(.defaultLow, for: .vertical)
         table.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
@@ -229,6 +245,7 @@ class WaittingRoom: UIViewController, UICollectionViewDelegate, UICollectionView
         
         /* 유저 리스트에서 특정 인덱스의 유저 삭제 */
         
+        /*
         guard let collection = self.waitUserCollection else { return }
         
         let new = Profile(userID: 0, image: nil, nickname: "", score: 0, winCount: 0, loseCount: 0)
@@ -239,8 +256,20 @@ class WaittingRoom: UIViewController, UICollectionViewDelegate, UICollectionView
         Myroom.users.remove(at: index)
         collection.deleteItems(at: [IndexPath(row: index, section: 0)])
         
+        */
+        
     }
 
+    func joinRoom(){
+        
+        SocketIOManager.shared.joinRoom(roomId: roomInfo.id) { [weak self] userList in
+            
+            self?.userList = userList
+            self?.waitUserCollection?.reloadData()
+            
+        }
+        
+    }
     
     
     // MARK: - Action Method
@@ -254,6 +283,7 @@ class WaittingRoom: UIViewController, UICollectionViewDelegate, UICollectionView
     
     @objc func touchExitButton(_ sender: UIButton) {
         
+        /*
         guard let collection = self.waitUserCollection else { return }
         guard let cell = self.myProfileCell else { return }
         guard let index = collection.indexPath(for: cell) else { return }
@@ -269,19 +299,23 @@ class WaittingRoom: UIViewController, UICollectionViewDelegate, UICollectionView
         
         /* 내가 방장일때 방 설정 버튼 활성화 */
         self.roomSettingButton?.isEnabled = Bool(Myroom.masterUserID == myProfile.userID)
+         */
+        
+        SocketIOManager.shared.leaveRoom()
+        
+        self.navigationController?.popViewController(animated: true)
+        
         
     }
     
     
     @objc func touchSettingButton(_ sender: UIButton){
         
-        guard let constraint = waitUserViewHeightConstraint else {
-            return
-        }
+        guard let height = self.waitUserCollection?.frame.height else { return }
 
         guard let top = self.navigationController?.navigationBar.frame.height else { return }
         
-        let view = RoomSetting(constraint.constant, top)
+        let view = RoomSetting(roomInfo, height, top)
         
         self.present(view, animated: true, completion: nil)
         
@@ -292,7 +326,7 @@ class WaittingRoom: UIViewController, UICollectionViewDelegate, UICollectionView
     // MARK: - CollectionView DataSoruce
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return Myroom.users.count
+        return userList.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -302,20 +336,21 @@ class WaittingRoom: UIViewController, UICollectionViewDelegate, UICollectionView
         cell.isReady = false
         cell.isRoomMaster = false
         
-        let info = Myroom.users[indexPath.row]
+        let user = userList[indexPath.row]
         
         /* 내 프로필이 담긴 셀 저장 */
-        if info.userID == myProfile.userID {
+        if user["userId"] as? Int == myUserId {
             self.myProfileCell = cell
         }
         
         /* 방장 셀의 속성 변경 */
-        if info.userID == Myroom.masterUserID {
+        if user["isHost"] as! Int == 1 {
             cell.isRoomMaster = true
         }
+                   
         
-        cell.nickname?.text = info.nickname
-        cell.image?.image = info.image
+        cell.nickname?.text = user["nickName"] as? String
+        cell.image?.image = UIImage(named: "ic_user_loading")
         
         return cell
         
@@ -331,7 +366,9 @@ class WaittingRoom: UIViewController, UICollectionViewDelegate, UICollectionView
         return size
     }
     
+    /*
     func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
+        
         
         let info = Myroom.users[indexPath.row]
         
@@ -349,6 +386,7 @@ class WaittingRoom: UIViewController, UICollectionViewDelegate, UICollectionView
         return false
         
     }
+     */
     
     
     // MARK: - TableView DataSource
@@ -362,8 +400,8 @@ class WaittingRoom: UIViewController, UICollectionViewDelegate, UICollectionView
         let cell = tableView.dequeueReusableCell(withIdentifier: self.chatIdentifier, for: indexPath) as! ChatCell
         
         let info = chattings[indexPath.row]
-        cell.nickname?.text = info.nickname
-        cell.chatting?.text = info.message
+        cell.nickname?.text = info["nickName"]
+        cell.chatting?.text = info["message"]
         
         return cell
     }
@@ -391,11 +429,15 @@ class WaittingRoom: UIViewController, UICollectionViewDelegate, UICollectionView
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = .white
+        self.navigationItem.title = roomInfo.title
+        self.navigationItem.hidesBackButton = true
         
         self.addWaittingUserView()
         self.addButtons()
         self.addWaitUserCollectionView()
         self.addChatView()
+        
+        joinRoom()
         
     }
     
@@ -405,5 +447,29 @@ class WaittingRoom: UIViewController, UICollectionViewDelegate, UICollectionView
         
     }
     
+    override func viewDidDisappear(_ animated: Bool) {
+        
+        
+        
+    }
+    
+    // MARK: - Initialize
+    
+    required init?(coder: NSCoder) {
+        fatalError()
+    }
+    
+    init(userId: Int, nickName: String, roomInfo: Room) {
+        self.myUserId = userId
+        self.myNickName = nickName
+        self.roomInfo = roomInfo
+        super.init(nibName: nil, bundle: nil)
+        
+        
+    }
+    
+    deinit {
+        print("WaittingRoom deint")
+    }
 }
 

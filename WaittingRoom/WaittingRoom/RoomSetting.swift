@@ -32,6 +32,8 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
     var contentViewHeight: CGFloat
     var contentViewTopAnchor: CGFloat
     
+    var roomInfo: Room
+    
     // MARK: - Method
     
     func addContentView() {
@@ -91,7 +93,7 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
             textField.autocorrectionType = .no
             textField.autocapitalizationType = .none
             textField.delegate = self
-            textField.text = Myroom.roomTitle
+            textField.text = roomInfo.title
             
             textField.translatesAutoresizingMaskIntoConstraints = false
             textField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 15).isActive = true
@@ -124,7 +126,7 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
             label.topAnchor.constraint(equalTo: view.topAnchor,constant: 10).isActive = true
             
             /* 방 비밀번호의 존재 여부에 따라 패스워드 입력 필드 상태 변경 */
-            let active = Myroom.password != nil ? true : false
+            let active = roomInfo.password != nil ? true : false
             
             let checkBox = UISwitch()
             
@@ -152,7 +154,7 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
             textField.isEnabled = active
             textField.isHidden = !active
             textField.placeholder = "방 비밀번호를 입력하세요"
-            textField.text = Myroom.password
+            textField.text = roomInfo.password
             textField.delegate = self
             
             textField.translatesAutoresizingMaskIntoConstraints = false
@@ -195,7 +197,7 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
             
             view.addSubview(infoLable)
             
-            infoLable.text = games[Myroom.gameType.rawValue].info
+            infoLable.text = games[roomInfo.gameType].info
             infoLable.font = .systemFont(ofSize: 18, weight: .medium)
             infoLable.backgroundColor = .systemGray6
             infoLable.clipsToBounds = true
@@ -234,7 +236,7 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
                 segment.insertSegment(action: action, at: i.gameId.rawValue, animated: true)
             }
             
-            segment.selectedSegmentIndex = Myroom.gameType.rawValue
+            segment.selectedSegmentIndex = roomInfo.gameType
             
             segment.translatesAutoresizingMaskIntoConstraints = false
             segment.leadingAnchor.constraint(equalTo: label.trailingAnchor, constant: 15).isActive = true
@@ -277,7 +279,7 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
             
             picker.dataSource = self
             picker.delegate = self
-            picker.selectRow(Myroom.maxUserNumber-3, inComponent: 0, animated: true)
+            picker.selectRow(roomInfo.maxUser-3, inComponent: 0, animated: true)
             picker.tag = 0
             
             picker.translatesAutoresizingMaskIntoConstraints = false
@@ -513,22 +515,23 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
         guard let subject = subjectPicker else {
             return
         }
-        guard let password = self.passwordTextField else { return }
+        guard let passwordTextField = self.passwordTextField else { return }
 
         
-        Myroom.roomTitle = title
-        Myroom.gameType = GameType(rawValue: gameType)!
-        Myroom.maxUserNumber = maxUserNumber + 3
-        Myroom.category = Category(categoryID: subject.selectedRow(inComponent: 1), subjectID: subject.selectedRow(inComponent: 0))
+        roomInfo.title = title
+        roomInfo.gameType = gameType
+        roomInfo.maxUser = maxUserNumber + 3
+        roomInfo.subject = subjects[subject.selectedRow(inComponent: 0)].category[subject.selectedRow(inComponent: 1)]
         
+        
+        var password = passwordTextField.text
         
         /* 비밀번호가 공백이거나 nil이면 nil값을 설정 */
-        if password.text == nil || password.text!.isEmpty {
-            Myroom.password = nil
+        if password != nil && password!.isEmpty {
+            password = nil
         }
-        else {
-            Myroom.password = password.text
-        }
+        
+        roomInfo.password = password
         
         self.dismiss(animated: true, completion: nil)
         
@@ -572,10 +575,11 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
         /* 현재 방에 설정돼있는 주제를 표시 */
         guard let subject = subjectPicker else {return}
         
+        /*
         subject.selectRow(Myroom.category.subjectID, inComponent: 0, animated: true)
         subject.selectRow(Myroom.category.categoryID, inComponent: 1, animated: true)
         subject.reloadAllComponents()
-        
+        */
     }
     
 
@@ -587,9 +591,10 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
         fatalError("Do not implemented")
     }
     
-    init(_ height: CGFloat, _ top: CGFloat) {
+    init(_ room: Room, _ height: CGFloat, _ top: CGFloat) {
         contentViewHeight = height
         contentViewTopAnchor = top
+        roomInfo = room
         super.init(nibName: nil, bundle: nil)
         
         self.modalTransitionStyle = .crossDissolve

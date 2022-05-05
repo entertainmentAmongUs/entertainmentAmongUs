@@ -30,7 +30,7 @@ class Lobby: UIViewController  {
     
     
     var connectedUserList: [[String:Any]] = []
-    var roomList: [[String:Any]] = []
+    var roomList: [Room] = []
     var lobbyChattings: [[String:String]] = []
     
     
@@ -241,6 +241,14 @@ class Lobby: UIViewController  {
         
     }
     
+    @objc func enterCreatedRoom(noti: Notification) {
+        
+        let waittingRoom = WaittingRoom(userId: self.myUserId, nickName: self.myNickName, roomInfo: noti.object as! Room)
+        
+        self.navigationController?.pushViewController(waittingRoom, animated: true)
+        
+    }
+    
     // MARK: Function Method
     
     func tryConnectionToWebSocketServer(){
@@ -303,6 +311,8 @@ class Lobby: UIViewController  {
         
         NotificationCenter.default.addObserver(self, selector: #selector(getConnectedUserList(noti:)), name: Notification.Name("getConnectedUserListNotification"), object: nil)
         
+        NotificationCenter.default.addObserver(self, selector: #selector(enterCreatedRoom(noti:)), name: Notification.Name("enterCreatedRoomNotification"), object: nil)
+        
     }
     
     
@@ -329,24 +339,17 @@ extension Lobby: UITableViewDelegate, UITableViewDataSource {
             
             let room = roomList[indexPath.row]
             
+            cell.gameTypeLabel?.text = games[room.gameType].title
             
-            cell.gameTypeLabel?.text = "\(room["gameType"] as! Int)"
-            
-            cell.roomTitleLabel?.text = room["title"] as? String
+            cell.roomTitleLabel?.text = room.title
             
             cell.keyImageView?.image = UIImage(systemName: "key")
             
-            if let _ = room["password"] as? String {
-                
-                
-                
-            } else {
-                
+            if room.password == nil {
                 cell.keyImageView?.alpha = 0
             }
             
-            
-            cell.userCountLabel?.text = "\(room["maxUser"] as! Int)명"
+            cell.userCountLabel?.text = "\(room.maxUser)명"
             
             return cell
             
@@ -423,7 +426,7 @@ extension Lobby: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        let waittingRoom = WaittingRoom()
+        let waittingRoom = WaittingRoom(userId: self.myUserId, nickName: self.myNickName, roomInfo: roomList[indexPath.row])
         
         self.navigationController?.pushViewController(waittingRoom, animated: true)
     }

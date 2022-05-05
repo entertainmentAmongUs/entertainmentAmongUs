@@ -195,7 +195,7 @@ class RoomCreating: UIViewController, UIPickerViewDataSource, UIPickerViewDelega
             
             view.addSubview(infoLable)
             
-            infoLable.text = games[Myroom.gameType.rawValue].info
+            infoLable.text = games[0].info
             infoLable.font = .systemFont(ofSize: 15, weight: .medium)
             infoLable.backgroundColor = .systemGray6
             infoLable.clipsToBounds = true
@@ -277,7 +277,7 @@ class RoomCreating: UIViewController, UIPickerViewDataSource, UIPickerViewDelega
             
             picker.dataSource = self
             picker.delegate = self
-            picker.selectRow(Myroom.maxUserNumber-3, inComponent: 0, animated: true)
+            picker.selectRow(0, inComponent: 0, animated: true)
             picker.tag = 0
             
             picker.translatesAutoresizingMaskIntoConstraints = false
@@ -525,7 +525,9 @@ class RoomCreating: UIViewController, UIPickerViewDataSource, UIPickerViewDelega
             password = nil
         }
         
-        SocketIOManager.shared.createRoom(roomTitle: title, password: password, gameType: gameType, subject: topic, maxUser: maxUserNumber+3)
+        var newRoom: [String: Any] = ["title": title, "password":password, "gameType":gameType, "subject":topic, "maxUser": maxUserNumber+3]
+        
+        SocketIOManager.shared.createRoom(room: newRoom)
         
         self.dismiss(animated: true, completion: nil)
         

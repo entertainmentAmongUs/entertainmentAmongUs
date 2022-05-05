@@ -42,11 +42,17 @@ class SocketIOManager: NSObject {
         
     }
     
-    func getRoomList(completionHandler: @escaping (_ roomList: [[String:Any]]) -> Void) {
+    func getRoomList(completionHandler: @escaping (_ roomList: [Room]) -> Void) {
         
         socket.on("roomList") { dataArray, ack in
             
-            completionHandler(dataArray[0] as! [[String:Any]])
+            if let jsonData = try? JSONSerialization.data(withJSONObject: dataArray[0]){
+                if let rooms = try? JSONDecoder().decode([Room].self, from: jsonData) {
+                    
+                    completionHandler(rooms)
+                    
+                }
+            }
             
         }
         
@@ -54,7 +60,9 @@ class SocketIOManager: NSObject {
     
     func getLobbyChatting() {
         
+        
         socket.on("newLobbyChatMessage") { dataArray, ack in
+            
             
             NotificationCenter.default.post(name: Notification.Name("newLobbyChatMessageNotification"), object: dataArray[0] as! [String: String])
             
@@ -83,26 +91,45 @@ class SocketIOManager: NSObject {
     }
     
     
-    func createRoom(roomTitle: String, password: String?, gameType: Int, subject: String, maxUser: Int) {
+    func createRoom(room: [String:Any]) {
         
-        var newRoom: [String: Any] = ["title":roomTitle, "password":password, "gameType":gameType, "subject":subject, "maxUser": maxUser]
-        
+        var newRoom = room
         socket.emit("createRoom", newRoom)
         
         socket.on("newRoom") { dataArray, ack in
             
-            newRoom["roomId"] = dataArray[0] as! String
-            NotificationCenter.default.post(name: Notification.Name(rawValue: "newRoomNotification"), object: newRoom as? [String: AnyObject])
+            newRoom["id"] = dataArray[0] as! String
+            newRoom["userCount"] = 1
+            
+            if let jsonData = try? JSONSerialization.data(withJSONObject: newRoom){
+                if let roomData = try? JSONDecoder().decode(Room.self, from: jsonData) {
+                    
+                    NotificationCenter.default.post(name: Notification.Name(rawValue: "enterCreatedRoomNotification"), object: roomData)
+                    
+                }
+            }
+        }
+        
+    }
+    
+    func joinRoom(roomId: String, completionHanlder: @escaping (_ userList: [[String:Any]])->Void) {
+        
+        let newData: [String:String] = ["roomId":roomId]
+        
+        socket.emit("joinRoom", newData)
+        
+        socket.on("userList") { dataArray, ack in
+            
+            completionHanlder(dataArray[0] as! [[String:Any]])
             
         }
         
     }
     
-    func joinRoom(roomId: String) {
+    func leaveRoom(){
         
-        let newData: [String:String] = ["roomId":roomId]
+        socket.emit("leaveRoom")
         
-        socket.emit("joinRoom", newData)
         
     }
     

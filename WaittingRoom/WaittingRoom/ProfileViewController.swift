@@ -129,7 +129,7 @@ class ProfileViewController: UIViewController {
         forcedToleave.setTitleColor(.systemRed, for: .normal)
         forcedToleave.setTitleColor(.systemGray3, for: .disabled)
         forcedToleave.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
-        forcedToleave.isEnabled = Bool((myProfile.userID == Myroom.masterUserID) && (userProfile.userID != myProfile.userID))
+//        forcedToleave.isEnabled = Bool((myProfile.userID == Myroom.masterUserID) && (userProfile.userID != myProfile.userID))
         
         self.forcedToLeaveButton = forcedToleave
         
@@ -247,7 +247,7 @@ class ProfileViewController: UIViewController {
     }
     
     @objc func touchForcedToLeaveButton(_ sender: UIButton) {
-        
+        /*
         guard let waittingRoom = self.presentingViewController as? WaittingRoom else {return}
         guard let collection = waittingRoom.waitUserCollection else { return }
         
@@ -259,6 +259,7 @@ class ProfileViewController: UIViewController {
         }
         
         self.dismiss(animated: true, completion: nil)
+        */
     }
     
     @objc func touchCancleButton(_ sender: UIButton){

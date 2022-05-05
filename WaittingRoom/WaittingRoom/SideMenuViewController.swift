@@ -7,6 +7,7 @@
 
 import UIKit
 import SideMenu
+import Alamofire
 
 class SideMenuViewController: UIViewController {
     
@@ -256,6 +257,19 @@ extension SideMenuViewController: UITableViewDataSource, UITableViewDelegate {
         return UITableView.automaticDimension
         
     }
+    
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        AF.request("http://52.78.47.148:8080/profile/1/mypage").validate().response { response in
+            
+            print(response.description)
+             
+            
+        }
+        
+    }
+    
     
     
 }
