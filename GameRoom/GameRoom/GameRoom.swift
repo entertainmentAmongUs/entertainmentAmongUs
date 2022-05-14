@@ -65,7 +65,7 @@ class GameRoom: UIViewController, UITableViewDataSource, UITableViewDelegate, UI
         label.setContentHuggingPriority(.defaultHigh, for: .vertical)
         
         self.announcementLabel = label
-        
+
         
         let keyword = UILabel()
         

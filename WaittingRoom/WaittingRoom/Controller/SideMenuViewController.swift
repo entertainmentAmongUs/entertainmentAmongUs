@@ -24,7 +24,7 @@ class SideMenuViewController: UIViewController {
     var settingButton: UIButton?
     var logoutButton: UIButton?
     
-    var connectedUserList: [[String:Any]]
+    var lobbyUserList: [User]
     
     
     // MARK: - Method
@@ -191,11 +191,11 @@ class SideMenuViewController: UIViewController {
         
     }
     
-    @objc func getConnectedUserList(noti:Notification) {
+    @objc func getLobbyUserList(noti:Notification) {
         
-        let userList = noti.object as! [[String: Any]]
+        let userList = noti.object as! [User]
         
-        self.connectedUserList = userList
+        self.lobbyUserList = userList
         
         userTableView?.reloadData()
         
@@ -223,11 +223,11 @@ class SideMenuViewController: UIViewController {
         
     }
     
-    init(userList: [[String:Any]]) {
-        self.connectedUserList = userList
+    init(userList: [User]) {
+        self.lobbyUserList = userList
         super.init(nibName: nil, bundle: nil)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(getConnectedUserList(noti:)), name: NSNotification.Name(rawValue: "getConnectedUserListNotification"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(getLobbyUserList(noti:)), name: NSNotification.Name(rawValue: "getLobbyUserListNotification"), object: nil)
     }
     
     
@@ -239,14 +239,14 @@ extension SideMenuViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        return connectedUserList.count
+        return lobbyUserList.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: userCellIdentifier, for: indexPath) as! UserCell
         
-        cell.nickname?.text = connectedUserList[indexPath.row]["nickName"] as? String
+        cell.nickname?.text = lobbyUserList[indexPath.row].nickName
         
         return cell
         

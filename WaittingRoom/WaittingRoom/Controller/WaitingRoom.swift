@@ -1,13 +1,13 @@
 //
 //  ViewController.swift
-//  WaittingRoom
+//  WaitingRoom
 //
 //  Created by 김윤수 on 2022/02/14.
 //
 
 import UIKit
 
-class WaittingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource  {
+class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource  {
     
     
     // MARK: - Properties
@@ -30,18 +30,18 @@ class WaittingRoom: UIViewController, UICollectionViewDelegate, UICollectionView
     
     var myNickName: String
     var myUserId: Int
+    var roomId: String
     
     
-    var roomInfo: Room
-    var userList: [[String: Any]] = []
-    var chattings: [[String:String]] = []
+    var roomInfo: Room?
+    var chattings: [Chat] = []
     
     
     // MARK: - Method
     
     
     /* MARK: Create View Method */
-    func addWaittingUserView() {
+    func addWaitingUserView() {
         
         let view = UIView()
         let layoutGuide = self.view.safeAreaLayoutGuide
@@ -260,13 +260,36 @@ class WaittingRoom: UIViewController, UICollectionViewDelegate, UICollectionView
         
     }
 
-    func joinRoom(){
+    func getRoomInfo(){
         
-        SocketIOManager.shared.joinRoom(roomId: roomInfo.id) { [weak self] userList in
+        SocketIOManager.shared.fetchRoomInfo(roomId: roomId) { [weak self] roomInfo in
             
-            self?.userList = userList
+            self?.roomInfo = roomInfo
+            
+            self?.navigationItem.title = roomInfo.title
+            
             self?.waitUserCollection?.reloadData()
             
+        }
+        
+    }
+    
+    func getReadyToKicked() {
+        
+        SocketIOManager.shared.getKicked { [unowned self] userId in
+            
+            if myUserId == userId {
+                SocketIOManager.shared.leaveRoom(roomId: roomId, userId: myUserId)
+                
+                let alertController = UIAlertController(title: "알림", message: "방장에 의해 퇴장당했습니다.", preferredStyle: .alert)
+                
+                alertController.addAction(UIAlertAction(title: "확인", style: .cancel))
+                
+                self.present(alertController, animated: true)
+                
+                self.navigationController?.popViewController(animated: true)
+                
+            }
         }
         
     }
@@ -301,7 +324,7 @@ class WaittingRoom: UIViewController, UICollectionViewDelegate, UICollectionView
         self.roomSettingButton?.isEnabled = Bool(Myroom.masterUserID == myProfile.userID)
          */
         
-        SocketIOManager.shared.leaveRoom()
+        SocketIOManager.shared.leaveRoom(roomId: roomId, userId: myUserId)
         
         self.navigationController?.popViewController(animated: true)
         
@@ -315,18 +338,32 @@ class WaittingRoom: UIViewController, UICollectionViewDelegate, UICollectionView
 
         guard let top = self.navigationController?.navigationBar.frame.height else { return }
         
+        guard let roomInfo = roomInfo else { return }
+
         let view = RoomSetting(roomInfo, height, top)
         
         self.present(view, animated: true, completion: nil)
         
     }
     
+    @objc func getNewChatting(noti:Notification) {
+        
+        let newChat = noti.object as! Chat
+        
+        chattings.append(newChat)
+        
+        chatTableView?.reloadData()
+        
+        chatTableView?.scrollToRow(at: IndexPath(row: chattings.count-1, section: 0), at: .bottom, animated: true)
+        
+        
+    }
     
     
     // MARK: - CollectionView DataSoruce
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return userList.count
+        return roomInfo?.users.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -336,20 +373,20 @@ class WaittingRoom: UIViewController, UICollectionViewDelegate, UICollectionView
         cell.isReady = false
         cell.isRoomMaster = false
         
-        let user = userList[indexPath.row]
+        guard let user = roomInfo?.users[indexPath.row] else { return cell }
         
         /* 내 프로필이 담긴 셀 저장 */
-        if user["userId"] as? Int == myUserId {
+        if user.userId == myUserId {
             self.myProfileCell = cell
         }
         
         /* 방장 셀의 속성 변경 */
-        if user["isHost"] as! Int == 1 {
+        if roomInfo?.hostId == user.userId  {
             cell.isRoomMaster = true
         }
                    
         
-        cell.nickname?.text = user["nickName"] as? String
+        cell.nickname?.text = user.nickName
         cell.image?.image = UIImage(named: "ic_user_loading")
         
         return cell
@@ -399,9 +436,9 @@ class WaittingRoom: UIViewController, UICollectionViewDelegate, UICollectionView
         
         let cell = tableView.dequeueReusableCell(withIdentifier: self.chatIdentifier, for: indexPath) as! ChatCell
         
-        let info = chattings[indexPath.row]
-        cell.nickname?.text = info["nickName"]
-        cell.chatting?.text = info["message"]
+        let chat = chattings[indexPath.row]
+        cell.nickname?.text = chat.nickName
+        cell.chatting?.text = chat.message
         
         return cell
     }
@@ -415,11 +452,11 @@ class WaittingRoom: UIViewController, UICollectionViewDelegate, UICollectionView
     
     func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
         
-        /*
-        let chatRoom = LobbyChattingRoom()
+        
+        let chatRoom = ChattingRoom(roomId: roomId, nickName: myNickName, chattings: chattings)
         
         self.present(chatRoom, animated: true, completion: nil)
-         */
+         
         return false
     }
     
@@ -429,15 +466,15 @@ class WaittingRoom: UIViewController, UICollectionViewDelegate, UICollectionView
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = .white
-        self.navigationItem.title = roomInfo.title
         self.navigationItem.hidesBackButton = true
         
-        self.addWaittingUserView()
+        self.addWaitingUserView()
         self.addButtons()
         self.addWaitUserCollectionView()
         self.addChatView()
         
-        joinRoom()
+        getRoomInfo()
+        getReadyToKicked()
         
     }
     
@@ -459,17 +496,19 @@ class WaittingRoom: UIViewController, UICollectionViewDelegate, UICollectionView
         fatalError()
     }
     
-    init(userId: Int, nickName: String, roomInfo: Room) {
+    init(userId: Int, nickName: String, roomId: String) {
         self.myUserId = userId
         self.myNickName = nickName
-        self.roomInfo = roomInfo
+        self.roomId = roomId
         super.init(nibName: nil, bundle: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(getNewChatting(noti:)), name: Notification.Name("newChatNotification"), object: nil)
         
         
     }
     
     deinit {
-        print("WaittingRoom deint")
+        print("WaitingRoom deint")
     }
 }
 

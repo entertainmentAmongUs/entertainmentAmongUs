@@ -19,18 +19,33 @@ struct Friend {
 /* 게임 타입(라이어, 이미지)에 대한 정보 */
 struct Game {
     
-    let gameId: GameType
+    let type: GameType
     let title: String
     let info: String
     let maxUserNumber: Int
     
 }
 
-enum GameType: Int {
+enum GameType: String, Codable {
     
-    case liar
-    case image
+    case liar = "LIAR"
+    case image = "IMAGE"
     
+}
+
+enum RoomStatus: String, Codable {
+    
+    case waiting = "WAITING"
+    case playing = "PLAYING"
+}
+
+enum JoinStatus: String, Codable {
+    
+    case success = "SUCCESS"
+    case passwordIncorrect = "PASSWORD_INCORRECT"
+    case fullUser = "FULL_USER"
+    case alreadyStarted = "ALREADY_STARTED"
+    case unexist = "UN_EXIST"
 }
 
 /* 주제 카테고리 (depth2) */
@@ -45,17 +60,58 @@ struct Subject {
     let category: [String]
 }
 
+struct RoomList: Codable {
+    
+    var roomList: [Room]
+    
+}
+
+struct UserList: Codable {
+    
+    var users: [User]
+    
+}
+
+struct JoinRoom: Codable{
+    
+    var status: JoinStatus
+}
+
+struct UserInRoom: Codable {
+    
+    var isReady: Bool
+    var nickName: String
+    var userId: Int
+//    var socketId: String
+    
+}
+
 /* 게임방에 대한 정보 */
 struct Room: Codable {
     
-    var id: String
+    var roomId: String
+    var maxUser: Int
     var title: String
     var password: String?
-    var userCount: Int
-    var maxUser: Int
-    var gameType: Int
+    var users: [UserInRoom]
+    var gameType: GameType
     var subject: String
+    var hostId: Int
+    var status: RoomStatus
     
+}
+
+struct User: Codable {
+    
+    var userId: Int
+    var nickName: String
+    
+}
+
+struct Chat: Codable {
+    
+    let nickName: String
+    let message: String
 }
 
 
@@ -73,11 +129,7 @@ struct Profile {
     var loseCount: Int
 }
 
-struct Chat: Codable {
-    
-    let nickName: String
-    let message: String
-}
+
 
 /* 친구 요청 상태에 대한 정보 */
 struct FriendRequest {
@@ -91,7 +143,7 @@ struct FriendRequest {
 }
 
 /* 설정 가능한 게임 목록 */
-let games = [Game(gameId: .liar, title: "라이어", info: "거짓말하는 사람을 찾아내는 게임입니다.", maxUserNumber: 8), Game(gameId: .image, title: "이미지", info: "이미지를 보고 무엇인지 맞추는 게임입니다.", maxUserNumber: 6)]
+let games = [Game(type: .liar, title: "라이어", info: "거짓말하는 사람을 찾아내는 게임입니다.", maxUserNumber: 8), Game(type: .image, title: "이미지", info: "이미지를 보고 무엇인지 맞추는 게임입니다.", maxUserNumber: 6)]
 
 /* 설정 가능한 주제 카테고리 목록 */
 let subjects = [Subject(title: "인물", category: ["배우", "가수", "유명인사", "아이돌"]), Subject(title: "문화", category: ["음악", "영화"])]

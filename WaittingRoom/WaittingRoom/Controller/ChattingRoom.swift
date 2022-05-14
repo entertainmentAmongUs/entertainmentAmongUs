@@ -7,7 +7,7 @@
 
 import UIKit
 
-class LobbyChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
+class ChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
 
     
     // MARK: - Properties
@@ -21,8 +21,9 @@ class LobbyChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataS
     var textFieldBottomConstraint: NSLayoutConstraint?
     
     var myNickname: String
+    var roomId: String
     
-    var lobbyChattings: [[String:String]]
+    var chattings: [Chat]
     
     
     // MARK: - Method
@@ -88,7 +89,7 @@ class LobbyChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataS
         
         /* WaittingRoom의 채팅 테이블 뷰 갱신 */
         
-        guard let waittingRoom = self.presentingViewController as? WaittingRoom else {return}
+        guard let waittingRoom = self.presentingViewController as? WaitingRoom else {return}
         
         waittingRoom.chatTableView?.reloadData()
         waittingRoom.chatTableView?.scrollToRow(at: index, at: .bottom, animated: false)
@@ -138,26 +139,26 @@ class LobbyChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataS
         
         guard let table = self.chatTableView else { return }
         
-        let chatCount = lobbyChattings.count
+        let chatCount = chattings.count
         
         if chatCount > 0 {
             
-            table.scrollToRow(at: IndexPath(row: lobbyChattings.count-1, section: 0), at: .bottom, animated: true)
+            table.scrollToRow(at: IndexPath(row: chattings.count-1, section: 0), at: .bottom, animated: true)
             
         }
         
     }
     
     
-    @objc func getNewLobbyChatting(noti:Notification) {
+    @objc func getNewChatting(noti:Notification) {
         
-        let newLobbyChat = noti.object as! [String:String]
+        let newChat = noti.object as! Chat
         
-        lobbyChattings.append(newLobbyChat)
+        chattings.append(newChat)
         
         chatTableView?.reloadData()
         
-        chatTableView?.scrollToRow(at: IndexPath(row: lobbyChattings.count-1, section: 0), at: .bottom, animated: true)
+        chatTableView?.scrollToRow(at: IndexPath(row: chattings.count-1, section: 0), at: .bottom, animated: true)
         
     }
     
@@ -189,7 +190,7 @@ class LobbyChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataS
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        return lobbyChattings.count
+        return chattings.count
     }
 
     
@@ -197,9 +198,9 @@ class LobbyChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataS
         
         let cell = tableView.dequeueReusableCell(withIdentifier: self.chatIdentifier, for: indexPath) as! ChatCell
         
-        let chat = lobbyChattings[indexPath.row]
-        cell.nickname?.text = chat["nickName"]
-        cell.chatting?.text = chat["message"]
+        let chat = chattings[indexPath.row]
+        cell.nickname?.text = chat.nickName
+        cell.chatting?.text = chat.message
         
         return cell
         
@@ -236,7 +237,7 @@ class LobbyChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataS
         
         guard let message = textField.text else { return false }
         
-        SocketIOManager.shared.sendMessage(message: message, nickname: self.myNickname)
+        SocketIOManager.shared.sendMessage(roomId: roomId, message: message, nickname: self.myNickname)
         textField.text = nil
         
         return true
@@ -250,10 +251,11 @@ class LobbyChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataS
         fatalError("fatal Error")
     }
     
-    init(nickName: String, chattings: [[String:String]]) {
+    init(roomId: String, nickName: String, chattings: [Chat]) {
         
-        self.lobbyChattings = chattings
+        self.chattings = chattings
         self.myNickname = nickName
+        self.roomId = roomId
         
         super.init(nibName: nil, bundle: nil)
         
@@ -266,12 +268,12 @@ class LobbyChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataS
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardDidShow(_:)), name: UIResponder.keyboardDidShowNotification, object: nil)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(getNewLobbyChatting(noti:)), name: Notification.Name("newLobbyChatMessageNotification"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(getNewChatting(noti:)), name: Notification.Name("newChatNotification"), object: nil)
         
     }
     
     deinit {
-        print("LobbyChattingRoom deinit")
+        print("ChattingRoom deinit")
     }
 
 }

@@ -19,6 +19,7 @@ class Lobby: UIViewController  {
     
     var roomCreateButton: UIButton?
     var roomSearchButton: UIButton?
+    var roomRefreshButton: UIButton?
     var buttonStack: UIStackView?
     
     var chatTextField: UITextField?
@@ -29,9 +30,9 @@ class Lobby: UIViewController  {
     var myNickName: String
     
     
-    var connectedUserList: [[String:Any]] = []
+    var lobbyUserList: [User] = []
     var roomList: [Room] = []
-    var lobbyChattings: [[String:String]] = []
+    var lobbyChattings: [Chat] = []
     
     
     lazy var sideMenuButton: UIBarButtonItem = {
@@ -92,9 +93,17 @@ class Lobby: UIViewController  {
         
         self.roomCreateButton = createButton
         
+        let refreshButton = UIButton(type: .system)
+        refreshButton.setTitle("새로고침", for: .normal)
+        refreshButton.titleLabel?.font = UIFont.systemFont(ofSize: 20,weight: .regular)
+        refreshButton.addTarget(self, action: #selector(self.touchRoomRefreshButton(_:)), for: .touchUpInside)
+        refreshButton.setTitleColor(.systemBlue, for: .normal)
+        
+        self.roomRefreshButton = refreshButton
+        
         
         let stackView: UIStackView = {
-            let stackView = UIStackView(arrangedSubviews: [searchButton, createButton])
+            let stackView = UIStackView(arrangedSubviews: [searchButton, refreshButton, createButton])
             stackView.translatesAutoresizingMaskIntoConstraints = false
             stackView.axis = .horizontal
             stackView.alignment = .fill
@@ -175,7 +184,7 @@ class Lobby: UIViewController  {
          present(sideBar, animated: true, completion: nil)
          */
         
-        let sideMenuViewController = SideMenuViewController(userList: self.connectedUserList)
+        let sideMenuViewController = SideMenuViewController(userList: self.lobbyUserList)
         let sideMenuNavi = SideMenuNavigationController(rootViewController: sideMenuViewController)
         
         sideMenuViewController.navigationItem.title = "사이드바"
@@ -206,7 +215,7 @@ class Lobby: UIViewController  {
         guard let height = self.roomListTableView?.frame.height else { return }
         guard let top = self.navigationController?.navigationBar.frame.height else { return }
         
-        let roomSettingController = RoomCreating(height, top)
+        let roomSettingController = RoomCreating(myUserId, height, top)
         
         present(roomSettingController, animated: true)
         
@@ -220,11 +229,17 @@ class Lobby: UIViewController  {
         
     }
     
-    @objc func getNewLobbyChatting(noti:Notification) {
+    @objc func touchRoomRefreshButton(_ sender: UIButton){
         
-        let newLobbyChat = noti.object as! [String:String]
+        SocketIOManager.shared.refreshRoomList()
         
-        lobbyChattings.append(newLobbyChat)
+    }
+    
+    @objc func getNewChatting(noti:Notification) {
+        
+        let newChat = noti.object as! Chat
+        
+        lobbyChattings.append(newChat)
         
         chatTableView?.reloadData()
         
@@ -233,17 +248,18 @@ class Lobby: UIViewController  {
         
     }
     
-    @objc func getConnectedUserList(noti:Notification) {
+    @objc func getLobbyUserList(noti:Notification) {
         
-        let userList = noti.object as! [[String: Any]]
+        let userList = noti.object as! [User]
         
-        self.connectedUserList = userList
+        self.lobbyUserList = userList
         
     }
     
     @objc func enterCreatedRoom(noti: Notification) {
         
-        let waittingRoom = WaittingRoom(userId: self.myUserId, nickName: self.myNickName, roomInfo: noti.object as! Room)
+        let roomId = noti.object as! String
+        let waittingRoom = WaitingRoom(userId: self.myUserId, nickName: self.myNickName, roomId: roomId)
         
         self.navigationController?.pushViewController(waittingRoom, animated: true)
         
@@ -260,11 +276,11 @@ class Lobby: UIViewController  {
     
     func getLobbyData(){
         
-        SocketIOManager.shared.getConnectedUserList()
+        SocketIOManager.shared.fetchLobbyUserList()
         
-        SocketIOManager.shared.getLobbyChatting()
+        SocketIOManager.shared.fetchLobbyChatting()
         
-        SocketIOManager.shared.getRoomList { [weak self] roomList in
+        SocketIOManager.shared.fetchRoomList { [weak self] roomList in
             
             self?.roomList = roomList
             
@@ -307,9 +323,9 @@ class Lobby: UIViewController  {
         self.myNickName = nickName
         super.init(nibName: nil, bundle: nil)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(getNewLobbyChatting(noti:)), name: Notification.Name("newLobbyChatMessageNotification"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(getNewChatting(noti:)), name: Notification.Name("newChatNotification"), object: nil)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(getConnectedUserList(noti:)), name: Notification.Name("getConnectedUserListNotification"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(getLobbyUserList(noti:)), name: Notification.Name("getLobbyUserListNotification"), object: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(enterCreatedRoom(noti:)), name: Notification.Name("enterCreatedRoomNotification"), object: nil)
         
@@ -339,7 +355,8 @@ extension Lobby: UITableViewDelegate, UITableViewDataSource {
             
             let room = roomList[indexPath.row]
             
-            cell.gameTypeLabel?.text = games[room.gameType].title
+            cell.gameTypeLabel?.text = room.gameType.rawValue
+//            games[room.gameType.rawValue]
             
             cell.roomTitleLabel?.text = room.title
             
@@ -360,8 +377,8 @@ extension Lobby: UITableViewDelegate, UITableViewDataSource {
             let chat = lobbyChattings[indexPath.row]
             //RoomCell 변수 = model 변수
             
-            cell.nickname?.text = chat["nickName"]
-            cell.chatting?.text = chat["message"]
+            cell.nickname?.text = chat.nickName
+            cell.chatting?.text = chat.message
             
             return cell
             
@@ -426,9 +443,68 @@ extension Lobby: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        let waittingRoom = WaittingRoom(userId: self.myUserId, nickName: self.myNickName, roomInfo: roomList[indexPath.row])
+        let roomInfo = roomList[indexPath.row]
+        
+        let completionHandler: (_ status: JoinStatus) -> Void = {status in
+            
+            let message: String
+            
+             switch status {
+                 
+             case .success:
+                 let waitingRoom = WaitingRoom(userId: self.myUserId, nickName: self.myNickName, roomId: roomInfo.roomId)
+                 self.navigationController?.pushViewController(waitingRoom, animated: true)
+                 return
+             case .alreadyStarted:
+                 message = "이미 게임이 시작된 방입니다."
+             case .fullUser:
+                 message = "방이 가득찼습니다."
+             case .passwordIncorrect:
+                 message = "비밀번호가 일치하지 않습니다."
+             case .unexist:
+                 message = "존재하지 않는 방입니다."
+             }
+            
+            let alertController = UIAlertController(title: "알림", message: message, preferredStyle: .alert)
+            alertController.addAction(UIAlertAction(title: "확인", style: .default))
+            self.present(alertController, animated: true)
+        }
+        
+        
+        if let _ = roomInfo.password {
+            
+            let alertController = UIAlertController(title: "비밀번호", message: "비밀번호를 입력하세요", preferredStyle: .alert)
+            alertController.addTextField()
+            
+            let cancleAction = UIAlertAction(title: "취소", style: .cancel)
+            let okAction = UIAlertAction(title: "확인", style: .default) { [unowned self] action in
+                let password = alertController.textFields?[0].text
+                
+                SocketIOManager.shared.joinRoom(roomId: roomInfo.roomId, userId: myUserId, password: password, completionHandler: completionHandler)
+                
+            }
+            
+            alertController.addAction(okAction)
+            alertController.addAction(cancleAction)
+            
+            self.present(alertController, animated: true)
+            
+        } else {
+            
+            SocketIOManager.shared.joinRoom(roomId: roomInfo.roomId, userId: myUserId, password: nil, completionHandler: completionHandler)
+            
+        }
+                                                
+       
+        /*
+        let roomId = roomList[indexPath.row].roomId
+        
+        SocketIOManager.shared.joinRoom(roomId: <#T##String#>, completionHanlder: <#T##([[String : Any]]) -> Void##([[String : Any]]) -> Void##(_ userList: [[String : Any]]) -> Void#>)
+        
+        let waittingRoom = WaittingRoom(userId: self.myUserId, nickName: self.myNickName, roomId: roomId)
         
         self.navigationController?.pushViewController(waittingRoom, animated: true)
+        */
     }
     
     
@@ -444,7 +520,7 @@ extension Lobby: UITextFieldDelegate {
     
     func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
         
-        let chatRoom = LobbyChattingRoom(nickName: self.myNickName, chattings: self.lobbyChattings)
+        let chatRoom = ChattingRoom(roomId: "LOBBY",nickName: self.myNickName, chattings: self.lobbyChattings)
         self.present(chatRoom, animated: true, completion: nil)
         
         return false

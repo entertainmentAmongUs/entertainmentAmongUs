@@ -45,7 +45,7 @@ class RoomCell: UITableViewCell {
         
         let image = UIImageView()
         image.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-        
+        image.image = UIImage(systemName: "key")
         
         self.keyImageView = image
  

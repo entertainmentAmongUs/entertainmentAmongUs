@@ -16,11 +16,11 @@
 		0D9DBB602821B47500CF93A0 /* UserCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D9DBB5F2821B47500CF93A0 /* UserCell.swift */; };
 		0D9DBB622821CD5400CF93A0 /* RoomCreating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D9DBB612821CD5400CF93A0 /* RoomCreating.swift */; };
 		0DD3623727C0D7AA00C206E0 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD3623627C0D7AA00C206E0 /* Model.swift */; };
-		0DD3623B27C26A6D00C206E0 /* LobbyChattingRoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD3623A27C26A6D00C206E0 /* LobbyChattingRoom.swift */; };
+		0DD3623B27C26A6D00C206E0 /* ChattingRoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD3623A27C26A6D00C206E0 /* ChattingRoom.swift */; };
 		0DD3623D27C54B0E00C206E0 /* RoomSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD3623C27C54B0E00C206E0 /* RoomSetting.swift */; };
 		0DD99D5C27BA9004009FAD3F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD99D5B27BA9004009FAD3F /* AppDelegate.swift */; };
 		0DD99D5E27BA9004009FAD3F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD99D5D27BA9004009FAD3F /* SceneDelegate.swift */; };
-		0DD99D6027BA9004009FAD3F /* WaittingRoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD99D5F27BA9004009FAD3F /* WaittingRoom.swift */; };
+		0DD99D6027BA9004009FAD3F /* WaitingRoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD99D5F27BA9004009FAD3F /* WaitingRoom.swift */; };
 		0DD99D6327BA9004009FAD3F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0DD99D6127BA9004009FAD3F /* Main.storyboard */; };
 		0DD99D6527BA9006009FAD3F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0DD99D6427BA9006009FAD3F /* Assets.xcassets */; };
 		0DD99D6827BA9006009FAD3F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0DD99D6627BA9006009FAD3F /* LaunchScreen.storyboard */; };
@@ -40,12 +40,12 @@
 		0D9DBB5F2821B47500CF93A0 /* UserCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCell.swift; sourceTree = "<group>"; };
 		0D9DBB612821CD5400CF93A0 /* RoomCreating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomCreating.swift; sourceTree = "<group>"; };
 		0DD3623627C0D7AA00C206E0 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
-		0DD3623A27C26A6D00C206E0 /* LobbyChattingRoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LobbyChattingRoom.swift; sourceTree = "<group>"; };
+		0DD3623A27C26A6D00C206E0 /* ChattingRoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChattingRoom.swift; sourceTree = "<group>"; };
 		0DD3623C27C54B0E00C206E0 /* RoomSetting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomSetting.swift; sourceTree = "<group>"; };
 		0DD99D5827BA9004009FAD3F /* WaittingRoom.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WaittingRoom.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0DD99D5B27BA9004009FAD3F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0DD99D5D27BA9004009FAD3F /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		0DD99D5F27BA9004009FAD3F /* WaittingRoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaittingRoom.swift; sourceTree = "<group>"; };
+		0DD99D5F27BA9004009FAD3F /* WaitingRoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaitingRoom.swift; sourceTree = "<group>"; };
 		0DD99D6227BA9004009FAD3F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		0DD99D6427BA9006009FAD3F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0DD99D6727BA9006009FAD3F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -70,6 +70,41 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0DB9C1CF282CE81E0048F63C /* View */ = {
+			isa = PBXGroup;
+			children = (
+				0DD99D8F27BC0156009FAD3F /* ProfileCell.swift */,
+				0DD99D9127BCFAD2009FAD3F /* ChatCell.swift */,
+				0D9DBA6F282062C200CF93A0 /* RoomCell.swift */,
+				0D9DBB5F2821B47500CF93A0 /* UserCell.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		0DB9C1D1282CE8480048F63C /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				0DD99D5F27BA9004009FAD3F /* WaitingRoom.swift */,
+				0DD3623C27C54B0E00C206E0 /* RoomSetting.swift */,
+				0D9DBB612821CD5400CF93A0 /* RoomCreating.swift */,
+				0D9DBA6B2820623500CF93A0 /* Lobby.swift */,
+				0D9DBB5B2821A4B900CF93A0 /* SideMenuViewController.swift */,
+				0DD3623A27C26A6D00C206E0 /* ChattingRoom.swift */,
+				0DD99D9327BE4B7B009FAD3F /* ProfileViewController.swift */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		0DB9C1D2282CE84F0048F63C /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				0DD3623627C0D7AA00C206E0 /* Model.swift */,
+				0D9DBB5D2821A96500CF93A0 /* Singleton.swift */,
+				0D9DBA6D282062B100CF93A0 /* LobbyModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 		0DD99D4F27BA9004009FAD3F = {
 			isa = PBXGroup;
 			children = (
@@ -91,20 +126,9 @@
 		0DD99D5A27BA9004009FAD3F /* WaittingRoom */ = {
 			isa = PBXGroup;
 			children = (
-				0DD99D5F27BA9004009FAD3F /* WaittingRoom.swift */,
-				0DD3623C27C54B0E00C206E0 /* RoomSetting.swift */,
-				0D9DBB612821CD5400CF93A0 /* RoomCreating.swift */,
-				0D9DBA6B2820623500CF93A0 /* Lobby.swift */,
-				0D9DBB5B2821A4B900CF93A0 /* SideMenuViewController.swift */,
-				0D9DBB5F2821B47500CF93A0 /* UserCell.swift */,
-				0D9DBB5D2821A96500CF93A0 /* Singleton.swift */,
-				0DD3623A27C26A6D00C206E0 /* LobbyChattingRoom.swift */,
-				0DD99D9327BE4B7B009FAD3F /* ProfileViewController.swift */,
-				0D9DBA6D282062B100CF93A0 /* LobbyModel.swift */,
-				0D9DBA6F282062C200CF93A0 /* RoomCell.swift */,
-				0DD99D9127BCFAD2009FAD3F /* ChatCell.swift */,
-				0DD99D8F27BC0156009FAD3F /* ProfileCell.swift */,
-				0DD3623627C0D7AA00C206E0 /* Model.swift */,
+				0DB9C1D2282CE84F0048F63C /* Model */,
+				0DB9C1D1282CE8480048F63C /* Controller */,
+				0DB9C1CF282CE81E0048F63C /* View */,
 				0D9DBA712820641F00CF93A0 /* SocketIOManager.swift */,
 				0DD99D5B27BA9004009FAD3F /* AppDelegate.swift */,
 				0DD99D5D27BA9004009FAD3F /* SceneDelegate.swift */,
@@ -250,10 +274,10 @@
 			files = (
 				0DD3623727C0D7AA00C206E0 /* Model.swift in Sources */,
 				0DD3623D27C54B0E00C206E0 /* RoomSetting.swift in Sources */,
-				0DD3623B27C26A6D00C206E0 /* LobbyChattingRoom.swift in Sources */,
+				0DD3623B27C26A6D00C206E0 /* ChattingRoom.swift in Sources */,
 				0DD99D9427BE4B7B009FAD3F /* ProfileViewController.swift in Sources */,
 				0D9DBB5C2821A4B900CF93A0 /* SideMenuViewController.swift in Sources */,
-				0DD99D6027BA9004009FAD3F /* WaittingRoom.swift in Sources */,
+				0DD99D6027BA9004009FAD3F /* WaitingRoom.swift in Sources */,
 				0DD99D9027BC0156009FAD3F /* ProfileCell.swift in Sources */,
 				0D9DBA6C2820623500CF93A0 /* Lobby.swift in Sources */,
 				0D9DBB602821B47500CF93A0 /* UserCell.swift in Sources */,

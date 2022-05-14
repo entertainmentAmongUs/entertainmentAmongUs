@@ -1,15 +1,13 @@
 //
-//  RoomCreating.swift
+//  RoomSetting.swift
 //  WaittingRoom
 //
-//  Created by 김윤수 on 2022/05/04.
+//  Created by 김윤수 on 2022/02/23.
 //
 
 import UIKit
 
-import UIKit
-
-class RoomCreating: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate, UITextFieldDelegate {
+class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate, UITextFieldDelegate {
     
     
     // MARK: - Properties
@@ -33,6 +31,8 @@ class RoomCreating: UIViewController, UIPickerViewDataSource, UIPickerViewDelega
     /* MARK: Others */
     var contentViewHeight: CGFloat
     var contentViewTopAnchor: CGFloat
+    
+    var roomInfo: Room
     
     // MARK: - Method
     
@@ -70,13 +70,14 @@ class RoomCreating: UIViewController, UIPickerViewDataSource, UIPickerViewDelega
             view.backgroundColor = .white
             view.clipsToBounds = true
             view.layer.cornerRadius = 5
+            view.frame.size = CGSize(width: 200, height: 200)
             
             let label = UILabel()
             
             view.addSubview(label)
             
             label.text = "방 제목"
-            label.font = .systemFont(ofSize: 15, weight: .semibold)
+            label.font = .systemFont(ofSize: 20, weight: .semibold)
             label.translatesAutoresizingMaskIntoConstraints = false
             label.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 10).isActive = true
             label.topAnchor.constraint(equalTo: view.topAnchor,constant: 10).isActive = true
@@ -88,11 +89,11 @@ class RoomCreating: UIViewController, UIPickerViewDataSource, UIPickerViewDelega
             view.addSubview(textField)
             
             textField.borderStyle = .roundedRect
-            textField.font = .systemFont(ofSize: 15, weight: .regular)
+            textField.font = .systemFont(ofSize: 18, weight: .regular)
             textField.autocorrectionType = .no
             textField.autocapitalizationType = .none
             textField.delegate = self
-            textField.placeholder = "방 제목을 입력하세요"
+            textField.text = roomInfo.title
             
             textField.translatesAutoresizingMaskIntoConstraints = false
             textField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 15).isActive = true
@@ -119,13 +120,13 @@ class RoomCreating: UIViewController, UIPickerViewDataSource, UIPickerViewDelega
             view.addSubview(label)
             
             label.text = "비밀번호 활성화"
-            label.font = .systemFont(ofSize: 15 , weight: .regular)
+            label.font = .systemFont(ofSize: 20, weight: .regular)
             label.translatesAutoresizingMaskIntoConstraints = false
             label.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 10).isActive = true
             label.topAnchor.constraint(equalTo: view.topAnchor,constant: 10).isActive = true
             
             /* 방 비밀번호의 존재 여부에 따라 패스워드 입력 필드 상태 변경 */
-            let active = false
+            let active = roomInfo.password != nil ? true : false
             
             let checkBox = UISwitch()
             
@@ -137,7 +138,7 @@ class RoomCreating: UIViewController, UIPickerViewDataSource, UIPickerViewDelega
             checkBox.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
             
             checkBox.translatesAutoresizingMaskIntoConstraints = false
-            checkBox.leadingAnchor.constraint(equalTo: label.trailingAnchor, constant: 0).isActive = true
+            checkBox.leadingAnchor.constraint(equalTo: label.trailingAnchor, constant: 5).isActive = true
             checkBox.centerYAnchor.constraint(equalTo: label.centerYAnchor).isActive = true
             checkBox.isOn = active
             
@@ -153,6 +154,7 @@ class RoomCreating: UIViewController, UIPickerViewDataSource, UIPickerViewDelega
             textField.isEnabled = active
             textField.isHidden = !active
             textField.placeholder = "방 비밀번호를 입력하세요"
+            textField.text = roomInfo.password
             textField.delegate = self
             
             textField.translatesAutoresizingMaskIntoConstraints = false
@@ -181,7 +183,7 @@ class RoomCreating: UIViewController, UIPickerViewDataSource, UIPickerViewDelega
             view.addSubview(label)
             
             label.text = "게임 타입"
-            label.font = .systemFont(ofSize: 15, weight: .medium)
+            label.font = .systemFont(ofSize: 20, weight: .medium)
             
             label.translatesAutoresizingMaskIntoConstraints = false
             label.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10).isActive = true
@@ -196,7 +198,7 @@ class RoomCreating: UIViewController, UIPickerViewDataSource, UIPickerViewDelega
             view.addSubview(infoLable)
             
             infoLable.text = games[0].info
-            infoLable.font = .systemFont(ofSize: 15, weight: .medium)
+            infoLable.font = .systemFont(ofSize: 18, weight: .medium)
             infoLable.backgroundColor = .systemGray6
             infoLable.clipsToBounds = true
             infoLable.layer.cornerRadius = 5
@@ -219,19 +221,19 @@ class RoomCreating: UIViewController, UIPickerViewDataSource, UIPickerViewDelega
             
             view.addSubview(segment)
             
-            for i in games {
+            for i in 0...games.count-1 {
                 /* 세그먼트 변경에 대한 액션 */
                 let action = UIAction { [weak self] _ in
                     
-                    infoLable.text = i.info
+                    infoLable.text = games[i].info
                     
                     /* 변경된 게임의 최대 인원 수에 맞게 설정할 수 있는 인원 최댓값 조정*/
                     guard let picker = self?.maxUserNumberPicker else {return}
                     
                     picker.reloadComponent(0)
                 }
-                action.title = i.title
-                segment.insertSegment(action: action, at: i.gameId.rawValue, animated: true)
+                action.title = games[i].title
+                segment.insertSegment(action: action, at: i, animated: true)
             }
             
             segment.selectedSegmentIndex = 0
@@ -263,7 +265,7 @@ class RoomCreating: UIViewController, UIPickerViewDataSource, UIPickerViewDelega
             view.addSubview(label)
             
             label.text = "최대 인원"
-            label.font = .systemFont(ofSize: 15, weight: .medium)
+            label.font = .systemFont(ofSize: 20, weight: .medium)
             label.translatesAutoresizingMaskIntoConstraints = false
             label.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 10).isActive = true
             label.topAnchor.constraint(equalTo: view.topAnchor, constant:  10).isActive = true
@@ -277,7 +279,7 @@ class RoomCreating: UIViewController, UIPickerViewDataSource, UIPickerViewDelega
             
             picker.dataSource = self
             picker.delegate = self
-            picker.selectRow(0, inComponent: 0, animated: true)
+            picker.selectRow(roomInfo.maxUser-3, inComponent: 0, animated: true)
             picker.tag = 0
             
             picker.translatesAutoresizingMaskIntoConstraints = false
@@ -307,7 +309,7 @@ class RoomCreating: UIViewController, UIPickerViewDataSource, UIPickerViewDelega
             view.addSubview(label)
             
             label.text = "주제 선택"
-            label.font = .systemFont(ofSize: 15, weight: .medium)
+            label.font = .systemFont(ofSize: 20, weight: .medium)
             label.translatesAutoresizingMaskIntoConstraints = false
             label.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 10).isActive = true
             label.topAnchor.constraint(equalTo: view.topAnchor, constant:  10).isActive = true
@@ -344,7 +346,7 @@ class RoomCreating: UIViewController, UIPickerViewDataSource, UIPickerViewDelega
         stack.axis = .vertical
         stack.distribution = .fillEqually
         stack.alignment = .fill
-        stack.spacing = 3
+        stack.spacing = 5
         
         stack.translatesAutoresizingMaskIntoConstraints = false
         stack.leadingAnchor.constraint(equalTo: content.leadingAnchor, constant: 20).isActive = true
@@ -510,13 +512,17 @@ class RoomCreating: UIViewController, UIPickerViewDataSource, UIPickerViewDelega
         guard let title = roomTitleTextField?.text else {return}
         guard let maxUserNumber = maxUserNumberPicker?.selectedRow(inComponent: 0) else {return}
         guard let gameType = gameTypeSegment?.selectedSegmentIndex else {return}
-        guard let subjectPicker = subjectPicker else {
+        guard let subject = subjectPicker else {
             return
         }
         guard let passwordTextField = self.passwordTextField else { return }
 
         
-        let topic = subjects[subjectPicker.selectedRow(inComponent: 0)].category[subjectPicker.selectedRow(inComponent: 1)]
+        roomInfo.title = title
+        roomInfo.gameType = games[gameType].type
+        roomInfo.maxUser = maxUserNumber + 3
+        roomInfo.subject = subjects[subject.selectedRow(inComponent: 0)].category[subject.selectedRow(inComponent: 1)]
+        
         
         var password = passwordTextField.text
         
@@ -525,9 +531,7 @@ class RoomCreating: UIViewController, UIPickerViewDataSource, UIPickerViewDelega
             password = nil
         }
         
-        var newRoom: [String: Any] = ["title": title, "password":password, "gameType":gameType, "subject":topic, "maxUser": maxUserNumber+3]
-        
-        SocketIOManager.shared.createRoom(room: newRoom)
+        roomInfo.password = password
         
         self.dismiss(animated: true, completion: nil)
         
@@ -571,10 +575,11 @@ class RoomCreating: UIViewController, UIPickerViewDataSource, UIPickerViewDelega
         /* 현재 방에 설정돼있는 주제를 표시 */
         guard let subject = subjectPicker else {return}
         
-        subject.selectRow(0, inComponent: 0, animated: true)
-        subject.selectRow(0, inComponent: 1, animated: true)
+        /*
+        subject.selectRow(Myroom.category.subjectID, inComponent: 0, animated: true)
+        subject.selectRow(Myroom.category.categoryID, inComponent: 1, animated: true)
         subject.reloadAllComponents()
-        
+        */
     }
     
 
@@ -586,15 +591,16 @@ class RoomCreating: UIViewController, UIPickerViewDataSource, UIPickerViewDelega
         fatalError("Do not implemented")
     }
     
-    init(_ height: CGFloat, _ top: CGFloat) {
+    init(_ room: Room, _ height: CGFloat, _ top: CGFloat) {
         contentViewHeight = height
         contentViewTopAnchor = top
+        roomInfo = room
         super.init(nibName: nil, bundle: nil)
         
         self.modalTransitionStyle = .crossDissolve
         self.modalPresentationStyle = .overFullScreen
     }
-        
+    	
     deinit {
         print("deinit RoomSetting")
     }

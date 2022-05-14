@@ -14,15 +14,6 @@ class Singleton: NSObject {
     var userId = -1
     var nickName = ""
     
-    var connectedUserList: [[String:Any]] = []
-    var lobbyChattings: [[String:String]] = []
-    var roomList: [[String:Any]] = []
-    
-    func readyToGetLobbyData(){
-        
-        
-        
-    }
     
     override init() {
         super.init()
