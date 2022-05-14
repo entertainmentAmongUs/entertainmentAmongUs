@@ -70,14 +70,13 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
             view.backgroundColor = .white
             view.clipsToBounds = true
             view.layer.cornerRadius = 5
-            view.frame.size = CGSize(width: 200, height: 200)
             
             let label = UILabel()
             
             view.addSubview(label)
             
             label.text = "방 제목"
-            label.font = .systemFont(ofSize: 20, weight: .semibold)
+            label.font = .systemFont(ofSize: 15, weight: .semibold)
             label.translatesAutoresizingMaskIntoConstraints = false
             label.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 10).isActive = true
             label.topAnchor.constraint(equalTo: view.topAnchor,constant: 10).isActive = true
@@ -89,11 +88,12 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
             view.addSubview(textField)
             
             textField.borderStyle = .roundedRect
-            textField.font = .systemFont(ofSize: 18, weight: .regular)
+            textField.font = .systemFont(ofSize: 15, weight: .regular)
             textField.autocorrectionType = .no
             textField.autocapitalizationType = .none
             textField.delegate = self
             textField.text = roomInfo.title
+            textField.placeholder = "방 제목을 입력하세요"
             
             textField.translatesAutoresizingMaskIntoConstraints = false
             textField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 15).isActive = true
@@ -120,7 +120,7 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
             view.addSubview(label)
             
             label.text = "비밀번호 활성화"
-            label.font = .systemFont(ofSize: 20, weight: .regular)
+            label.font = .systemFont(ofSize: 15, weight: .regular)
             label.translatesAutoresizingMaskIntoConstraints = false
             label.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 10).isActive = true
             label.topAnchor.constraint(equalTo: view.topAnchor,constant: 10).isActive = true
@@ -138,7 +138,7 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
             checkBox.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
             
             checkBox.translatesAutoresizingMaskIntoConstraints = false
-            checkBox.leadingAnchor.constraint(equalTo: label.trailingAnchor, constant: 5).isActive = true
+            checkBox.leadingAnchor.constraint(equalTo: label.trailingAnchor, constant: 0).isActive = true
             checkBox.centerYAnchor.constraint(equalTo: label.centerYAnchor).isActive = true
             checkBox.isOn = active
             
@@ -183,7 +183,7 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
             view.addSubview(label)
             
             label.text = "게임 타입"
-            label.font = .systemFont(ofSize: 20, weight: .medium)
+            label.font = .systemFont(ofSize: 15, weight: .medium)
             
             label.translatesAutoresizingMaskIntoConstraints = false
             label.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10).isActive = true
@@ -198,7 +198,7 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
             view.addSubview(infoLable)
             
             infoLable.text = games[0].info
-            infoLable.font = .systemFont(ofSize: 18, weight: .medium)
+            infoLable.font = .systemFont(ofSize: 15, weight: .medium)
             infoLable.backgroundColor = .systemGray6
             infoLable.clipsToBounds = true
             infoLable.layer.cornerRadius = 5
@@ -512,17 +512,13 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
         guard let title = roomTitleTextField?.text else {return}
         guard let maxUserNumber = maxUserNumberPicker?.selectedRow(inComponent: 0) else {return}
         guard let gameType = gameTypeSegment?.selectedSegmentIndex else {return}
-        guard let subject = subjectPicker else {
+        guard let subjectPicker = subjectPicker else {
             return
         }
         guard let passwordTextField = self.passwordTextField else { return }
 
         
-        roomInfo.title = title
-        roomInfo.gameType = games[gameType].type
-        roomInfo.maxUser = maxUserNumber + 3
-        roomInfo.subject = subjects[subject.selectedRow(inComponent: 0)].category[subject.selectedRow(inComponent: 1)]
-        
+        let topic = subjects[subjectPicker.selectedRow(inComponent: 0)].category[subjectPicker.selectedRow(inComponent: 1)]
         
         var password = passwordTextField.text
         
@@ -531,9 +527,24 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
             password = nil
         }
         
-        roomInfo.password = password
+        let roomInfo: [String:Any] = ["roomId": roomInfo.roomId, "title": title, "password": password, "gameType": games[gameType].type.rawValue, "subject": topic, "maxUser": maxUserNumber+3]
         
-        self.dismiss(animated: true, completion: nil)
+        SocketIOManager.shared.editRoom(room: roomInfo) { [weak self] status in
+            
+            switch status {
+                
+            case .success:
+                self?.dismiss(animated: true)
+                
+            case .overCount:
+                let alertController = UIAlertController(title: "알림", message: "설정한 최대 인원이 방의 인원보다 작습니다. ", preferredStyle: .alert)
+                alertController.addAction(UIAlertAction(title: "확인", style: .cancel))
+                self?.present(alertController, animated: true)
+            }
+            
+        }
+        
+//        self.dismiss(animated: true, completion: nil)
         
     }
     
@@ -573,7 +584,7 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
     override func viewDidAppear(_ animated: Bool) {
         
         /* 현재 방에 설정돼있는 주제를 표시 */
-        guard let subject = subjectPicker else {return}
+//        guard let subject = subjectPicker else {return}
         
         /*
         subject.selectRow(Myroom.category.subjectID, inComponent: 0, animated: true)
@@ -591,10 +602,10 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
         fatalError("Do not implemented")
     }
     
-    init(_ room: Room, _ height: CGFloat, _ top: CGFloat) {
-        contentViewHeight = height
-        contentViewTopAnchor = top
-        roomInfo = room
+    init(_ roomInfo: Room, _ height: CGFloat, _ top: CGFloat) {
+        self.contentViewHeight = height
+        self.contentViewTopAnchor = top
+        self.roomInfo = roomInfo
         super.init(nibName: nil, bundle: nil)
         
         self.modalTransitionStyle = .crossDissolve

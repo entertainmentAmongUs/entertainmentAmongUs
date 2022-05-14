@@ -48,6 +48,12 @@ enum JoinStatus: String, Codable {
     case unexist = "UN_EXIST"
 }
 
+enum EditStatus: String, Codable {
+    
+    case success = "SUCCESS"
+    case overCount = "OVER_COUNT"
+}
+
 /* 주제 카테고리 (depth2) */
 struct Category {
     var categoryID: Int
@@ -72,9 +78,15 @@ struct UserList: Codable {
     
 }
 
+
 struct JoinRoom: Codable{
     
     var status: JoinStatus
+}
+
+struct EditRoom: Codable{
+    
+    var status: EditStatus
 }
 
 struct UserInRoom: Codable {
@@ -83,6 +95,12 @@ struct UserInRoom: Codable {
     var nickName: String
     var userId: Int
 //    var socketId: String
+    
+}
+
+struct RoomUserList: Codable {
+    
+    var userList: [UserInRoom]
     
 }
 
@@ -110,6 +128,7 @@ struct User: Codable {
 
 struct Chat: Codable {
     
+    let roomId: String
     let nickName: String
     let message: String
 }
@@ -146,7 +165,7 @@ struct FriendRequest {
 let games = [Game(type: .liar, title: "라이어", info: "거짓말하는 사람을 찾아내는 게임입니다.", maxUserNumber: 8), Game(type: .image, title: "이미지", info: "이미지를 보고 무엇인지 맞추는 게임입니다.", maxUserNumber: 6)]
 
 /* 설정 가능한 주제 카테고리 목록 */
-let subjects = [Subject(title: "인물", category: ["배우", "가수", "유명인사", "아이돌"]), Subject(title: "문화", category: ["음악", "영화"])]
+let subjects = [Subject(title: "국가", category: ["아시아", "유럽", "아메리카"]), Subject(title: "랜드마크", category: ["해외", "국내"])]
 
 /* 나의 프로필 정보*/
 var myProfile = Profile(userID: 99, image: UIImage(named: "ic_user_loading"), nickname: "초보입니다", score: 380, winCount: 32, loseCount: 50)

@@ -239,6 +239,10 @@ class Lobby: UIViewController  {
         
         let newChat = noti.object as! Chat
         
+        if newChat.roomId != "LOBBY"{
+            return
+        }
+        
         lobbyChattings.append(newChat)
         
         chatTableView?.reloadData()
@@ -262,6 +266,16 @@ class Lobby: UIViewController  {
         let waittingRoom = WaitingRoom(userId: self.myUserId, nickName: self.myNickName, roomId: roomId)
         
         self.navigationController?.pushViewController(waittingRoom, animated: true)
+        
+    }
+    
+    @objc func showKickAlert(noti: Notification){
+        
+        let alertController = UIAlertController(title: "알림", message: "방장에 의해 추방당했습니다.", preferredStyle: .alert)
+        
+        alertController.addAction(UIAlertAction(title: "확인", style: .cancel))
+        
+        self.present(alertController, animated: true)
         
     }
     
@@ -329,6 +343,7 @@ class Lobby: UIViewController  {
         
         NotificationCenter.default.addObserver(self, selector: #selector(enterCreatedRoom(noti:)), name: Notification.Name("enterCreatedRoomNotification"), object: nil)
         
+        NotificationCenter.default.addObserver(self, selector: #selector(showKickAlert(noti:)), name: Notification.Name("getKickedNotification"), object: nil)
     }
     
     

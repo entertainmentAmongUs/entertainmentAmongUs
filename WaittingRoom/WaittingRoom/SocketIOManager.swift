@@ -118,6 +118,22 @@ class SocketIOManager: NSObject {
     
     }
     
+    func fetchUserList(completionHandler: @escaping (_ userList: [UserInRoom]) -> Void) {
+        
+        socket.on("userList") { dataArray, ack in
+            
+            guard let jsonData = try? JSONSerialization.data(withJSONObject: dataArray[0]) else {
+                return
+            }
+            guard let userList = try? JSONDecoder().decode([UserInRoom].self, from: jsonData) else {
+                return
+            }
+            
+            completionHandler(userList)
+        }
+    
+    }
+    
     
     func sendMessage(roomId: String, message: String, nickname: String){
         
@@ -176,9 +192,19 @@ class SocketIOManager: NSObject {
         
     }
     
-    func getReady(userId: Int){
+    func getReady(roomId:String, userId: Int){
         
-        socket.emit("getReady", userId)
+        let readyData: [String: Any] = ["roomId":roomId, "userId":userId]
+        
+        socket.emit("getReady", readyData)
+        
+    }
+    
+    func kick(roomId:String, userId: Int) {
+        
+        let kickData: [String: Any] = ["roomId":roomId,"userId": userId]
+        
+        socket.emit("kick", kickData)
         
     }
     
@@ -190,6 +216,24 @@ class SocketIOManager: NSObject {
             
             completionHandler(userId)
             
+        }
+        
+    }
+    
+    func editRoom(room: [String:Any], completionHandler: @escaping (_ status:EditStatus) -> Void) {
+        
+        socket.emit("editRoom", room)
+        
+        socket.on("editRoom") { [unowned self] dataArray, ack in
+            
+            guard let jsonData = try? JSONSerialization.data(withJSONObject: dataArray[0]) else {
+                return }
+            
+            guard let status = try? JSONDecoder().decode(EditRoom.self, from: jsonData) else { return }
+            
+            completionHandler(status.status)
+            
+            self.socket.off("editRoom")
         }
         
     }

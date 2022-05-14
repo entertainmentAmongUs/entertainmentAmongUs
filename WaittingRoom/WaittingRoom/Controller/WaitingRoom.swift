@@ -274,6 +274,18 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
         
     }
     
+    func getUserList() {
+        
+        SocketIOManager.shared.fetchUserList { [weak self] userList in
+            
+            self?.roomInfo?.users = userList
+            
+            self?.waitUserCollection?.reloadData()
+            
+        }
+        
+    }
+    
     func getReadyToKicked() {
         
         SocketIOManager.shared.getKicked { [unowned self] userId in
@@ -281,13 +293,9 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
             if myUserId == userId {
                 SocketIOManager.shared.leaveRoom(roomId: roomId, userId: myUserId)
                 
-                let alertController = UIAlertController(title: "알림", message: "방장에 의해 퇴장당했습니다.", preferredStyle: .alert)
-                
-                alertController.addAction(UIAlertAction(title: "확인", style: .cancel))
-                
-                self.present(alertController, animated: true)
-                
                 self.navigationController?.popViewController(animated: true)
+                
+                NotificationCenter.default.post(name: NSNotification.Name("getKickedNotification"), object: nil)
                 
             }
         }
@@ -300,7 +308,10 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
     @objc func touchReadyButton(_ sender: UIButton) {
         
         sender.isSelected.toggle()
-        self.myProfileCell?.isReady.toggle()
+        
+//        self.myProfileCell?.isReady.toggle()
+        
+        SocketIOManager.shared.getReady(roomId: roomId, userId: myUserId)
         
     }
     
@@ -350,6 +361,8 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
         
         let newChat = noti.object as! Chat
         
+        if newChat.roomId != roomId { return }
+        
         chattings.append(newChat)
         
         chatTableView?.reloadData()
@@ -384,6 +397,11 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
         if roomInfo?.hostId == user.userId  {
             cell.isRoomMaster = true
         }
+        
+        if user.isReady == true {
+            
+            cell.isReady = true
+        }
                    
         
         cell.nickname?.text = user.nickName
@@ -403,27 +421,28 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
         return size
     }
     
-    /*
+    
     func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
         
         
-        let info = Myroom.users[indexPath.row]
+        guard let roomInfo = roomInfo else { return false }
+
+        let user = roomInfo.users[indexPath.row]
         
-        
+        /*
         if info.userID == nil {
             return false
         }
+        */
         
-        guard let cell = collectionView.cellForItem(at: indexPath) as? ProfileCell else { return false }
+        let profileView = ProfileViewController(roomId: roomId, userId: user.userId, myUserId: myUserId, hostId: roomInfo.hostId)
         
-        let view = ProfileViewController(info, cell)
-        
-        self.present(view, animated: true, completion: nil)
+        self.present(profileView, animated: true, completion: nil)
         
         return false
         
     }
-     */
+     
     
     
     // MARK: - TableView DataSource
@@ -474,6 +493,7 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
         self.addChatView()
         
         getRoomInfo()
+        getUserList()
         getReadyToKicked()
         
     }

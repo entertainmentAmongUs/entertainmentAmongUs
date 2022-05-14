@@ -24,12 +24,14 @@ class ProfileViewController: UIViewController {
     
     /* MARK: Buttons */
     var buttonStackView: UIStackView?
-    var forcedToLeaveButton: UIButton?
+    var kickButton: UIButton?
     var backButton: UIButton?
     var friendButton: UIButton?
     
-    var userProfile: Profile
-    var userCell: ProfileCell
+    var roomId: String
+    var userId: Int
+    var myUserId: Int
+    var hostId: Int
     
     
     
@@ -115,6 +117,7 @@ class ProfileViewController: UIViewController {
         friend.backgroundColor = .white
         friend.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .regular)
         friend.setTitle("친구 요청", for: .normal)
+        friend.isEnabled = userId == myUserId ? false : true
         
         self.checkFriendRequestButton(friend)
         self.friendButton = friend
@@ -122,21 +125,21 @@ class ProfileViewController: UIViewController {
         
         // forcedToLeaveButton Setting
         
-        let forcedToleave = UIButton(type: .system)
-        forcedToleave.backgroundColor = .white
-        forcedToleave.addTarget(self, action: #selector(self.touchForcedToLeaveButton(_:)), for: .touchUpInside)
-        forcedToleave.setTitle("강퇴", for: .normal)
-        forcedToleave.setTitleColor(.systemRed, for: .normal)
-        forcedToleave.setTitleColor(.systemGray3, for: .disabled)
-        forcedToleave.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
-//        forcedToleave.isEnabled = Bool((myProfile.userID == Myroom.masterUserID) && (userProfile.userID != myProfile.userID))
+        let kick = UIButton(type: .system)
+        kick.backgroundColor = .white
+        kick.addTarget(self, action: #selector(self.touchKickButton(_:)), for: .touchUpInside)
+        kick.setTitle("강퇴", for: .normal)
+        kick.setTitleColor(.systemRed, for: .normal)
+        kick.setTitleColor(.systemGray3, for: .disabled)
+        kick.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
+        kick.isEnabled = (userId != myUserId && hostId == myUserId) ? true : false
         
-        self.forcedToLeaveButton = forcedToleave
+        self.kickButton = kick
         
         
         // buttonStackView Setting
         
-        let stack = UIStackView(arrangedSubviews: [back, friend, forcedToleave])
+        let stack = UIStackView(arrangedSubviews: [back, friend, kick])
         
         content.addSubview(stack)
         
@@ -165,18 +168,28 @@ class ProfileViewController: UIViewController {
         
         /* 레이블에 유저 프로필 정보 입력 */
         
+        /*
         self.profileImage.image = userProfile.image
         self.nicknameLabel.text = "닉네임: \(userProfile.nickname)"
         self.victoryRateLabel.text = "승률: " + String(format: "%.2f", userProfile.victoryRate) + "%"
         self.winCountLabel.text = "이긴 횟수: \(userProfile.winCount)회"
         self.loseCountLabel.text = "진 횟수: \(userProfile.loseCount)회"
         self.scoreLabel.text = "점수: \(userProfile.score)"
+        */
+        
+        self.profileImage.image = nil
+        self.nicknameLabel.text = "닉네임: 미구현"
+        self.victoryRateLabel.text = "승률: 100%"
+        self.winCountLabel.text = "이긴 횟수: 0회"
+        self.loseCountLabel.text = "진 횟수: 0)회"
+        self.scoreLabel.text = "점수: 1000"
         
         
     }
     
     func checkFriendRequestButton(_ button: UIButton) {
         
+        /*
         /* 해당 유저가 자기 자신인지 확인 */
         if userProfile.userID == myProfile.userID {
             button.isHidden = true
@@ -212,6 +225,7 @@ class ProfileViewController: UIViewController {
         
         
         button.addTarget(self, action: #selector(touchRequestFriendButton(_:)), for: .touchUpInside)
+         */
     }
     
     
@@ -219,6 +233,7 @@ class ProfileViewController: UIViewController {
     
     @objc func touchRequestFriendButton(_ sender: UIButton) {
         
+        /*
         /* 친구 요청 객체 생성 */
         let request = FriendRequest(senderID: myProfile.userID, responderID: userProfile.userID, status: 0)
         
@@ -226,13 +241,14 @@ class ProfileViewController: UIViewController {
         
         sender.isEnabled = false
         sender.setTitle("요청 보냄", for: .disabled)
+         */
         
         
     }
     
     @objc func touchRemoveFriendButton(_ sender: UIButton) {
         
-        
+        /*
         /* 친구 목록 리스트에서 친구 삭제 */
         for i in 0...myFriends.count-1 {
             
@@ -244,9 +260,10 @@ class ProfileViewController: UIViewController {
         }
         
         self.dismiss(animated: true, completion: nil)
+         */
     }
     
-    @objc func touchForcedToLeaveButton(_ sender: UIButton) {
+    @objc func touchKickButton(_ sender: UIButton) {
         /*
         guard let waittingRoom = self.presentingViewController as? WaittingRoom else {return}
         guard let collection = waittingRoom.waitUserCollection else { return }
@@ -260,6 +277,11 @@ class ProfileViewController: UIViewController {
         
         self.dismiss(animated: true, completion: nil)
         */
+        
+        SocketIOManager.shared.kick(roomId: roomId, userId: userId)
+        
+        self.dismiss(animated: true)
+        
     }
     
     @objc func touchCancleButton(_ sender: UIButton){
@@ -286,9 +308,11 @@ class ProfileViewController: UIViewController {
         fatalError("어쩌구")
     }
     
-    init(_ profile: Profile, _ cell: ProfileCell){
-        self.userProfile = profile
-        self.userCell = cell
+    init(roomId: String, userId: Int, myUserId: Int, hostId: Int){
+        self.roomId = roomId
+        self.userId = userId
+        self.myUserId = myUserId
+        self.hostId = hostId
         super.init(nibName: nil, bundle: nil)
         
         self.modalTransitionStyle = .crossDissolve
