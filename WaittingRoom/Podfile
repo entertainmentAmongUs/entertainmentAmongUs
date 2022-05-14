@@ -9,5 +9,6 @@ target 'WaittingRoom' do
   # Pods for WaittingRoom
   pod 'SideMenu'
   pod 'Socket.IO-Client-Swift', '~> 16.0.0'
+  pod 'Alamofire'
 
 end

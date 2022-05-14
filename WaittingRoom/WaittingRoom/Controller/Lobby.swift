@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SideMenu
 
 class Lobby: UIViewController  {
     
@@ -14,11 +15,11 @@ class Lobby: UIViewController  {
     var sideButton: UIButton?
     
     var roomListTableView: UITableView?
-    var roomListTableViewHeightConstraint: NSLayoutConstraint?
     let roomCellIdentifier = "roomCell"
     
     var roomCreateButton: UIButton?
     var roomSearchButton: UIButton?
+    var roomRefreshButton: UIButton?
     var buttonStack: UIStackView?
     
     var chatTextField: UITextField?
@@ -29,16 +30,16 @@ class Lobby: UIViewController  {
     var myNickName: String
     
     
-    var connectedUserList: [[String:Any]] = []
-    var roomList: [[String:Any]] = []
-    var lobbyChattings: [[String:String]] = []
+    var lobbyUserList: [User] = []
+    var roomList: [Room] = []
+    var lobbyChattings: [Chat] = []
     
     
-    lazy var rightButton: UIBarButtonItem = {
-            let button = UIBarButtonItem()
-            
-            return button
-        }()
+    lazy var sideMenuButton: UIBarButtonItem = {
+        let button = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(touchSideMenuButton(_:)))
+        
+        return button
+    }()
     
     
     
@@ -74,10 +75,10 @@ class Lobby: UIViewController  {
     func addButton(){
         
         guard let roomListTableView = self.roomListTableView else { return }
-
+        
         let searchButton = UIButton(type: .system)
         searchButton.setTitle("방 검색", for: .normal)
-        searchButton.titleLabel?.font = .systemFont(ofSize: 18,weight: .semibold)
+        searchButton.titleLabel?.font = .systemFont(ofSize: 20,weight: .regular)
         searchButton.addTarget(self, action: #selector(self.touchRoomSearchButton(_:)), for: .touchUpInside)
         searchButton.setTitleColor(.systemBlue, for: .normal)
         
@@ -86,15 +87,23 @@ class Lobby: UIViewController  {
         
         let createButton = UIButton(type: .system)
         createButton.setTitle("방 생성", for: .normal)
-        createButton.titleLabel?.font = UIFont.systemFont(ofSize: 18,weight: .semibold)
+        createButton.titleLabel?.font = UIFont.systemFont(ofSize: 20,weight: .regular)
         createButton.addTarget(self, action: #selector(self.touchRoomCreateButton(_:)), for: .touchUpInside)
         createButton.setTitleColor(.systemBlue, for: .normal)
         
         self.roomCreateButton = createButton
         
+        let refreshButton = UIButton(type: .system)
+        refreshButton.setTitle("새로고침", for: .normal)
+        refreshButton.titleLabel?.font = UIFont.systemFont(ofSize: 20,weight: .regular)
+        refreshButton.addTarget(self, action: #selector(self.touchRoomRefreshButton(_:)), for: .touchUpInside)
+        refreshButton.setTitleColor(.systemBlue, for: .normal)
+        
+        self.roomRefreshButton = refreshButton
+        
         
         let stackView: UIStackView = {
-           let stackView = UIStackView(arrangedSubviews: [searchButton, createButton])
+            let stackView = UIStackView(arrangedSubviews: [searchButton, refreshButton, createButton])
             stackView.translatesAutoresizingMaskIntoConstraints = false
             stackView.axis = .horizontal
             stackView.alignment = .fill
@@ -116,7 +125,7 @@ class Lobby: UIViewController  {
     func addChatView(){
         
         guard let buttonStack = self.buttonStack else { return }
-
+        
         let textField = UITextField()
         
         self.view.addSubview(textField)
@@ -165,38 +174,54 @@ class Lobby: UIViewController  {
     
     // MARK: Action Method
     
-    /*
-    @objc func presentSideMenu(_ sender: UIButton) {
+    
+    @objc func touchSideMenuButton(_ sender: UIButton) {
         /* 그냥 처음에 대충 넣은 것.
-        let sideBar = SideMenuViewController()
-        self.navigationController?.pushViewController(SideBar, animated: true)
-        
-        이번엔 present이용해서 사용.
-        present(sideBar, animated: true, completion: nil)
+         let sideBar = SideMenuViewController()
+         self.navigationController?.pushViewController(SideBar, animated: true)
+         
+         이번엔 present이용해서 사용.
+         present(sideBar, animated: true, completion: nil)
          */
         
-        let SideMenuViewController = SideMenuViewController()
-        let CustomSideMenuNavi = CustomSideMenuNavigation(rootViewController: SideMenuViewController)
-
+        let sideMenuViewController = SideMenuViewController(userList: self.lobbyUserList)
+        let sideMenuNavi = SideMenuNavigationController(rootViewController: sideMenuViewController)
         
-        present(CustomSideMenuNavi,animated: true,completion: nil)
+        sideMenuViewController.navigationItem.title = "사이드바"
+        
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithTransparentBackground()
+        
+        
+        sideMenuNavi.navigationBar.scrollEdgeAppearance = appearance
+        sideMenuNavi.navigationBar.standardAppearance = appearance
+        
+        present(sideMenuNavi,animated: true,completion: nil)
+        
     }
     
-    */
+    
     
     @objc func touchRoomCreateButton(_ sender: UIButton){
         
         /*
-        let roomCreateButtonView = RoomCreateButtonController()
-        roomCreateButtonView.modalTransitionStyle = .crossDissolve
-        roomCreateButtonView.modalPresentationStyle = .overCurrentContext
-        //present로 화면 전환 해보는 것 응용함.
-        present(roomCreateButtonView,animated: true, completion: nil)
-        */
+         let roomCreateButtonView = RoomCreateButtonController()
+         roomCreateButtonView.modalTransitionStyle = .crossDissolve
+         roomCreateButtonView.modalPresentationStyle = .overCurrentContext
+         //present로 화면 전환 해보는 것 응용함.
+         present(roomCreateButtonView,animated: true, completion: nil)
+         */
+        
+        guard let height = self.roomListTableView?.frame.height else { return }
+        guard let top = self.navigationController?.navigationBar.frame.height else { return }
+        
+        let roomSettingController = RoomCreating(myUserId, height, top)
+        
+        present(roomSettingController, animated: true)
         
     }
     
-     
+    
     @objc func touchRoomSearchButton(_ sender: UIButton){
         
         //let SignUpView = SignUpViewController()
@@ -204,11 +229,21 @@ class Lobby: UIViewController  {
         
     }
     
-    @objc func getNewLobbyChatting(noti:Notification) {
+    @objc func touchRoomRefreshButton(_ sender: UIButton){
         
-        let newLobbyChat = noti.object as! [String:String]
+        SocketIOManager.shared.refreshRoomList()
         
-        lobbyChattings.append(newLobbyChat)
+    }
+    
+    @objc func getNewChatting(noti:Notification) {
+        
+        let newChat = noti.object as! Chat
+        
+        if newChat.roomId != "LOBBY"{
+            return
+        }
+        
+        lobbyChattings.append(newChat)
         
         chatTableView?.reloadData()
         
@@ -217,11 +252,30 @@ class Lobby: UIViewController  {
         
     }
     
-    @objc func getConnectedUserList(noti:Notification) {
+    @objc func getLobbyUserList(noti:Notification) {
         
-        let userList = noti.object as! [[String: Any]]
+        let userList = noti.object as! [User]
         
-        self.connectedUserList = userList
+        self.lobbyUserList = userList
+        
+    }
+    
+    @objc func enterCreatedRoom(noti: Notification) {
+        
+        let roomId = noti.object as! String
+        let waittingRoom = WaitingRoom(userId: self.myUserId, nickName: self.myNickName, roomId: roomId)
+        
+        self.navigationController?.pushViewController(waittingRoom, animated: true)
+        
+    }
+    
+    @objc func showKickAlert(noti: Notification){
+        
+        let alertController = UIAlertController(title: "알림", message: "방장에 의해 추방당했습니다.", preferredStyle: .alert)
+        
+        alertController.addAction(UIAlertAction(title: "확인", style: .cancel))
+        
+        self.present(alertController, animated: true)
         
     }
     
@@ -236,11 +290,11 @@ class Lobby: UIViewController  {
     
     func getLobbyData(){
         
-        SocketIOManager.shared.getConnectedUserList()
+        SocketIOManager.shared.fetchLobbyUserList()
         
-        SocketIOManager.shared.getLobbyChatting()
+        SocketIOManager.shared.fetchLobbyChatting()
         
-        SocketIOManager.shared.getRoomList { [weak self] roomList in
+        SocketIOManager.shared.fetchRoomList { [weak self] roomList in
             
             self?.roomList = roomList
             
@@ -248,7 +302,7 @@ class Lobby: UIViewController  {
             
         }
     }
-   
+    
     // MARK: - LifeCycle
     
     override func viewDidLoad() {
@@ -256,7 +310,7 @@ class Lobby: UIViewController  {
         super.viewDidLoad()
         self.view.backgroundColor = .white
         self.navigationItem.title = "로비"
-        self.navigationItem.rightBarButtonItem = self.rightButton
+        self.navigationItem.rightBarButtonItem = self.sideMenuButton
         
         self.addRoomListTableView()
         self.addButton()
@@ -283,15 +337,18 @@ class Lobby: UIViewController  {
         self.myNickName = nickName
         super.init(nibName: nil, bundle: nil)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(getNewLobbyChatting(noti:)), name: Notification.Name("newLobbyChatMessageNotification"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(getNewChatting(noti:)), name: Notification.Name("newChatNotification"), object: nil)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(getConnectedUserList(noti:)), name: Notification.Name("getConnectedUserListNotification"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(getLobbyUserList(noti:)), name: Notification.Name("getLobbyUserListNotification"), object: nil)
         
+        NotificationCenter.default.addObserver(self, selector: #selector(enterCreatedRoom(noti:)), name: Notification.Name("enterCreatedRoomNotification"), object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(showKickAlert(noti:)), name: Notification.Name("getKickedNotification"), object: nil)
     }
-        
+    
     
 }
-    
+
 // MARK: - Extension
 
 extension Lobby: UITableViewDelegate, UITableViewDataSource {
@@ -306,24 +363,25 @@ extension Lobby: UITableViewDelegate, UITableViewDataSource {
     
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        //3번
+        
         if tableView == roomListTableView {
             
             let cell = tableView.dequeueReusableCell(withIdentifier: self.roomCellIdentifier, for: indexPath) as! RoomCell
+            
             let room = roomList[indexPath.row]
-            //RoomCell 변수 = model 변수
-            cell.gameTypeLabel?.text = "\(room["gameType"] as! Int)"
             
-            cell.roomTitleLabel?.text = room["title"] as? String
+            cell.gameTypeLabel?.text = room.gameType.rawValue
+//            games[room.gameType.rawValue]
             
-            if room["password"] as! String == "" {
-                cell.keyImageView?.image = UIImage(systemName: "")
+            cell.roomTitleLabel?.text = room.title
+            
+            cell.keyImageView?.image = UIImage(systemName: "key")
+            
+            if room.password == nil {
+                cell.keyImageView?.alpha = 0
             }
-            else {
-                cell.keyImageView?.image = UIImage(systemName: "key")
-            }
             
-            cell.userCountLabel?.text = "\(room["maxUser"] as! Int)명"
+            cell.userCountLabel?.text = "\(room.maxUser)명"
             
             return cell
             
@@ -334,8 +392,8 @@ extension Lobby: UITableViewDelegate, UITableViewDataSource {
             let chat = lobbyChattings[indexPath.row]
             //RoomCell 변수 = model 변수
             
-            cell.nickname?.text = chat["nickName"]
-            cell.chatting?.text = chat["message"]
+            cell.nickname?.text = chat.nickName
+            cell.chatting?.text = chat.message
             
             return cell
             
@@ -400,9 +458,68 @@ extension Lobby: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        let waittingRoom = WaittingRoom()
+        let roomInfo = roomList[indexPath.row]
+        
+        let completionHandler: (_ status: JoinStatus) -> Void = {status in
+            
+            let message: String
+            
+             switch status {
+                 
+             case .success:
+                 let waitingRoom = WaitingRoom(userId: self.myUserId, nickName: self.myNickName, roomId: roomInfo.roomId)
+                 self.navigationController?.pushViewController(waitingRoom, animated: true)
+                 return
+             case .alreadyStarted:
+                 message = "이미 게임이 시작된 방입니다."
+             case .fullUser:
+                 message = "방이 가득찼습니다."
+             case .passwordIncorrect:
+                 message = "비밀번호가 일치하지 않습니다."
+             case .unexist:
+                 message = "존재하지 않는 방입니다."
+             }
+            
+            let alertController = UIAlertController(title: "알림", message: message, preferredStyle: .alert)
+            alertController.addAction(UIAlertAction(title: "확인", style: .default))
+            self.present(alertController, animated: true)
+        }
+        
+        
+        if let _ = roomInfo.password {
+            
+            let alertController = UIAlertController(title: "비밀번호", message: "비밀번호를 입력하세요", preferredStyle: .alert)
+            alertController.addTextField()
+            
+            let cancleAction = UIAlertAction(title: "취소", style: .cancel)
+            let okAction = UIAlertAction(title: "확인", style: .default) { [unowned self] action in
+                let password = alertController.textFields?[0].text
+                
+                SocketIOManager.shared.joinRoom(roomId: roomInfo.roomId, userId: myUserId, password: password, completionHandler: completionHandler)
+                
+            }
+            
+            alertController.addAction(okAction)
+            alertController.addAction(cancleAction)
+            
+            self.present(alertController, animated: true)
+            
+        } else {
+            
+            SocketIOManager.shared.joinRoom(roomId: roomInfo.roomId, userId: myUserId, password: nil, completionHandler: completionHandler)
+            
+        }
+                                                
+       
+        /*
+        let roomId = roomList[indexPath.row].roomId
+        
+        SocketIOManager.shared.joinRoom(roomId: <#T##String#>, completionHanlder: <#T##([[String : Any]]) -> Void##([[String : Any]]) -> Void##(_ userList: [[String : Any]]) -> Void#>)
+        
+        let waittingRoom = WaittingRoom(userId: self.myUserId, nickName: self.myNickName, roomId: roomId)
         
         self.navigationController?.pushViewController(waittingRoom, animated: true)
+        */
     }
     
     
@@ -418,11 +535,11 @@ extension Lobby: UITextFieldDelegate {
     
     func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
         
-        let chatRoom = LobbyChattingRoom(nickName: self.myNickName, chattings: self.lobbyChattings)
+        let chatRoom = ChattingRoom(roomId: "LOBBY",nickName: self.myNickName, chattings: self.lobbyChattings)
         self.present(chatRoom, animated: true, completion: nil)
         
         return false
         
     }
-
+    
 }

@@ -12,7 +12,6 @@ class SocketIOManager: NSObject {
     
     static let shared = SocketIOManager()
     
-//    var manager = SocketManager(socketURL: URL(string: "http://localhost:8080")!)
     var manager = SocketManager(socketURL: URL(string: "ws://13.209.69.156:8080")!, config: [
         .log(true),
         .forceWebsockets(true)
@@ -25,12 +24,12 @@ class SocketIOManager: NSObject {
         // 웹소켓 서버에 연결 시도
         socket.connect()
         
-        // 연결 완료되면 서버로 내 정보를 담은 login 이벤트 발송
-        socket.on("connect") { [unowned self] _,_ in
+        // 연결이 완료되면 로비에 참여했다고 알림
+        socket.on("connect") {  [unowned self] _, _ in
             
             let userData: [String:Any] = ["userId":userId, "nickName":nickName]
             
-            socket.emit("login", userData)
+            self.socket.emit("joinLobby", userData)
             
         }
         
@@ -42,162 +41,200 @@ class SocketIOManager: NSObject {
         
     }
     
-    func getRoomList(completionHandler: @escaping (_ roomList: [[String:Any]]) -> Void) {
+    func refreshRoomList() {
+        
+        socket.emit("roomList")
+        
+    }
+    
+    func fetchRoomList(completionHandler: @escaping (_ roomList: [Room]) -> Void) {
         
         socket.on("roomList") { dataArray, ack in
             
-            completionHandler(dataArray[0] as! [[String:Any]])
+            guard let jsonData = try? JSONSerialization.data(withJSONObject: dataArray[0]) else {
+                return
+            }
+            guard let roomList = try? JSONDecoder().decode(RoomList.self, from: jsonData) else {
+                return
+            }
+            
+            completionHandler(roomList.roomList)
             
         }
         
     }
     
-    func getLobbyChatting() {
+    func fetchLobbyChatting() {
         
-        socket.on("newLobbyChatMessage") { dataArray, ack in
+        
+        socket.on("chat") { dataArray, ack in
             
-            NotificationCenter.default.post(name: Notification.Name("newLobbyChatMessageNotification"), object: dataArray[0] as! [String: String])
+            guard let jsonData = try? JSONSerialization.data(withJSONObject: dataArray[0]) else {
+                return
+            }
+            guard let chat = try? JSONDecoder().decode(Chat.self, from: jsonData) else {
+                return
+            }
+            
+            NotificationCenter.default.post(name: Notification.Name("newChatNotification"), object: chat)
+        }
+        
+    }
+    
+    func fetchLobbyUserList() {
+        
+        
+        socket.on("lobbyUserList") { dataArray, ack in
+            
+            guard let jsonData = try? JSONSerialization.data(withJSONObject: dataArray[0]) else {
+                return
+            }
+            guard let userList = try? JSONDecoder().decode(UserList.self, from: jsonData) else {
+                return
+            }
+            
+            NotificationCenter.default.post(name: Notification.Name("getLobbyUserListNotification"), object: userList.users)
+        }
+        
+    }
+    
+    func fetchRoomInfo(roomId: String, completionHandler: @escaping (_ roomInfo: Room) -> Void) {
+        
+        let roomData:[String:String] = ["roomId":roomId]
+        
+        socket.emit("roomInfo", roomData)
+        
+        socket.on("roomInfo") { dataArray, ack in
+            
+            guard let jsonData = try? JSONSerialization.data(withJSONObject: dataArray[0]) else {
+                return
+            }
+            guard let roomInfo = try? JSONDecoder().decode(Room.self, from: jsonData) else {
+                return
+            }
+            
+            completionHandler(roomInfo)
+        }
+    
+    }
+    
+    func fetchUserList(completionHandler: @escaping (_ userList: [UserInRoom]) -> Void) {
+        
+        socket.on("userList") { dataArray, ack in
+            
+            guard let jsonData = try? JSONSerialization.data(withJSONObject: dataArray[0]) else {
+                return
+            }
+            guard let userList = try? JSONDecoder().decode([UserInRoom].self, from: jsonData) else {
+                return
+            }
+            
+            completionHandler(userList)
+        }
+    
+    }
+    
+    
+    func sendMessage(roomId: String, message: String, nickname: String){
+        
+        let chatData: [String: String] = ["nickName": nickname, "message": message, "roomId": roomId]
+        
+        socket.emit("chat", chatData)
+        
+    }
+    
+    
+    func createRoom(room: [String:Any]) {
+        
+        socket.emit("createRoom", room)
+        
+        socket.on("createRoom") { [unowned self] dataArray, ack in
+            
+            let roomId = (dataArray[0] as! [String:Any])["roomId"]
+            
+            NotificationCenter.default.post(name: Notification.Name(rawValue: "enterCreatedRoomNotification"), object: roomId)
+                    
+            self.socket.off("createRoom")
+        }
+        
+    }
+    
+    func joinRoom(roomId: String, userId: Int, password:String?, completionHandler: @escaping (_ status: JoinStatus) -> Void) {
+        
+        let joinData: [String:Any] = ["roomId":roomId, "userId":userId, "password":password as Any]
+        
+        socket.emit("joinRoom", joinData)
+        
+        socket.on("joinRoom") { dataArray, ack in
+            
+            guard let jsonData = try? JSONSerialization.data(withJSONObject: dataArray[0]) else {
+                return }
+            
+            guard let status = try? JSONDecoder().decode(JoinRoom.self, from: jsonData) else { return }
+            
+            completionHandler(status.status)
+            
+            self.socket.off("joinRoom")
+        }
+        
+    }
+    
+    func leaveRoom(roomId:String, userId: Int){
+        
+        let newData: [String: Any] = ["roomId":roomId, "userId": userId]
+        
+        socket.off("roomInfo")
+        
+        socket.off("kick")
+        
+        socket.emit("leaveRoom", newData)
+        
+        
+    }
+    
+    func getReady(roomId:String, userId: Int){
+        
+        let readyData: [String: Any] = ["roomId":roomId, "userId":userId]
+        
+        socket.emit("getReady", readyData)
+        
+    }
+    
+    func kick(roomId:String, userId: Int) {
+        
+        let kickData: [String: Any] = ["roomId":roomId,"userId": userId]
+        
+        socket.emit("kick", kickData)
+        
+    }
+    
+    func getKicked(completionHandler: @escaping (_ userId: Int) -> Void){
+        
+        socket.on("kick") { dataArray, ack in
+            
+            let userId = (dataArray[0] as! [String:Any])["userId"] as! Int
+            
+            completionHandler(userId)
             
         }
         
     }
     
-    func getConnectedUserList() {
+    func editRoom(room: [String:Any], completionHandler: @escaping (_ status:EditStatus) -> Void) {
         
+        socket.emit("editRoom", room)
         
-        socket.on("connectedUserList") { dataArray, ack in
+        socket.on("editRoom") { [unowned self] dataArray, ack in
             
-            NotificationCenter.default.post(name: Notification.Name("getConnectedUserListNotification"), object: dataArray[0] as! [[String: Any]])
+            guard let jsonData = try? JSONSerialization.data(withJSONObject: dataArray[0]) else {
+                return }
             
+            guard let status = try? JSONDecoder().decode(EditRoom.self, from: jsonData) else { return }
+            
+            completionHandler(status.status)
+            
+            self.socket.off("editRoom")
         }
-        
-    }
-    
-    
-    func sendMessage(message: String, nickname: String){
-        
-        let chatData: [String: String] = ["nickName": nickname, "message": message]
-        
-        socket.emit("lobbyChatMessage", chatData)
-        
-    }
-    
-    func getChatMessage(completionHandler: @escaping (_ messageInfo: [String: Any]) -> Void) {
-        
-        /*
-        socket.on("newChatMessage") { dataArray, ack in
-            var messageDictionary = [String: Any]()
-            messageDictionary["nickname"] = dataArray[0] as! String
-            messageDictionary["message"] = dataArray[1] as! String
-            messageDictionary["date"] = dataArray[2] as! String
-            
-            completionHandler(messageDictionary)
-        }
-        */
-        
-        socket.on("newLobbyChatMessage") { dataArray, ack in
-            print("새로운 메세지 확인")
-            
-            var messageDictionary = [String: Any]()
-            let newData = dataArray[0] as! [String:Any]
-            messageDictionary["nickname"] = newData["nickName"] as! String
-            messageDictionary["message"] = newData["message"] as! String
-            messageDictionary["date"] = "알아서 뭐하게?"
-            
-            completionHandler(messageDictionary)
-        }
-        
-    }
-    
-    private func listenForOtherMessage() {
-        
-        socket.on("userConnectUpdate") { dataArray, ack in
-            
-            NotificationCenter.default.post(name: Notification.Name(rawValue: "userWasConnectedNotification"), object: dataArray[0] as! [String: AnyObject])
-            
-        }
-        
-        socket.on("userExitUpdate") { dataArray, ack in
-            
-            NotificationCenter.default.post(name: Notification.Name(rawValue: "userWasDisconnectedNotification"), object: dataArray[0] as! String)
-            
-        }
-        
-        socket.on("userTypingUpdate") { dataArray, ack in
-            
-            NotificationCenter.default.post(name: Notification.Name(rawValue: "userTypingNotification"), object: dataArray[0] as? [String: AnyObject])
-            
-        }
-    }
-    
-    func connectToServer(completionHandler: @escaping (_ userList: [[String: Any]]) -> Void) {
-        
-        /*
-        let data: [String: Any] = ["userId": myProfile.userID, "nickName": myProfile.nickname]
-        
-        socket.emit("login", data)
-        
-        
-        socket.on("connectedUserList") { dataArray, ack in
-
-            connectedUserList = dataArray[0] as! [[String:Any]]
-        }
-        
-        socket.on("roomList") { dataArray, ack in
-            
-            roomList = dataArray[0] as! [[String:Any]]
-         
-        }
-        */
-        
-        
-    }
-    
-    func exitChatWithNickname(nickname: String, completionHandler: () -> Void) {
-        
-        socket.emit("exitUser", nickname)
-        completionHandler()
-        
-    }
-    
-    func sendStartTypingMessage(nickname: String) {
-        
-        socket.emit("startType", nickname)
-        
-    }
-    
-    func sendStopTypingMessage(nickname: String) {
-        
-        socket.emit("stopType", nickname)
-        
-    }
-    
-    func createRoom(roomTitle: String, password: String?, gameType: Int, subject: String, maxUser: Int) {
-        
-        var newData: [String: Any] = ["title":roomTitle, "password":password, "gameType":gameType, "subject":subject, "maxUser": 6]
-        
-        socket.emit("createRoom", newData)
-        
-        socket.on("newRoom") { dataArray, ack in
-            
-            newData["roomId"] = dataArray[0] as! String
-            NotificationCenter.default.post(name: Notification.Name(rawValue: "newRoomNotification"), object: newData as? [String: AnyObject])
-            
-        }
-        
-    }
-    
-    func joinRoom(roomId: String) {
-        
-        let newData: [String:String] = ["roomId":roomId]
-        
-        socket.emit("joinRoom", newData)
-        
-    }
-    
-    func getReady(userId: Int){
-        
-        socket.emit("getReady", userId)
         
     }
     

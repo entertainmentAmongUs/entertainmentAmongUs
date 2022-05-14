@@ -44,21 +44,23 @@ class ProfileCell: UICollectionViewCell {
     func addImage(_ size: CGSize) {
         
         let image = UIImageView()
+        let imageWidth = 2*size.height/3
         
         self.contentView.addSubview(image)
+        
         
         image.backgroundColor = .white
         image.image = nil
         image.contentMode = .scaleAspectFit
-        image.layer.cornerRadius = size.width/4
+        image.layer.cornerRadius = imageWidth/2
         image.clipsToBounds = true
         
         /* 셀 크기에 따라 이미지 크기 및 오토 레이아웃 설정 */
         image.translatesAutoresizingMaskIntoConstraints = false
         image.topAnchor.constraint(equalTo: self.contentView.topAnchor, constant: 5).isActive = true
         image.centerXAnchor.constraint(equalTo: self.contentView.centerXAnchor).isActive = true
-        image.widthAnchor.constraint(equalToConstant: size.width/2).isActive = true
-        image.heightAnchor.constraint(equalToConstant: size.width/2).isActive = true
+        image.widthAnchor.constraint(equalToConstant: imageWidth).isActive = true
+        image.heightAnchor.constraint(equalToConstant: imageWidth).isActive = true
         
         
         self.image = image
