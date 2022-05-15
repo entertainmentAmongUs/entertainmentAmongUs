@@ -304,11 +304,11 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
     
     func getReadyToStarted() {
         
-        SocketIOManager.shared.startGame (roomId: roomId){ [unowned self] playingInfo in
+        SocketIOManager.shared.startGame { [unowned self] playingInfo in
             
             guard let userList = roomInfo?.users else { return }
             
-            let playingRoom = PlayingRoom(userId: myUserId, nickName: myNickName, playingInfo: playingInfo, userList: userList)
+            let playingRoom = PlayingRoom(userId: myUserId, nickName: myNickName, playingInfo: playingInfo, userList: userList, roomId: roomId)
             
             self.navigationController?.pushViewController(playingRoom, animated: true)
             

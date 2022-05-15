@@ -104,6 +104,7 @@ struct RoomUserList: Codable {
     
 }
 
+
 /* 게임방에 대한 정보 */
 struct Room: Codable {
     

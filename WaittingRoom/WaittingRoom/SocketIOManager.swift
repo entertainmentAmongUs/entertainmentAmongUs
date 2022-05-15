@@ -222,26 +222,6 @@ class SocketIOManager: NSObject {
         
     }
     
-    func startGame(roomId: String, completionHandler: @escaping (_ playingInfo: PlayingInfo) -> Void){
-        
-        socket.on("startGame") { dataArray, ack in
-            
-            guard let jsonData = try? JSONSerialization.data(withJSONObject: dataArray[0]) else {
-                return }
-            
-            guard let playingInfo = try? JSONDecoder().decode(PlayingInfo.self, from: jsonData) else { return }
-            
-            completionHandler(playingInfo)
-            
-            let newData: [String: String] = ["roomId":roomId]
-            
-            self.socket.emit("loadingEnd", newData)
-            
-            self.socket.off("startGame")
-            
-        }
-        
-    }
     
     func editRoom(room: [String:Any], completionHandler: @escaping (_ status:EditStatus) -> Void) {
         
@@ -257,6 +237,42 @@ class SocketIOManager: NSObject {
             completionHandler(status.status)
             
             self.socket.off("editRoom")
+        }
+        
+    }
+    
+    func startGame(completionHandler: @escaping (_ playingInfo: PlayingInfo) -> Void){
+        
+        socket.on("startGame") { dataArray, ack in
+            
+            guard let jsonData = try? JSONSerialization.data(withJSONObject: dataArray[0]) else {
+                return }
+            
+            guard let playingInfo = try? JSONDecoder().decode(PlayingInfo.self, from: jsonData) else { return }
+            
+            completionHandler(playingInfo)
+            
+            self.socket.off("startGame")
+            
+        }
+        
+    }
+    
+    func endAnnouncemnet(roomId: String, completionHandler: @escaping (_ playingTime: PlayingTime) -> Void) {
+        
+        let newData: [String: String] = ["roomId":roomId]
+        
+        self.socket.emit("loadingEnd", newData)
+        
+        self.socket.on("time") { dataArray, ack in
+            
+            guard let jsonData = try? JSONSerialization.data(withJSONObject: dataArray[0]) else {
+                return }
+            
+            guard let playingTime = try? JSONDecoder().decode(PlayingTime.self, from: jsonData) else { return }
+            
+            completionHandler(playingTime)
+            
         }
         
     }

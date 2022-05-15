@@ -30,10 +30,13 @@ class PlayingRoom: UIViewController, UITextFieldDelegate {
     
     var myNickName: String
     var myUserId: Int
+    var roomId: String
     
     var playingInfo: PlayingInfo
     var userList: [UserInRoom]
     var chattings: [Chat] = []
+    var time = -1
+    var currentOrder = -1
     lazy var gestureRecognizer = UITapGestureRecognizer()
     
     
@@ -246,6 +249,56 @@ class PlayingRoom: UIViewController, UITextFieldDelegate {
         
     }
     
+    
+    // MARK: Function Method
+    
+    func announcement() {
+        
+        let timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(10), repeats: false) { [unowned self] timer in
+            print("시간 끝")
+            SocketIOManager.shared.endAnnouncemnet(roomId: roomId) { playingInfo in
+                
+                self.time = playingInfo.time
+                
+                self.currentOrder = playingInfo.order
+                
+            }
+            
+            guard let label = self.announcementLabel else {return}
+            label.text = "다른 플레이어를 기다리는 중..."
+            blink(label)
+        }
+        
+        RunLoop.main.add(timer, forMode: .common)
+    }
+    
+    func blink(_ view: UIView) {
+        
+        UIView.animate(withDuration: 0.5, delay: 0, options: [.repeat, .autoreverse, .curveEaseInOut, .allowUserInteraction]) {
+            view.alpha = 0.0
+        } completion: { _ in
+            view.alpha = 1.0
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            view.layer.removeAllAnimations()
+        }
+        
+    }
+    
+    func damping(_ view: UIView) {
+        
+        UIView.animate(withDuration: 1, delay: 0, usingSpringWithDamping: 0.2, initialSpringVelocity: 0.2, options: [.curveEaseInOut]) {
+            view.transform = CGAffineTransform(scaleX: 1.5, y: 1.5)
+        } completion: { _ in
+            view.transform = CGAffineTransform(scaleX: 1.0, y: 1.0)
+        }
+        
+    }
+    
+    
+    
+    
     // MARK: Action Method
     
     @objc func getNewChatting(noti:Notification) {
@@ -357,6 +410,8 @@ class PlayingRoom: UIViewController, UITextFieldDelegate {
         self.addTimerView()
         
         
+        self.announcement()
+        
     }
     
     // MARK: - Initialization
@@ -365,11 +420,12 @@ class PlayingRoom: UIViewController, UITextFieldDelegate {
         fatalError()
     }
     
-    init(userId: Int, nickName: String, playingInfo: PlayingInfo, userList: [UserInRoom]){
+    init(userId: Int, nickName: String, playingInfo: PlayingInfo, userList: [UserInRoom], roomId: String){
         self.myUserId = userId
         self.myNickName = nickName
         self.playingInfo = playingInfo
         self.userList = userList
+        self.roomId = roomId
         super.init(nibName: nil, bundle: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(getNewChatting(noti:)), name: Notification.Name("newChatNotification"), object: nil)
