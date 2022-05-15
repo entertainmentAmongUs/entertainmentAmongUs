@@ -187,6 +187,8 @@ class SocketIOManager: NSObject {
         
         socket.off("kick")
         
+        socket.off("startGame")
+        
         socket.emit("leaveRoom", newData)
         
         
@@ -215,6 +217,27 @@ class SocketIOManager: NSObject {
             let userId = (dataArray[0] as! [String:Any])["userId"] as! Int
             
             completionHandler(userId)
+            
+        }
+        
+    }
+    
+    func startGame(roomId: String, completionHandler: @escaping (_ playingInfo: PlayingInfo) -> Void){
+        
+        socket.on("startGame") { dataArray, ack in
+            
+            guard let jsonData = try? JSONSerialization.data(withJSONObject: dataArray[0]) else {
+                return }
+            
+            guard let playingInfo = try? JSONDecoder().decode(PlayingInfo.self, from: jsonData) else { return }
+            
+            completionHandler(playingInfo)
+            
+            let newData: [String: String] = ["roomId":roomId]
+            
+            self.socket.emit("loadingEnd", newData)
+            
+            self.socket.off("startGame")
             
         }
         

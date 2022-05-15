@@ -133,6 +133,21 @@ struct Chat: Codable {
     let message: String
 }
 
+struct PlayingInfo: Codable {
+    
+    var keyword: String
+    var order: [Int]
+    var liarNumber: Int
+    
+}
+
+struct PlayingTime: Codable {
+    
+    var time: Int
+    var order: Int
+    
+}
+
 
 /* 유저의 프로필 정보 */
 struct Profile {

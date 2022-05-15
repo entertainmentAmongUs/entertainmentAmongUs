@@ -21,7 +21,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window = UIWindow(frame: scene.coordinateSpace.bounds)
         window?.windowScene = scene
         
-        let lobby = Lobby(id: 3, nickName: "남궁광")
+        let lobby = Lobby(id: 2, nickName: "김낙현")
         let navigationController = UINavigationController(rootViewController: lobby)
         
         window?.rootViewController = navigationController

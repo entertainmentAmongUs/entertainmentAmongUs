@@ -265,7 +265,7 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
             view.addSubview(label)
             
             label.text = "최대 인원"
-            label.font = .systemFont(ofSize: 20, weight: .medium)
+            label.font = .systemFont(ofSize: 15, weight: .medium)
             label.translatesAutoresizingMaskIntoConstraints = false
             label.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 10).isActive = true
             label.topAnchor.constraint(equalTo: view.topAnchor, constant:  10).isActive = true
@@ -309,7 +309,7 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
             view.addSubview(label)
             
             label.text = "주제 선택"
-            label.font = .systemFont(ofSize: 20, weight: .medium)
+            label.font = .systemFont(ofSize: 15, weight: .medium)
             label.translatesAutoresizingMaskIntoConstraints = false
             label.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 10).isActive = true
             label.topAnchor.constraint(equalTo: view.topAnchor, constant:  10).isActive = true

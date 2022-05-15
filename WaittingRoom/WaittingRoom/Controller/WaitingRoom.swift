@@ -302,6 +302,21 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
         
     }
     
+    func getReadyToStarted() {
+        
+        SocketIOManager.shared.startGame (roomId: roomId){ [unowned self] playingInfo in
+            
+            guard let userList = roomInfo?.users else { return }
+            
+            let playingRoom = PlayingRoom(userId: myUserId, nickName: myNickName, playingInfo: playingInfo, userList: userList)
+            
+            self.navigationController?.pushViewController(playingRoom, animated: true)
+            
+        }
+        
+        
+    }
+    
     
     // MARK: - Action Method
     
@@ -495,6 +510,7 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
         getRoomInfo()
         getUserList()
         getReadyToKicked()
+        getReadyToStarted()
         
     }
     
