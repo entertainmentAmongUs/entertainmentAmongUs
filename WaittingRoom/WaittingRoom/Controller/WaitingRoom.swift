@@ -107,7 +107,7 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
         setting.setTitle("방 설정", for: .normal)
         setting.addTarget(self, action: #selector(self.touchSettingButton(_:)), for: .touchUpInside)
         setting.titleLabel?.font = UIFont.systemFont(ofSize: 20, weight: .medium)
-//        setting.isEnabled = Bool(myProfile.userID == Myroom.masterUserID)
+        setting.isEnabled = roomInfo?.hostId == myUserId ? true : false
         
         self.roomSettingButton = setting
         
@@ -269,6 +269,8 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
             self?.navigationItem.title = roomInfo.title
             
             self?.waitUserCollection?.reloadData()
+            
+            self?.roomSettingButton?.isEnabled = roomInfo.hostId == self?.myUserId ? true : false
             
         }
         

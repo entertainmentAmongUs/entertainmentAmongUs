@@ -95,6 +95,7 @@ class RoomCreating: UIViewController, UIPickerViewDataSource, UIPickerViewDelega
             textField.autocapitalizationType = .none
             textField.delegate = self
             textField.placeholder = "방 제목을 입력하세요"
+            textField.enablesReturnKeyAutomatically = true
             
             textField.translatesAutoresizingMaskIntoConstraints = false
             textField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 15).isActive = true
@@ -156,6 +157,7 @@ class RoomCreating: UIViewController, UIPickerViewDataSource, UIPickerViewDelega
             textField.isHidden = !active
             textField.placeholder = "방 비밀번호를 입력하세요"
             textField.delegate = self
+            textField.enablesReturnKeyAutomatically = true
             
             textField.translatesAutoresizingMaskIntoConstraints = false
             textField.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 5).isActive = true
@@ -378,6 +380,7 @@ class RoomCreating: UIViewController, UIPickerViewDataSource, UIPickerViewDelega
         complete.addTarget(self, action: #selector(touchCompleteButton(_:)), for: .touchUpInside)
         complete.setTitle("완료", for: .normal)
         complete.titleLabel?.font = .systemFont(ofSize: 20, weight: .semibold)
+        complete.isEnabled = false
         
         self.completeButton = complete
         
@@ -496,6 +499,20 @@ class RoomCreating: UIViewController, UIPickerViewDataSource, UIPickerViewDelega
         return true
     }
     
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        if textField == roomTitleTextField {
+            
+            if let text = (textField.text as? NSString)?.replacingCharacters(in: range, with: string) {
+                completeButton?.isEnabled = text.isEmpty ? false : true
+            } else {
+                completeButton?.isEnabled = false
+            }
+            
+        }
+        
+        return true
+    }
+   
     
     // MARK: - Action
     

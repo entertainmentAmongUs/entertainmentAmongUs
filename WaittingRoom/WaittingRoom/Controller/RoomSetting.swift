@@ -496,6 +496,19 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
         return true
     }
     
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        if textField == roomTitleTextField {
+            
+            if let text = (textField.text as? NSString)?.replacingCharacters(in: range, with: string) {
+                completeButton?.isEnabled = text.isEmpty ? false : true
+            } else {
+                completeButton?.isEnabled = false
+            }
+            
+        }
+        
+        return true
+    }
     
     // MARK: - Action
     
