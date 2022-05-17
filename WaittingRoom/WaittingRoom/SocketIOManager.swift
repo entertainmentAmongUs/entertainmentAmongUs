@@ -258,7 +258,7 @@ class SocketIOManager: NSObject {
         
     }
     
-    func endAnnouncemnet(roomId: String, completionHandler: @escaping (_ playingTime: PlayingTime) -> Void) {
+    func endAnnouncemnet(roomId: String, completionHandler: @escaping (_ tickTok: TickTok) -> Void) {
         
         let newData: [String: String] = ["roomId":roomId]
         
@@ -269,9 +269,9 @@ class SocketIOManager: NSObject {
             guard let jsonData = try? JSONSerialization.data(withJSONObject: dataArray[0]) else {
                 return }
             
-            guard let playingTime = try? JSONDecoder().decode(PlayingTime.self, from: jsonData) else { return }
+            guard let tickTok = try? JSONDecoder().decode(TickTok.self, from: jsonData) else { return }
             
-            completionHandler(playingTime)
+            completionHandler(tickTok)
             
         }
         

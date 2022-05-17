@@ -596,8 +596,8 @@ class RoomCreating: UIViewController, UIPickerViewDataSource, UIPickerViewDelega
         /* 현재 방에 설정돼있는 주제를 표시 */
         guard let subject = subjectPicker else {return}
         
-        subject.selectRow(0, inComponent: 0, animated: true)
-        subject.selectRow(0, inComponent: 1, animated: true)
+        subject.selectRow(0, inComponent: 0, animated: false)
+        subject.selectRow(0, inComponent: 1, animated: false)
         subject.reloadAllComponents()
         
     }

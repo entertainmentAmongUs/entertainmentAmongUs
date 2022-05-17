@@ -11,6 +11,7 @@ class PlayingRoom: UIViewController, UITextFieldDelegate {
     
     // MARK: - Properties
     
+    // MARK: About View
     var chatView: UITableView?
     var announcementLabel: UILabel?
     var keywordLabel: UILabel?
@@ -27,6 +28,11 @@ class PlayingRoom: UIViewController, UITextFieldDelegate {
     let hintCellIdentifier = "hintCell"
     let playerCellIdentifier = "playerCell"
     var timeStackBottomConstraint: NSLayoutConstraint?
+    var bottomHeight: CGFloat?
+    
+    lazy var gestureRecognizer = UITapGestureRecognizer()
+    
+    // MARK: About Game
     
     var myNickName: String
     var myUserId: Int
@@ -35,9 +41,13 @@ class PlayingRoom: UIViewController, UITextFieldDelegate {
     var playingInfo: PlayingInfo
     var userList: [UserInRoom]
     var chattings: [Chat] = []
-    var time = -1
+    var hint: [String] = []
+    var time: Int {
+        willSet {
+            timeLabel?.text = "남은 시간: \(newValue)초"
+        }
+    }
     var currentOrder = -1
-    lazy var gestureRecognizer = UITapGestureRecognizer()
     
     
     // MARK: - Method
@@ -50,7 +60,7 @@ class PlayingRoom: UIViewController, UITextFieldDelegate {
         
         self.view.addSubview(label)
         
-        label.font = .systemFont(ofSize: 30, weight: .medium)
+        label.font = .systemFont(ofSize: 30, weight: .bold)
         label.textAlignment = .center
         label.adjustsFontSizeToFitWidth = true
         label.numberOfLines = 1
@@ -75,9 +85,8 @@ class PlayingRoom: UIViewController, UITextFieldDelegate {
         
         self.view.addSubview(keyword)
         
-        keyword.font = .systemFont(ofSize: 20, weight: .semibold)
+        keyword.font = .systemFont(ofSize: 18, weight: .regular)
         keyword.textAlignment = .center
-        
         
         keyword.translatesAutoresizingMaskIntoConstraints = false
         keyword.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 5).isActive = true
@@ -159,14 +168,17 @@ class PlayingRoom: UIViewController, UITextFieldDelegate {
     func addPlayerCollection() {
         
         
-        //        let cellWidthAndHeight = (self.view.safeAreaLayoutGuide.layoutFrame.width-100)/4
+        let cellHeight = (self.view.safeAreaLayoutGuide.layoutFrame.height/9).rounded()
+        
+        self.bottomHeight = cellHeight
+        
         
         let flow = UICollectionViewFlowLayout()
         flow.scrollDirection = .horizontal
         flow.minimumInteritemSpacing = 0
         flow.minimumLineSpacing = 15
         flow.sectionInset = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
-        flow.itemSize = CGSize(width: 70, height: 90)
+        flow.itemSize = CGSize(width: cellHeight-20, height: cellHeight)
         
         let collection = UICollectionView(frame: .zero, collectionViewLayout: flow)
         
@@ -179,12 +191,10 @@ class PlayingRoom: UIViewController, UITextFieldDelegate {
         collection.allowsSelection = false
         
         
-        
-        
         collection.translatesAutoresizingMaskIntoConstraints = false
         collection.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 20).isActive = true
         collection.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -20).isActive = true
-        collection.heightAnchor.constraint(equalToConstant: 90).isActive = true
+        collection.heightAnchor.constraint(equalToConstant: cellHeight).isActive = true
         collection.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         
         collection.setContentHuggingPriority(.defaultHigh, for: .vertical)
@@ -198,6 +208,7 @@ class PlayingRoom: UIViewController, UITextFieldDelegate {
     func addTimerView() {
         
         guard let textfield = self.chatTextField else {return}
+        guard let height = self.bottomHeight else {return}
         
         let minus = UIButton(type: .system)
         let plus = UIButton(type: .system)
@@ -217,6 +228,7 @@ class PlayingRoom: UIViewController, UITextFieldDelegate {
         timer.text = "남은 시간"
         timer.textAlignment = .center
         timer.font = .systemFont(ofSize: 20, weight: .medium)
+        timer.adjustsFontSizeToFitWidth = true
         
         self.timeLabel = timer
         
@@ -234,7 +246,7 @@ class PlayingRoom: UIViewController, UITextFieldDelegate {
         stack.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -20).isActive = true
         stack.topAnchor.constraint(equalTo: textfield.bottomAnchor, constant: 5).isActive = true
         
-        let bottom = stack.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor, constant: -100)
+        let bottom = stack.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor, constant: -(height + 10.0))
         
         bottom.isActive = true
         
@@ -252,21 +264,110 @@ class PlayingRoom: UIViewController, UITextFieldDelegate {
     
     // MARK: Function Method
     
+    func isMyTurn (_ status: PlayStatus, _ order: Int) -> Bool {
+        
+        if status == .freeChat || (status == .hint && userList[order].userId == myUserId) {
+            return true
+        } else {
+            return false
+        }
+        
+    }
+    
+    func changeTextFieldState(_ turn: Bool) {
+        
+        guard let textField = chatTextField else { return }
+        
+        if turn {
+            
+            textField.isEnabled = true
+            
+            textField.backgroundColor = .white
+            
+        } else {
+            
+            textField.isEnabled = false
+            
+            textField.backgroundColor = .systemGray6
+            
+            self.view.endEditing(true)
+            
+        }
+
+        
+    }
+    
+    func showLiar() {
+        
+        guard let announce = self.announcementLabel else { return }
+        guard let keyword = keywordLabel else { return }
+        
+        if playingInfo.liarNumber == myUserId {
+            
+            announce.text = "당신은 라이어입니다!"
+            keyword.text = "다른 유저들의 힌트를 보고 키워드를 알아내세요."
+            
+        } else {
+            
+            announce.text = "당신은 라이어가 아닙니다."
+            keyword.text = "키워드: \(playingInfo.keyword)"
+            
+        }
+        
+        blink(announce)
+        blink(keyword)
+
+        
+    }
+    
+    func changeOrder(_ status: PlayStatus, _ order: Int) {
+        
+        guard let announce = self.announcementLabel else { return }
+        
+        // 힌트 제시하는 차례고 턴이 바뀌면 안내
+        if status == .hint && currentOrder != order {
+            
+            announce.text = "\(userList[order].nickName)님이 힌트를 입력중입니다."
+            currentOrder = order
+            blink(announce)
+            
+            
+        } else if status == .freeChat && currentOrder != order {
+            
+            announce.text = "남은 시간동안 자유롭게 토론하세요"
+            currentOrder = order
+            blink(announce)
+            
+            
+        } else if status == .vote {
+            
+            announce.text = "하단의 유저를 클릭하여 라이어를 지명하세요"
+            
+        }
+        
+        
+    }
+    
+    
     func announcement() {
         
+        showLiar()
+        
         let timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(10), repeats: false) { [unowned self] timer in
-            print("시간 끝")
-            SocketIOManager.shared.endAnnouncemnet(roomId: roomId) { playingInfo in
+
+            SocketIOManager.shared.endAnnouncemnet(roomId: roomId) { [unowned self] tickTok in
                 
-                self.time = playingInfo.time
+                time = tickTok.time
                 
-                self.currentOrder = playingInfo.order
+                changeOrder(tickTok.status, tickTok.order)
+                
+                changeTextFieldState(isMyTurn(tickTok.status, tickTok.order))
                 
             }
             
             guard let label = self.announcementLabel else {return}
             label.text = "다른 플레이어를 기다리는 중..."
-            blink(label)
+//            blink(label)
         }
         
         RunLoop.main.add(timer, forMode: .common)
@@ -368,11 +469,11 @@ class PlayingRoom: UIViewController, UITextFieldDelegate {
     @objc func keyboardWillHide(_ noti: Notification) {
         
         guard let duration = noti.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval else {return}
-        
         guard let bottom = self.timeStackBottomConstraint else {return}
+        guard let height = self.bottomHeight else {return}
         
         UIView.animate(withDuration: duration) {
-            bottom.constant = -100
+            bottom.constant = -(height + 10.0)
         }
     }
     
@@ -397,7 +498,7 @@ class PlayingRoom: UIViewController, UITextFieldDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.navigationItem.hidesBackButton = true
+        self.navigationController?.isNavigationBarHidden = true
         self.view.backgroundColor = .systemGray6
     
         self.gestureRecognizer.addTarget(self, action: #selector(self.hideKeyboard))
@@ -426,6 +527,7 @@ class PlayingRoom: UIViewController, UITextFieldDelegate {
         self.playingInfo = playingInfo
         self.userList = userList
         self.roomId = roomId
+        self.time = -1
         super.init(nibName: nil, bundle: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(getNewChatting(noti:)), name: Notification.Name("newChatNotification"), object: nil)
@@ -440,10 +542,12 @@ class PlayingRoom: UIViewController, UITextFieldDelegate {
 
 }
 
+// MARK: - UITableView DataSource
+
 extension PlayingRoom: UITableViewDataSource, UITableViewDelegate {
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return userList.count+1
+        return hint.count
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -459,9 +563,9 @@ extension PlayingRoom: UITableViewDataSource, UITableViewDelegate {
         if indexPath.section < userList.count {
             let cell = tableView.dequeueReusableCell(withIdentifier: hintCellIdentifier, for: indexPath) as!  HintCell
             
-//            let hint = sections[indexPath.section]
+//            let hint = hint[indexPath.section]
             
-            cell.chatting?.text = "예시입니다"
+            cell.chatting?.text = "예시"
             
             return cell
             
@@ -508,6 +612,8 @@ extension PlayingRoom: UITableViewDataSource, UITableViewDelegate {
     }
     
 }
+
+// MARK: - UICollectionView DataSource
 
 extension PlayingRoom: UICollectionViewDataSource, UICollectionViewDelegate {
     

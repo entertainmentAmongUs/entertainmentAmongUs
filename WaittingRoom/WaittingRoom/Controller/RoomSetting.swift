@@ -323,7 +323,7 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
             picker.dataSource = self
             picker.delegate = self
             picker.tag = 1
-            picker.selectRow(1, inComponent: 0, animated: false)
+            picker.selectRow(0, inComponent: 0, animated: false)
             
             picker.translatesAutoresizingMaskIntoConstraints = false
             picker.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 0).isActive = true
@@ -597,13 +597,13 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
     override func viewDidAppear(_ animated: Bool) {
         
         /* 현재 방에 설정돼있는 주제를 표시 */
-//        guard let subject = subjectPicker else {return}
+        guard let subject = subjectPicker else {return}
         
-        /*
-        subject.selectRow(Myroom.category.subjectID, inComponent: 0, animated: true)
-        subject.selectRow(Myroom.category.categoryID, inComponent: 1, animated: true)
+        
+        subject.selectRow(0, inComponent: 0, animated: false)
+        subject.selectRow(0, inComponent: 1, animated: false)
         subject.reloadAllComponents()
-        */
+        
     }
     
 

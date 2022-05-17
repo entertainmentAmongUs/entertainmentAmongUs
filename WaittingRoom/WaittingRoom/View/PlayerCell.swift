@@ -26,13 +26,13 @@ class PlayerCell: UICollectionViewCell {
         }
     }
     
-    func addPlayerImage() {
+    func addPlayerImage(width: CGFloat) {
         
         let image = UIImageView()
         
         self.contentView.addSubview(image)
         
-        image.layer.cornerRadius = 35
+        image.layer.cornerRadius = width/2
         image.clipsToBounds = true
         image.backgroundColor = .white
         image.image = UIImage(named: "ic_user_loading")
@@ -86,7 +86,7 @@ class PlayerCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        self.addPlayerImage()
+        self.addPlayerImage(width: frame.width)
         self.addNicknameLabel()
     }
     
