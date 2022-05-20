@@ -27,12 +27,21 @@ spring:
       hibernate:
         format_sql: true
   thymeleaf:
-    prefix: classpath:templates/
+    prefix: classpath:/templates/
     check-templates-location: true
     suffix: .html
     mode: HTML5
     cache: false
     order: 0
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 849784182633-0281623723ls8vuv5pcrauj3u0v2ivcf.apps.googleusercontent.com
+            client-secret: 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
+#  profiles:
+#    include: google
 server:
   port: 8080
   error:

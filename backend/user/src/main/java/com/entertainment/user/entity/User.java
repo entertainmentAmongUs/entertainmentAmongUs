@@ -37,6 +37,11 @@ public class User implements UserDetails {
     @Column
     private String code;            //사용자의 이메일 인증 코드
 
+//    @Enumerated(EnumType.STRING)
+//    @Column(nullable = false)
+//    private Role role;
+
+    @Builder
     public User(RegisterReq registerDto) {
         this.email = registerDto.getEmail();
         this.nickname = registerDto.getNickname();
@@ -44,6 +49,15 @@ public class User implements UserDetails {
         this.token = "Token"+this.nickname;
         this.code="";
     }
+
+    public User update(String nickname) {
+        this.nickname = nickname;
+        return this;
+    }
+
+//    public String getRoleKey(){
+//        return this.role.getKey();
+//    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

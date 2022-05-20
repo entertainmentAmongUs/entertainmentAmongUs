@@ -3,6 +3,7 @@ package com.entertainment.user.controller;
 import com.entertainment.user.config.security.JwtTokenProvider;
 import com.entertainment.user.entity.Profile;
 import com.entertainment.user.entity.SessionKey;
+//import com.entertainment.user.entity.SessionUser;
 import com.entertainment.user.repository.UserRepository;
 import com.entertainment.user.request.ChangePwReq;
 import com.entertainment.user.request.CodeReq;
@@ -15,13 +16,22 @@ import com.entertainment.user.service.SessionService;
 import com.entertainment.user.service.UserService;
 import com.fasterxml.jackson.databind.ser.Serializers;
 //import io.swagger.annotations.ApiOperation;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -29,9 +39,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 @Slf4j
 @RequiredArgsConstructor
+@Api(value = "SwaggerTestController")
 @RestController
 //@RequestMapping("/user")
 public class UserController {
@@ -48,7 +60,14 @@ public class UserController {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
+    private final HttpSession httpSession;
 
+    //1번 기능
+    @ApiOperation(value = "test", notes="테스트입니다.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "OK!"),
+            @ApiResponse(code = 404, message = "page not found!")
+    })
     @PostMapping("/users/new-user")
     //@ApiOperation(value = "hello, world api", notes = "hello world swagger check")
 //    public ResponseEntity signUp(@RequestBody RegisterReq registerDto){
@@ -57,16 +76,17 @@ public class UserController {
         String s;
         //email 중복 확인
         if(checkEmail(registerDto.getEmail()).getStatusCodeValue()!=200){
-            s = "\"code\": \"SIGNUP_ERROR_100\", \"message\": \"이메일 중복\"";
+            s = "{\"message\": \"이메일 중복\"}";
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(s);
             //System.out.println(s);
             //BaseRes baseRes = new BaseRes(401, "이메일 중복");
             //return 401;
         }
 
+
         //nickname 중복 확인
         if(checkNickname(registerDto.getNickname()).getStatusCodeValue()!=200){
-            s = "\"code\": \"SIGNUP_ERROR_101\", \"message\": \"닉네임 중복\"";
+            s = "{\"message\": \"닉네임 중복\"}";
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(s);
             //System.out.println(s);
             //return false;
@@ -77,7 +97,7 @@ public class UserController {
 
         //이메일 & 닉네임 중복 없을 때
         userService.registerUser(registerDto);
-        s = "\"code\": \"200, SUCCESS\", \"message\": "+registerDto.getNickname()+"님 회원가입이 되었습니다.";
+        s = "{\"message\": \"회원가입이 되었습니다.\"}";
         return ResponseEntity.status(HttpStatus.OK).body(s);
         //System.out.println(s);
         //return true;
@@ -86,47 +106,180 @@ public class UserController {
         //return 200;
     }
 
+    //2번 기능
     @GetMapping("/users/checkEmail/{email}")
     public ResponseEntity checkEmail(@PathVariable String email){
         String s;
         if(userService.doExistUserEmail(email)){
 
-            s = "\"code\": \"SIGNUP_ERROR_100\", \"message\": \"이메일 중복\"";
+            s = "{\"message\": \"이메일 중복\"}";
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(s);
             //return true;            //이메일 중복일 때
             //BaseRes baseRes = new BaseRes(401, "이메일 중복");
             //return 401;
         }
-        s = "\"code\": \"200, SUCCESS\", \"message\": "+"이메일 중복 X";
+        s = "{\"message\": \"이메일 사용이 가능합니다.\"}";
         return ResponseEntity.status(HttpStatus.OK).body(s);
         //return false;               //이메일 중복 아닐 때
         //BaseRes baseRes = new BaseRes(200, "이메일 중복아님");
         //return 200;
     }
 
+    //3번 기능
     @GetMapping("/users/checkNickname/{nickname}")
     public ResponseEntity checkNickname(@PathVariable String nickname){
         String s;
         if(userService.doExistUserNickname(nickname)){
-            s = "\"code\": \"SIGNUP_ERROR_101\", \"message\": \"닉네임 중복\"";
+            s = "{\"message\": \"닉네임 중복\"}";
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(s);
             //return 402;            //닉네임 중복일 때
         }
-        s = "\"code\": \"200, SUCCESS\", \"message\": "+"닉네임 중복 X";
+        s = "{\"message\": \"닉네임 사용이 가능합니다.\"}";
         return ResponseEntity.status(HttpStatus.OK).body(s);
         //return 200;               //닉네임 중복 아닐 때
     }
 
+    //12번 기능
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/googleLogin")
+    public ResponseEntity googleLogin( @AuthenticationPrincipal OAuth2User user){
+        String email = user.getAttribute("email");
+        String nickname = user.getAttribute("name");
+        //String s=email+" "+nickname;
+        String s="";
+
+        //회원이 처음 로그인 했다면 회원가입 하기
+        //email 중복이라면 로그인하기
+        if(checkEmail(email).getStatusCodeValue()!=200){
+            //s = "{\"message\": \"이메일 중복\"}";
+            //로그인 기능
+            httpSession.setAttribute(SessionKey.LOGIN_USER_ID, email);
+            sessionService.setRedisStringValue(email, sessionService.getSessionId(httpSession));
+            User user1 = userService.getUserNicknameByUserEmail(email);
+
+            int profileId = userService.getProfileIdByUserNickname(user1.getNickname());
+            if(profileId==-1){
+                System.out.println("해당 유저의 프로필이 존재하지 않습니다.");
+            }
+
+            int userId = user1.getId();
+            //테스트용
+            s = "{ \"Token\": \""+jwtTokenProvider.createToken(user1.getUsername())+"\"," +
+                    "\"profileId\": \""+profileId+"\"," +
+                    "\"userId\": \""+user1.getId()+"\"," +
+                    "\"nickname\": \""+user1.getNickname()+"\"}";
+            //------------------------------------------------------
+            return ResponseEntity.status(HttpStatus.OK).body(s);
+            //return s;
+        }
+
+        //nickname 중복이라면 nickname+rand()해서 닉네임 입력
+        else if(checkNickname(nickname).getStatusCodeValue()!=200){
+            //s = "{\"message\": \"닉네임 중복\"}";
+            //닉네임 랜덤 돌리기 기능
+            while(true){
+                String temp = createNickname();
+                if(checkNickname(nickname+temp).getStatusCodeValue()==200){
+                    nickname+=temp;
+                    break;
+                }
+            }
+            //-------------------------
+            //회원가입 후 로그인
+            //password random 값 입력
+            String password = createPassword();
+            RegisterReq registerDto = new RegisterReq(email, nickname, password);
+            userService.registerUser(registerDto);
+            //s = "{\"message\": \"회원가입이 되었습니다.\"}";
+            //로그인 기능
+            httpSession.setAttribute(SessionKey.LOGIN_USER_ID, email);
+            sessionService.setRedisStringValue(email, sessionService.getSessionId(httpSession));
+            User user1 = userService.getUserNicknameByUserEmail(email);
+
+            int profileId = userService.getProfileIdByUserNickname(user1.getNickname());
+            if(profileId==-1){
+                System.out.println("해당 유저의 프로필이 존재하지 않습니다.");
+            }
+
+            int userId = user1.getId();
+            //테스트용
+            s = "{ \"Token\": \""+jwtTokenProvider.createToken(user1.getUsername())+"\"," +
+                    "\"profileId\": \""+profileId+"\"," +
+                    "\"userId\": \""+user1.getId()+"\"," +
+                    "\"nickname\": \""+user1.getNickname()+"\"}";
+            //------------------------------------------------------
+            return ResponseEntity.status(HttpStatus.OK).body(s);
+        }
+        String password = createPassword();
+        System.out.println("password Create");
+        //회원가입 후 로그인
+        //password random 값 입력
+        RegisterReq registerDto = new RegisterReq(email,nickname, password);
+        userService.registerUser(registerDto);
+
+        System.out.println("register success");
+        //s = "{\"message\": \"회원가입이 되었습니다.\"}";
+        //로그인 기능
+        httpSession.setAttribute(SessionKey.LOGIN_USER_ID, email);
+        sessionService.setRedisStringValue(email, sessionService.getSessionId(httpSession));
+        User user1 = userService.getUserNicknameByUserEmail(email);
+
+        int profileId = userService.getProfileIdByUserNickname(user1.getNickname());
+        if(profileId==-1){
+            System.out.println("해당 유저의 프로필이 존재하지 않습니다.");
+        }
+
+        int userId = user1.getId();
+        //테스트용
+
+        s = "{ \"Token\": \""+jwtTokenProvider.createToken(user1.getUsername())+"\"," +
+                "\"profileId\": \""+profileId+"\"," +
+                "\"userId\": \""+user1.getId()+"\"," +
+                "\"nickname\": \""+user1.getNickname()+"\"}";
+//        //------------------------------------------------------
+        return ResponseEntity.status(HttpStatus.OK).body(s);
+    }
+
+    private String createNickname() {
+        StringBuffer key = new StringBuffer();
+        Random rnd = new Random();
+        //인증코드 8자리
+        for (int i = 0; i < 4; i++) {
+            //0~2 까지 랜덤
+            int index = rnd.nextInt(3);
+            switch (index) {
+                case 0:
+                    //a ~ z (1+ 97 = 98. => (char)98 = 'b'
+                    key.append((char) ((int) (rnd.nextInt(26)) + 97));
+                    break;
+                case 1:
+                    //위와 비슷하게 A ~ Z
+                    key.append((char) ((int) (rnd.nextInt(26)) + 65));
+                    break;
+                case 2:
+                    //0 ~ 9
+                    key.append((rnd.nextInt(10)));
+                    break;
+            }
+        }
+        return key.toString();
+    }
+
+    //4번 기능
     @PostMapping("/users/login")
 //    public ResponseEntity logIn(@RequestBody LoginReq loginDto){
     public ResponseEntity logIn(@RequestBody LoginReq loginDto, HttpSession httpSession){
         String s;
 
         //email과 password 일치 확인
-        if(!userService.validateAccount(loginDto.getEmail(),loginDto.getPassword())){
-            s = "\"code\": \"LOGIN_ERROR_100\", \"message\": \"이메일과 비밀번호가 일치하지 않습니다.\"";
+        String answer = userService.validateAccount(loginDto.getEmail(),loginDto.getPassword());
+        if(answer.equals("Email No")){
+            s = "{\"message\": \"이메일이 존재하지 않습니다.\"}";
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(s);
             //return 403;     //이메일 비번 일치하지 않음
+        }else if(answer.equals("Email Valid & Password NO")){
+            s = "{\"message\": \"비밀번호가 일치하지 않습니다.\"}";
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(s);
         }
 
         //String id = sessionService.getSessionId(httpSession);
@@ -140,24 +293,43 @@ public class UserController {
 //        s = "{\"token\": \"";
 //        s += jwtTokenProvider.createToken(user.getUsername())+"\"}";
 
+        int profileId = userService.getProfileIdByUserNickname(user.getNickname());
+        if(profileId==-1){
+            System.out.println("해당 유저의 프로필이 존재하지 않습니다.");
+        }
+
+        int userId = user.getId();
         //테스트용
-        s = jwtTokenProvider.createToken(user.getUsername());
+        s = "{ \"Token\": \""+jwtTokenProvider.createToken(user.getUsername())+"\"," +
+                "\"profileId\": \""+profileId+"\"," +
+                "\"userId\": \""+user.getId()+"\"," +
+                "\"nickname\": \""+user.getNickname()+"\"}";
+
 
         return ResponseEntity.status(HttpStatus.OK).body(s);
         // 200;             //로그인 성공
     }
+
+    //5번 기능
     @PostMapping("/users/auth")
     public ResponseEntity auth(@RequestParam(name = "email") String email,HttpServletRequest request) {
         String s="";
         String token = jwtTokenProvider.resolveToken(request);
-        if(jwtTokenProvider.getUserEmail(token).equals(email)) {
-            //name: message value: true
-            s = "{\"message\": \"true\"}";
+        try{
+            if(jwtTokenProvider.getUserEmail(token).equals(email)) {
+                //name: message value: true
+                s = "{\"message\": \"토큰 인증\"}";
+                return ResponseEntity.status(HttpStatus.OK).body(s);
+            }else{
+                s = "{\"message\": \"토큰 인증 불가\"}";
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(s);
+            }
+        }catch (ExpiredJwtException e){
+            s = "{ \"Token\": \""+jwtTokenProvider.createToken(email)+"\"," +
+                    "\"message\": \"토큰 인증\"}";
             return ResponseEntity.status(HttpStatus.OK).body(s);
-        }else{
-            s = "{\"message\": \"false\"}";
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(s);
         }
+
 //        if(jwtTokenProvider.getUserEmail(token).equals("z")){
 //            s = "{\"email\": "+"\"true\" }";
 //            return ResponseEntity.status(HttpStatus.OK).body(s);
@@ -185,6 +357,7 @@ public class UserController {
 //        }
     }
 
+    //없앤 기능
     @DeleteMapping("/users/logout/{email}")
     public ResponseEntity logOut(@PathVariable(name = "email") String email, HttpSession httpSession) {
         httpSession.removeAttribute(email);
@@ -192,73 +365,87 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(s);
     }
 
+    //6번 기능
     @DeleteMapping("/users/{userId}")
     public ResponseEntity deleteUser(@PathVariable(name = "userId") int userId){
         String s;
         if(userService.deleteUser(userId)){
-            s = "\"code\": \"200, SUCCESS\", \"message\": "+"님 회원삭제가 되었습니다.";
+            s = "{\"message\": \"회원삭제가 되었습니다.\"}";
             return ResponseEntity.status(HttpStatus.OK).body(s);
             //return 200;
         }else { //아이디가 존재하지 않음
-            s = "\"code\": \"LOGIN_ERROR_100\", \"message\": \"아이디 존재 X.\"";
+            s = "{\"message\": \"아이디 존재 X.\"}";
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(s);
             //return 405;     //아이디 존재 X
         }
     }
 
+    //7번 기능
     @GetMapping("/emails/{email}/email")
     public ResponseEntity sendMail(@PathVariable(name = "email") String email){
         String s;
         if(userService.sendMail(email)){
-            s = "\"code\": \"200, SUCCESS\", \"message\": "+"님 이메일 전송이 되었습니다.";
+            s = "{\"message\": \"이메일 전송이 되었습니다.\"}";
             return ResponseEntity.status(HttpStatus.OK).body(s);
             //return 200;
         }else{
-            s = "\"code\": \"LOGIN_ERROR_100\", \"message\": \"이메일 존재 X\"";
+            s = "{\"message\": \"이메일 존재 X.\"}";
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(s);
             //return 406 ;        //이메일 존재 X
         }
     }
 
+    //8번 기능
     @PostMapping("/emails/email-code")
     public ResponseEntity Authorization(@RequestBody CodeReq codeReq){
         String s;
+        String answer = userService.authorization(codeReq);
 
-        if(userService.authorization(codeReq)){
-            s = "\"code\": \"200, SUCCESS\", \"message\": "+"님 인증이 되었습니다.";
+        if(answer.equals("코드 승인 완료")){
+            s = "{\"message\": \"코드 인증이 되었습니다.\"}";
             return ResponseEntity.status(HttpStatus.OK).body(s);
             //return 200;
-        }else{
-            s = "\"code\": \"LOGIN_ERROR_100\", \"message\": \"코드 인증 X\"";
+        }else if(answer.equals("이메일 존재 X")){
+            s = "{\"message\": \"이메일 존재 X.\"}";
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(s);
             //return 407;         //코드인증 안됨
+        }else{
+            s = "{\"message\": \"코드가 올바르지 않습니다.\"}";
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(s);
         }
     }
 
+    //9번 기능
     @PatchMapping("/users/{email}/password")
     public ResponseEntity changePassword(@PathVariable(name = "email")String email, @RequestBody ChangePwReq changePwReq){
         String s;
-        if(userService.changePassword(email, changePwReq)){
-            s = "\"code\": \"200, SUCCESS\", \"message\": "+"님 비밀번호 변경이 되었습니다.";
+
+        String answer = userService.changePassword(email, changePwReq);
+        if(answer.equals("True")){
+            s = "{\"message\": \"비밀번호 변경이 되었습니다.\"}";
 
             return ResponseEntity.status(HttpStatus.OK).body(s);
             //return 200;
-        }else {
-            s = "\"code\": \"LOGIN_ERROR_100\", \"message\": \"비번 일치 X.\"";
+        }else if(answer.equals("Password is not Same")){
+            s = "{\"message\": \"비번 일치 X.\"}";
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(s);
             //return 408;     //비번일치 X
+        }else {
+            s = "{\"message\": \"이메일이 존재하지 않습니다.\"}";
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(s);
         }
     }
 
+    //10번 기능
     @GetMapping("/profile/{profileId}/mypage")
     public ResponseEntity myPage(@PathVariable(name = "profileId")int profileId) {
         String s;
         String profile = userService.showProfile(profileId);
         if(!profile.isEmpty()){
-            s = "{\"code\": \"200, SUCCESS\", \"message\": "+"님 프로필이 조회되었습니다.}";
+            s = "{\"message\": \"프로필이 조회되었습니다.\"}";
             return ResponseEntity.status(HttpStatus.OK).body(s+"\n"+profile);
         }else{
-            s = "{\"code\": \"400, ERROR\", \"message\": "+"님은 존재하지 않습니다.}";
+            s = "{\"message\": \"프로필이 존재하지 않습니다.\"}";
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(s);
         }
     }
@@ -276,17 +463,43 @@ public class UserController {
 //    }
 
 
+    //11번 기능
     @GetMapping("/profile/{profileId}/list-up")
     public ResponseEntity listUp(@PathVariable(name = "profileId")int profileId) {
         String s;
         String profile = userService.showProfile(profileId);
         if(!profile.equals("")){
-            s = "{\"code\": \"200, SUCCESS\", \"message\": "+"님 프로필이 조회되었습니다.}";
+            s = "{\"message\": \"프로필이 조회되었습니다.\"}";
             return ResponseEntity.status(HttpStatus.OK).body(s+"\n"+profile);
         }else{
-            s = "{\"code\": \"400, ERROR\", \"message\": "+"님은 존재하지 않습니다.}";
+            s = "{\"message\": \"프로필이 존재하지 않습니다.\"}";
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(s);
         }
+    }
+
+    public static String createPassword() {
+        StringBuffer key = new StringBuffer();
+        Random rnd = new Random();
+        //인증코드 8자리
+        for (int i = 0; i < 8; i++) {
+            //0~2 까지 랜덤
+            int index = rnd.nextInt(3);
+            switch (index) {
+                case 0:
+                    //a ~ z (1+ 97 = 98. => (char)98 = 'b'
+                    key.append((char) ((int) (rnd.nextInt(26)) + 97));
+                    break;
+                case 1:
+                    //위와 비슷하게 A ~ Z
+                    key.append((char) ((int) (rnd.nextInt(26)) + 65));
+                    break;
+                case 2:
+                    //0 ~ 9
+                    key.append((rnd.nextInt(10)));
+                    break;
+            }
+        }
+        return key.toString();
     }
 //    @GetMapping("/profile/{nickName}/list-up")
 //    public ResponseEntity listUp(@PathVariable(name = "nickName")String nickName) {
