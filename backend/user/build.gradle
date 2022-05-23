@@ -1,5 +1,5 @@
 plugins {
-	id 'org.springframework.boot' version '2.6.3'
+	id 'org.springframework.boot' version '2.5.2'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
 }
@@ -43,22 +43,20 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security:2.6.7'
 	implementation 'io.jsonwebtoken:jjwt:0.9.1'
 
-	//implementation 'io.jsonwebtoken:jjwt-api:0.9.1'
-
-//	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.10.7'
-//	runtimeOnly('io.jsonwebtoken:jjwt-orgjson:0.11.4')
 
 	//Guava
 	implementation("com.google.guava:guava:29.0-jre")
 	annotationProcessor("com.google.guava:guava:29.0-jre")
 
-	//Swagger
-//	implementation("io.springfox:springfox-swagger2:3.0.0")
-//	implementation("io.springfox:springfox-swagger-ui:3.0.0")
-//	implementation("io.springfox:springfox-data-rest:3.0.0")
-//	implementation("io.springfox:springfox-bean-validators:3.0.0")
-//	implementation("io.springfox:springfox-boot-starter:3.0.0")
+	// oauth2
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
+	//Swagger
+	implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+	implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
+
+	//springdoc-openapi-ui
+//	implementation 'org.springdoc:springdoc-openapi-ui:1.6.8'
 }
 
 jar {

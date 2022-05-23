@@ -9,21 +9,27 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public interface UserService extends UserDetailsService {
     void registerUser(RegisterReq registerDto);
     boolean doExistUserEmail(String email);
     boolean doExistUserNickname(String nickname);
 
-    boolean validateAccount(String email, String password);
+    String validateAccount(String email, String password);
 
     User getUserNicknameByUserEmail(String email);
     boolean deleteUser(int UserId);
     boolean sendMail(String email);
 
-    boolean changePassword(String email, ChangePwReq changePwReq);
+    String changePassword(String email, ChangePwReq changePwReq);
 
-    boolean authorization(CodeReq codeReq);
+    String authorization(CodeReq codeReq);
 
     String showProfile(int profileId);
+
+    int getProfileIdByUserNickname(String nickname);
+
+    //Optional<User> findByEmail(String email);
 }

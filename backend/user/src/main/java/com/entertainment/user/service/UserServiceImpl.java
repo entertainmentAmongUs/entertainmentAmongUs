@@ -1,6 +1,7 @@
 package com.entertainment.user.service;
 
 import com.entertainment.user.entity.Profile;
+//import com.entertainment.user.entity.Role;
 import com.entertainment.user.repository.ProfileRepository;
 import com.entertainment.user.request.ChangePwReq;
 import com.entertainment.user.request.CodeReq;
@@ -41,10 +42,12 @@ public class UserServiceImpl implements UserService{
     public void registerUser(RegisterReq registerDto) {
 
         User user = new User(registerDto);
+//        user.builder().role(Role.USER);
         System.out.println(user.getEmail()+" "+user.getNickname()+" "+user.getPassword());
         userRepository.save(user);
         ProfileRegisterReq profileRegisterReq=new ProfileRegisterReq(user.getId(),user.getNickname());
         Profile profile = new Profile(profileRegisterReq);
+        //profile.setUser(userRepository.findById(user.getId()));
         profile.setUser(userRepository.getById(user.getId()));
         profileRepository.save(profile);
     }
@@ -72,15 +75,17 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public boolean validateAccount(String email, String password) {
+    public String validateAccount(String email, String password) {
         List<User> userList = userRepository.findAll();
         for(User u: userList){
-            if(u.getEmail().equals(email) && u.getPassword().equals(password)){
+            if(u.getEmail().equals(email) && u.getPassword().equals(password)){ // 이메일과 비밀번호 둘다 검증된 경우
 
-                return true;
+                return "Email & Password Valid";
+            }else if(u.getEmail().equals(email) && !u.getPassword().equals(password)){  //이메일은 검증되고 비밀번호는 다른경우
+                return "Email Valid & Password NO";
             }
         }
-        return false;
+        return "Email No";
     }
 
     @Override
@@ -148,7 +153,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public boolean changePassword(String email, ChangePwReq changePwReq) {
+    public String changePassword(String email, ChangePwReq changePwReq) {
         if(changePwReq.getPassword().equals(changePwReq.getPasswordCheck())){
             List<User> userList = userRepository.findAll();
             User user=new User(); //= userRepository.getById(userId);
@@ -161,22 +166,22 @@ public class UserServiceImpl implements UserService{
                 }
             }
             if(user.getId()==1){
-                return false;       //이메일 존재 X
+                return "No Email";       //이메일 존재 X
             }
 
             user.setPassword(changePwReq.getPassword());
             userRepository.save(user);
             //System.out.println("password changed");
-            return true;
+            return "True";
         }else{
             //System.out.println("password is not same");
-            return false;
+            return "Password is not Same";
         }
         //return false;
     }
 
     @Override
-    public boolean authorization(CodeReq codeReq) {
+    public String authorization(CodeReq codeReq) {
         List<User> userList = userRepository.findAll();
         User user=new User(); //= userRepository.getById(userId);
         user.setId(0);
@@ -186,18 +191,18 @@ public class UserServiceImpl implements UserService{
             }
         }
         if(user.getId()==0){
-            return false;       //이메일 존재 X
+            return "이메일 존재 X";       //이메일 존재 X
         }
         //User user = userRepository.getById(userId);
         //System.out.println((user.getId()+" "+user.getCode()));
 
         System.out.println((codeReq.getCode()+" "+user.getCode()));
         if(codeReq.getCode().equals(user.getCode())){
-            System.out.println("코드 승인 완료");
-            return true;
+            //System.out.println("코드 승인 완료");
+            return "코드 승인 완료";
         }else{
-            System.out.println("코드가 다릅니다.");
-            return false;
+            //System.out.println("코드가 다릅니다.");
+            return "코드가 올바르지 않습니다.";
         }
     }
 
@@ -213,6 +218,19 @@ public class UserServiceImpl implements UserService{
             }
         }
         return s;
+    }
+
+    @Override
+    public int getProfileIdByUserNickname(String nickname) {
+        List<Profile> list = profileRepository.findAll();
+        String s="";
+        for(Profile p : list){
+            if(p.getNickname().equals(nickname)){
+                //"{\"code\": \"200, SUCCESS\", \"message\": "+"님 프로필이 조회되었습니다.}";
+                return p.getId();
+            }
+        }
+        return -1;      //해당 프로필이 없을경우
     }
 
 //    @Override
