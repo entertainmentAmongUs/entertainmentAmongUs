@@ -107,7 +107,7 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
         setting.setTitle("방 설정", for: .normal)
         setting.addTarget(self, action: #selector(self.touchSettingButton(_:)), for: .touchUpInside)
         setting.titleLabel?.font = UIFont.systemFont(ofSize: 20, weight: .medium)
-//        setting.isEnabled = Bool(myProfile.userID == Myroom.masterUserID)
+        setting.isEnabled = roomInfo?.hostId == myUserId ? true : false
         
         self.roomSettingButton = setting
         
@@ -270,6 +270,8 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
             
             self?.waitUserCollection?.reloadData()
             
+            self?.roomSettingButton?.isEnabled = roomInfo.hostId == self?.myUserId ? true : false
+            
         }
         
     }
@@ -299,6 +301,23 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
                 
             }
         }
+        
+    }
+    
+    func getReadyToStarted() {
+        
+        SocketIOManager.shared.startGame { [unowned self] playingInfo in
+            
+            guard let userList = roomInfo?.users else { return }
+            
+            let playingRoom = PlayingRoom(userId: myUserId, nickName: myNickName, playingInfo: playingInfo, userList: userList, roomId: roomId)
+            
+            self.navigationController?.pushViewController(playingRoom, animated: true)
+            
+            readyButton?.isSelected = false
+            
+        }
+        
         
     }
     
@@ -495,6 +514,7 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
         getRoomInfo()
         getUserList()
         getReadyToKicked()
+        getReadyToStarted()
         
     }
     

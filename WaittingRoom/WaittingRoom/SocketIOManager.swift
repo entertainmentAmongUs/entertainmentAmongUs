@@ -14,12 +14,16 @@ class SocketIOManager: NSObject {
     
     var manager = SocketManager(socketURL: URL(string: "ws://13.209.69.156:8080")!, config: [
         .log(true),
-        .forceWebsockets(true)
+        .forceWebsockets(true),
+        .reconnects(true)
       ])
     
     var socket: SocketIOClient!
     
+    
+    // MARK: - Connection Method
     func establishConnection(userId: Int, nickName: String) {
+        
         
         // 웹소켓 서버에 연결 시도
         socket.connect()
@@ -40,6 +44,8 @@ class SocketIOManager: NSObject {
         socket.disconnect()
         
     }
+    
+    // MARK: - Lobby Method
     
     func refreshRoomList() {
         
@@ -65,7 +71,6 @@ class SocketIOManager: NSObject {
     }
     
     func fetchLobbyChatting() {
-        
         
         socket.on("chat") { dataArray, ack in
             
@@ -95,51 +100,6 @@ class SocketIOManager: NSObject {
             
             NotificationCenter.default.post(name: Notification.Name("getLobbyUserListNotification"), object: userList.users)
         }
-        
-    }
-    
-    func fetchRoomInfo(roomId: String, completionHandler: @escaping (_ roomInfo: Room) -> Void) {
-        
-        let roomData:[String:String] = ["roomId":roomId]
-        
-        socket.emit("roomInfo", roomData)
-        
-        socket.on("roomInfo") { dataArray, ack in
-            
-            guard let jsonData = try? JSONSerialization.data(withJSONObject: dataArray[0]) else {
-                return
-            }
-            guard let roomInfo = try? JSONDecoder().decode(Room.self, from: jsonData) else {
-                return
-            }
-            
-            completionHandler(roomInfo)
-        }
-    
-    }
-    
-    func fetchUserList(completionHandler: @escaping (_ userList: [UserInRoom]) -> Void) {
-        
-        socket.on("userList") { dataArray, ack in
-            
-            guard let jsonData = try? JSONSerialization.data(withJSONObject: dataArray[0]) else {
-                return
-            }
-            guard let userList = try? JSONDecoder().decode([UserInRoom].self, from: jsonData) else {
-                return
-            }
-            
-            completionHandler(userList)
-        }
-    
-    }
-    
-    
-    func sendMessage(roomId: String, message: String, nickname: String){
-        
-        let chatData: [String: String] = ["nickName": nickname, "message": message, "roomId": roomId]
-        
-        socket.emit("chat", chatData)
         
     }
     
@@ -179,6 +139,44 @@ class SocketIOManager: NSObject {
         
     }
     
+    // MARK: - WaitingRoom Method
+    
+    func fetchRoomInfo(roomId: String, completionHandler: @escaping (_ roomInfo: Room) -> Void) {
+        
+        let roomData:[String:String] = ["roomId":roomId]
+        
+        socket.emit("roomInfo", roomData)
+        
+        socket.on("roomInfo") { dataArray, ack in
+            
+            guard let jsonData = try? JSONSerialization.data(withJSONObject: dataArray[0]) else {
+                return
+            }
+            guard let roomInfo = try? JSONDecoder().decode(Room.self, from: jsonData) else {
+                return
+            }
+            
+            completionHandler(roomInfo)
+        }
+    
+    }
+    
+    func fetchUserList(completionHandler: @escaping (_ userList: [UserInRoom]) -> Void) {
+        
+        socket.on("userList") { dataArray, ack in
+            
+            guard let jsonData = try? JSONSerialization.data(withJSONObject: dataArray[0]) else {
+                return
+            }
+            guard let userList = try? JSONDecoder().decode([UserInRoom].self, from: jsonData) else {
+                return
+            }
+            
+            completionHandler(userList)
+        }
+    
+    }
+    
     func leaveRoom(roomId:String, userId: Int){
         
         let newData: [String: Any] = ["roomId":roomId, "userId": userId]
@@ -186,6 +184,8 @@ class SocketIOManager: NSObject {
         socket.off("roomInfo")
         
         socket.off("kick")
+        
+        socket.off("startGame")
         
         socket.emit("leaveRoom", newData)
         
@@ -220,6 +220,7 @@ class SocketIOManager: NSObject {
         
     }
     
+    
     func editRoom(room: [String:Any], completionHandler: @escaping (_ status:EditStatus) -> Void) {
         
         socket.emit("editRoom", room)
@@ -237,6 +238,148 @@ class SocketIOManager: NSObject {
         }
         
     }
+    
+    func startGame(completionHandler: @escaping (_ playingInfo: PlayingInfo) -> Void){
+        
+        socket.on("startGame") { dataArray, ack in
+            
+            guard let jsonData = try? JSONSerialization.data(withJSONObject: dataArray[0]) else {
+                return }
+            
+            guard let playingInfo = try? JSONDecoder().decode(PlayingInfo.self, from: jsonData) else { return }
+            
+            completionHandler(playingInfo)
+            
+        }
+        
+    }
+    
+    // MARK: - PlayingRoom Method
+    
+    func endAnnouncemnet(roomId: String, completionHandler: @escaping (_ tickTok: TickTok) -> Void) {
+        
+        let newData: [String: String] = ["roomId":roomId]
+        
+        self.socket.emit("loadingEnd", newData)
+        
+        self.socket.on("time") { dataArray, ack in
+            
+            guard let jsonData = try? JSONSerialization.data(withJSONObject: dataArray[0]) else {
+                return }
+            
+            guard let tickTok = try? JSONDecoder().decode(TickTok.self, from: jsonData) else { return }
+            
+            completionHandler(tickTok)
+            
+        }
+        
+    }
+    
+    func vote(roomId: String, targetId: Int) {
+        
+        let voteData: [String: Any] = ["roomId" : roomId, "targetUserId" : targetId]
+        
+        socket.emit("vote", voteData)
+        
+    }
+    
+    
+    func reVoting(completionHandler: @escaping (_ tickTok: TickTok) -> Void) {
+        
+        self.socket.on("reVoteTime") { dataArray, ack in
+            
+            guard let jsonData = try? JSONSerialization.data(withJSONObject: dataArray[0]) else {
+                return }
+            
+            guard let tickTok = try? JSONDecoder().decode(TickTok.self, from: jsonData) else { return }
+            
+            completionHandler(tickTok)
+            
+        }
+        
+        
+    }
+    
+    
+    func confirmVoting(completionHandler: @escaping (_ result: VoteResult) -> Void){
+        
+        self.socket.on("voteResult") { dataArray, ack in
+            
+            guard let jsonData = try? JSONSerialization.data(withJSONObject: dataArray[0]) else {
+                return }
+            
+            guard let voteResult = try? JSONDecoder().decode(VoteResult.self, from: jsonData) else { return }
+            
+            completionHandler(voteResult)
+            
+        }
+        
+    }
+    
+    func fetchGameChatting(completionHandler: @escaping (_ gameChat: GameChat) -> Void) {
+        
+        socket.on("gameChat") { dataArray, ack in
+            
+            guard let jsonData = try? JSONSerialization.data(withJSONObject: dataArray[0]) else {
+                return
+            }
+            guard let chat = try? JSONDecoder().decode(GameChat.self, from: jsonData) else {
+                return
+            }
+            
+            completionHandler(chat)
+            
+        }
+        
+    }
+    
+    func endGame(announce: UILabel?, completionHandler: @escaping () -> Void ){
+        
+        socket.on("endGame") { dataArray, ack in
+            
+            self.socket.off("time")
+            
+            self.socket.off("reVoteTime")
+            
+            self.socket.off("voteResult")
+            
+            self.socket.off("gameChat")
+            
+            self.socket.off("endGame")
+            
+            announce?.text = "5초 뒤 게임에서 나갑니다."
+            
+            let timer = Timer(timeInterval: TimeInterval(5), repeats: false) { timer in
+                completionHandler()
+            }
+            
+            RunLoop.main.add(timer, forMode: .common)
+            
+//            timer.fire()
+            
+        }
+        
+    }
+    
+    // MARK: - Chatting Method
+    
+    func sendMessage(roomId: String, message: String, nickname: String){
+        
+        let chatData: [String: String] = ["nickName": nickname, "message": message, "roomId": roomId]
+        
+        socket.emit("chat", chatData)
+        
+    }
+    
+    func sendGameMessage(status: String, roomId: String, message: String, nickname: String){
+        
+        let chatData: [String: String] = ["nickName": nickname, "message": message, "roomId": roomId, "status": status]
+        
+        socket.emit("gameChat", chatData)
+        
+    }
+    
+    // MARK: - Initialize
     
     override private init(){
         super.init()

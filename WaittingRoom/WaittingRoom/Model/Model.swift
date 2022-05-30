@@ -54,6 +54,20 @@ enum EditStatus: String, Codable {
     case overCount = "OVER_COUNT"
 }
 
+enum PlayStatus: String, Codable {
+    
+    case ready = "READY"
+    case hint = "HINT"
+    case freeChat = "FREE_CHAT"
+    case vote = "VOTE"
+}
+
+enum VoteStatus: String, Codable {
+    
+    case voteEnd = "VOTE_END"
+    case reVote = "RE_VOTE"
+}
+
 /* 주제 카테고리 (depth2) */
 struct Category {
     var categoryID: Int
@@ -104,6 +118,7 @@ struct RoomUserList: Codable {
     
 }
 
+
 /* 게임방에 대한 정보 */
 struct Room: Codable {
     
@@ -131,6 +146,44 @@ struct Chat: Codable {
     let roomId: String
     let nickName: String
     let message: String
+}
+
+struct GameChat: Codable {
+    
+    var roomId: String
+    var nickName: String
+    var status: PlayStatus
+    var message: String
+    
+}
+
+struct PlayingInfo: Codable {
+    
+    var keyword: String
+    var order: [Int]
+    var liarNumber: Int
+    
+}
+
+struct TickTok: Codable {
+    
+    var time: Int
+    var status: PlayStatus
+    var order: Int
+    
+}
+
+struct VotedPlayer: Codable {
+    
+    var userId: Int
+    var count: Int
+}
+
+struct VoteResult: Codable {
+    
+    var status: VoteStatus
+    var result: [VotedPlayer]
+    
 }
 
 
@@ -167,36 +220,6 @@ let games = [Game(type: .liar, title: "라이어", info: "거짓말하는 사람
 /* 설정 가능한 주제 카테고리 목록 */
 let subjects = [Subject(title: "국가", category: ["아시아", "유럽", "아메리카"]), Subject(title: "랜드마크", category: ["해외", "국내"])]
 
-/* 나의 프로필 정보*/
-var myProfile = Profile(userID: 99, image: UIImage(named: "ic_user_loading"), nickname: "초보입니다", score: 380, winCount: 32, loseCount: 50)
-
-/* 대기방에 존재하는 유저들의 프로필 */
-var profiles: [Profile] = [
-    Profile(userID: 15, image: UIImage(named: "ic_user_loading"), nickname: "내가라이어", score: 1000, winCount: 12, loseCount: 15),
-    Profile(userID: 51, image: UIImage(named: "ic_user_loading"), nickname: "김깝심", score: 1500, winCount: 67, loseCount: 52),
-    Profile(userID: 99, image: UIImage(named: "ic_user_loading"), nickname: "초보입니다", score: 380, winCount: 32, loseCount: 50),
-    Profile(userID: 114, image: UIImage(named: "ic_user_loading"), nickname: "이거재밌는맛이네", score: 777, winCount: 653, loseCount: 581),
-    Profile(userID: 13, image: UIImage(named: "ic_user_loading"), nickname: "트롤러", score: 32, winCount: 2, loseCount: 410),
-    Profile(userID: 43, image: UIImage(named: "ic_user_loading"), nickname: "랭킹1위", score: 5612, winCount: 910, loseCount: 421),
-    Profile(userID: 27, image: UIImage(named: "ic_user_loading"), nickname: "거짓말못하는사람", score: 415, winCount: 172, loseCount: 811),
-    Profile(userID: 8, image: UIImage(named: "ic_user_loading"), nickname: "수현아사랑해", score: 2273, winCount: 347, loseCount: 539)
-]
-
-
-/* 나의 친구 목록 */
-var myFriends: [Friend] = [
-    Friend(friendID: 51, nickname: "김깝심"),
-    Friend(friendID: 13, nickname: "트롤러"),
-    Friend(friendID: 43, nickname: "랭킹1위"),
-    Friend(friendID: 8, nickname: "수현아사랑해"),
-]
 
 /* 나의 친구 요청 목록 */
 var myFriendRequest: [FriendRequest] = []
-
-/* 현재 대기중인 방 정보 */
-/*
-var Myroom = Room(roomID: "roomExample", gameType: .liar, password: nil, category: Category(categoryID: 1, subjectID: 1), maxUserNumber: 6, masterUserID: 99, users: profiles, roomTitle: "즐겜합시다~")
- */
-
-/* 방에서 입력된 채팅 데이터 */

@@ -265,7 +265,7 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
             view.addSubview(label)
             
             label.text = "최대 인원"
-            label.font = .systemFont(ofSize: 20, weight: .medium)
+            label.font = .systemFont(ofSize: 15, weight: .medium)
             label.translatesAutoresizingMaskIntoConstraints = false
             label.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 10).isActive = true
             label.topAnchor.constraint(equalTo: view.topAnchor, constant:  10).isActive = true
@@ -309,7 +309,7 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
             view.addSubview(label)
             
             label.text = "주제 선택"
-            label.font = .systemFont(ofSize: 20, weight: .medium)
+            label.font = .systemFont(ofSize: 15, weight: .medium)
             label.translatesAutoresizingMaskIntoConstraints = false
             label.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 10).isActive = true
             label.topAnchor.constraint(equalTo: view.topAnchor, constant:  10).isActive = true
@@ -323,7 +323,7 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
             picker.dataSource = self
             picker.delegate = self
             picker.tag = 1
-            picker.selectRow(1, inComponent: 0, animated: false)
+            picker.selectRow(0, inComponent: 0, animated: false)
             
             picker.translatesAutoresizingMaskIntoConstraints = false
             picker.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 0).isActive = true
@@ -496,6 +496,19 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
         return true
     }
     
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        if textField == roomTitleTextField {
+            
+            if let text = (textField.text as? NSString)?.replacingCharacters(in: range, with: string) {
+                completeButton?.isEnabled = text.isEmpty ? false : true
+            } else {
+                completeButton?.isEnabled = false
+            }
+            
+        }
+        
+        return true
+    }
     
     // MARK: - Action
     
@@ -584,13 +597,13 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
     override func viewDidAppear(_ animated: Bool) {
         
         /* 현재 방에 설정돼있는 주제를 표시 */
-//        guard let subject = subjectPicker else {return}
+        guard let subject = subjectPicker else {return}
         
-        /*
-        subject.selectRow(Myroom.category.subjectID, inComponent: 0, animated: true)
-        subject.selectRow(Myroom.category.categoryID, inComponent: 1, animated: true)
+        
+        subject.selectRow(0, inComponent: 0, animated: false)
+        subject.selectRow(0, inComponent: 1, animated: false)
         subject.reloadAllComponents()
-        */
+        
     }
     
 

@@ -379,6 +379,8 @@ extension Lobby: UITableViewDelegate, UITableViewDataSource {
             
             if room.password == nil {
                 cell.keyImageView?.alpha = 0
+            } else {
+                cell.keyImageView?.alpha = 1
             }
             
             cell.userCountLabel?.text = "\(room.maxUser)명"

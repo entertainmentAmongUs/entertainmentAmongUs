@@ -21,7 +21,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window = UIWindow(frame: scene.coordinateSpace.bounds)
         window?.windowScene = scene
         
-        let lobby = Lobby(id: 3, nickName: "남궁광")
+        let lobby = Lobby(id: 22, nickName: "김낙현")
         let navigationController = UINavigationController(rootViewController: lobby)
         
         window?.rootViewController = navigationController
@@ -67,7 +67,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Use this method to save data, release shared resources, and store enough scene-specific state information
         // to restore the scene back to its current state.
         
-        SocketIOManager.shared.closeConnection()
+//        SocketIOManager.shared.closeConnection()
         
     }
 
