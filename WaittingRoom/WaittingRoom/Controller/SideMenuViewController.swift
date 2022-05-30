@@ -261,7 +261,7 @@ extension SideMenuViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        AF.request("http://52.78.47.148:8080/profile/1/mypage").validate().response { response in
+        AF.request("http://52.78.47.148:8080/profile/8/mypage").validate().response { response in
             
             print(response.description)
             

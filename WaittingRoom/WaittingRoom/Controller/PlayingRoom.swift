@@ -7,7 +7,7 @@
 
 import UIKit
 
-class PlayingRoom: UIViewController, UITextFieldDelegate {
+class PlayingRoom: UIViewController {
     
     // MARK: - Properties
     
@@ -37,6 +37,7 @@ class PlayingRoom: UIViewController, UITextFieldDelegate {
     var myNickName: String
     var myUserId: Int
     var roomId: String
+    var liarNickName: String?
     
     var playingInfo: PlayingInfo
     var userList: [UserInRoom]
@@ -48,6 +49,10 @@ class PlayingRoom: UIViewController, UITextFieldDelegate {
         }
     }
     var currentOrder = -1
+    var currentStatus = PlayStatus(rawValue: "READY")
+//    var hintCount = 0
+    var throwVoting = false
+    var gameStartTimer: Timer?
     
     
     // MARK: - Method
@@ -188,7 +193,7 @@ class PlayingRoom: UIViewController, UITextFieldDelegate {
         collection.dataSource = self
         collection.register(PlayerCell.self, forCellWithReuseIdentifier: playerCellIdentifier)
         collection.backgroundColor = .systemGray6
-        collection.allowsSelection = false
+        collection.allowsSelection = true
         
         
         collection.translatesAutoresizingMaskIntoConstraints = false
@@ -261,10 +266,20 @@ class PlayingRoom: UIViewController, UITextFieldDelegate {
         
     }
     
+    func addSubViews() {
+        
+        self.addAnnouncemnetLabel()
+        self.addChatView()
+        self.addChatTextField()
+        self.addPlayerCollection()
+        self.addTimerView()
+        
+    }
+    
     
     // MARK: Function Method
     
-    func isMyTurn (_ status: PlayStatus, _ order: Int) -> Bool {
+    func isEnableTextField (_ status: PlayStatus, _ order: Int) -> Bool {
         
         if status == .freeChat || (status == .hint && userList[order].userId == myUserId) {
             return true
@@ -297,6 +312,54 @@ class PlayingRoom: UIViewController, UITextFieldDelegate {
         
     }
     
+    func checkChatStatus(text: String) {
+        
+        guard let status = currentStatus else { return }
+        
+        // 내가 힌트를 제시할 차례라면
+        if status == .hint && userList[currentOrder].userId == myUserId {
+            
+            let count = hint.count
+            
+            hint[count-1] = text
+            
+            chatView?.reloadData()
+            
+            if let cell = chatView?.cellForRow(at: IndexPath(row: 0, section: count-1)) as? HintCell {
+                UIView.animate(withDuration: 0.1, delay: 0, options: [.autoreverse, .curveEaseInOut, .allowUserInteraction]) {
+                    cell.transform = CGAffineTransform(scaleX: 1.05, y: 1.05)
+                } completion: { _ in
+                    cell.transform = CGAffineTransform(scaleX: 1.0, y: 1.0)
+                }
+            }
+            
+        }
+        // 자유 토론 시간이라면
+        else if status == .freeChat {
+            
+            SocketIOManager.shared.sendGameMessage(status: status.rawValue, roomId: roomId, message: text, nickname: myNickName)
+            
+        }
+        
+        
+    }
+    
+    func sendHint() {
+        
+        guard let status = currentStatus else { return }
+        
+        
+        if currentOrder >= 0 && userList[currentOrder].userId == myUserId {
+            
+            let count = hint.count
+            
+            SocketIOManager.shared.sendGameMessage(status: status.rawValue, roomId: roomId, message: hint[count-2], nickname: myNickName)
+            
+        }
+        
+        
+    }
+    
     func showLiar() {
         
         guard let announce = self.announcementLabel else { return }
@@ -320,31 +383,89 @@ class PlayingRoom: UIViewController, UITextFieldDelegate {
         
     }
     
-    func changeOrder(_ status: PlayStatus, _ order: Int) {
+    func changeVotingState(_ status: PlayStatus){
         
-        guard let announce = self.announcementLabel else { return }
+        guard let playerCollection = playerCollection else { return }
+
         
-        // 힌트 제시하는 차례고 턴이 바뀌면 안내
-        if status == .hint && currentOrder != order {
+        if status == .vote {
             
-            announce.text = "\(userList[order].nickName)님이 힌트를 입력중입니다."
-            currentOrder = order
-            blink(announce)
+            playerCollection.allowsSelection = true
             
+        } else {
             
-        } else if status == .freeChat && currentOrder != order {
-            
-            announce.text = "남은 시간동안 자유롭게 토론하세요"
-            currentOrder = order
-            blink(announce)
-            
-            
-        } else if status == .vote {
-            
-            announce.text = "하단의 유저를 클릭하여 라이어를 지명하세요"
+            playerCollection.allowsSelection = false
             
         }
         
+    }
+    
+    func changeStatus(_ status: PlayStatus, _ order: Int) {
+        
+        guard let announce = self.announcementLabel else { return }
+        
+        if status != currentStatus {
+            
+            switch status {
+                
+            case .hint:
+                break
+            case .freeChat:
+                
+                hint.append("자유채팅 더미")
+                chatView?.insertSections(IndexSet(integer: hint.count-1), with: .automatic)
+//                hintCount += 1
+                sendHint()
+                
+                announce.text = "남은 시간동안 자유롭게 토론하세요"
+                blink(announce)
+                
+            case .vote:
+                self.view.removeGestureRecognizer(gestureRecognizer)
+                announce.text = "하단의 플레이어를 터치해서 라이어를 지명하세요"
+                blink(announce)
+            default:
+                break
+                
+            }
+            
+            currentStatus = status
+            
+            changeTextFieldState(isEnableTextField(status, order))
+
+        }
+        
+        // 힌트 제시 순서에 플레이어 차례가 바뀔경우
+        if currentStatus == .hint && currentOrder != order {
+            
+            announce.text = "\(userList[order].nickName)님이 힌트를 입력중입니다."
+            blink(announce)
+            
+            hint.append("힌트를 입력 중...")
+            chatView?.insertSections(IndexSet(integer: hint.count-1), with: .automatic)
+        
+//            hintCount += 1
+            
+            changeTextFieldState(isEnableTextField(status, order))
+            
+            // 내 순서가 끝날때 힌트 전송
+            sendHint()
+            
+            currentOrder = order
+            
+        }
+        
+        
+    }
+    
+    func checkVoting() {
+        
+        if throwVoting == false && currentStatus == .vote && time <= 0 {
+            
+            SocketIOManager.shared.vote(roomId: roomId, targetId: myUserId)
+            throwVoting = true
+            
+        }
         
     }
     
@@ -353,24 +474,144 @@ class PlayingRoom: UIViewController, UITextFieldDelegate {
         
         showLiar()
         
-        let timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(10), repeats: false) { [unowned self] timer in
-
-            SocketIOManager.shared.endAnnouncemnet(roomId: roomId) { [unowned self] tickTok in
+        let timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(10), repeats: false) { [weak self] timer in
+            
+            guard let roomId = self?.roomId else { return }
+            
+            let tickTokHandler: (_ tickTok: TickTok) -> Void = { tickTok in
                 
-                time = tickTok.time
+                self?.time = tickTok.time
                 
-                changeOrder(tickTok.status, tickTok.order)
+                self?.changeStatus(tickTok.status, tickTok.order)
                 
-                changeTextFieldState(isMyTurn(tickTok.status, tickTok.order))
+                self?.checkVoting()
                 
             }
             
-            guard let label = self.announcementLabel else {return}
+            SocketIOManager.shared.endAnnouncemnet(roomId: roomId, completionHandler: tickTokHandler)
+            
+            SocketIOManager.shared.reVoting(completionHandler: tickTokHandler)
+            
+            SocketIOManager.shared.confirmVoting { result in
+                
+                if result.status == .reVote {
+                    
+                    self?.throwVoting = false
+                    
+                } else {
+                    
+                    var maxVote = -1
+                    var targetId = 0
+                    
+                    for player in result.result {
+                        
+                        if player.count > maxVote {
+                            
+                            maxVote = player.count
+                            targetId = player.userId
+                            
+                            
+                        }
+                        
+                    }
+                    
+                    let message = targetId == self?.playingInfo.liarNumber ? "라이어가 패배했습니다" : "라이어가 승리했습니다."
+                    
+                    let alertController = UIAlertController(title: message, message: "라이어는 \(self?.liarNickName ?? "")님 이었습니다.", preferredStyle: .alert)
+                    
+                    alertController.addAction(UIAlertAction(title: "확인", style: .default))
+                    
+                    self?.present(alertController, animated: true)
+                    
+                }
+                
+            }
+            
+            guard let label = self?.announcementLabel else {return}
             label.text = "다른 플레이어를 기다리는 중..."
-//            blink(label)
+
         }
         
+        gameStartTimer = timer
+        
         RunLoop.main.add(timer, forMode: .common)
+        
+        
+    }
+    
+    func getGameChatting() {
+        
+        SocketIOManager.shared.fetchGameChatting { [weak self] gameChat in
+            
+            switch gameChat.status {
+                
+            case .hint:
+                
+                guard let hintCount = self?.hint.count else { return }
+                
+                self?.hint[hintCount-2] = gameChat.message
+                
+                self?.chatView?.reloadData()
+                
+                self?.chatView?.scrollToRow(at: IndexPath(row: 0, section: hintCount-2), at: .top, animated: true)
+                
+                if let cell = self?.chatView?.cellForRow(at: IndexPath(row: 0, section: hintCount-2)) {
+                
+                    self?.blink(cell)
+                
+                }
+            case .freeChat:
+                
+                self?.chattings.append(Chat(roomId: gameChat.roomId, nickName: gameChat.nickName, message: gameChat.message))
+                
+                guard let count = self?.chattings.count else { return }
+                
+                guard let hintCount = self?.hint.count else { return }
+                
+                let index = IndexPath(row: count-1, section: hintCount-1)
+                
+                self?.chatView?.insertRows(at: [index], with: .bottom)
+                
+                self?.chatView?.scrollToRow(at: index, at: .bottom, animated: true)
+
+                //                self?.chatView?.reloadData()
+                
+            default:
+                return
+                
+            }
+            
+        }
+        
+    }
+    
+    func endGame() {
+        
+        SocketIOManager.shared.endGame(announce: announcementLabel) { [weak self] in
+            
+            self?.gameStartTimer?.invalidate()
+            self?.navigationController?.isNavigationBarHidden = false
+            self?.navigationController?.popViewController(animated: true)
+            
+        }
+        
+    }
+    
+    func prepareGame() {
+        
+        for user in userList {
+            
+            if user.userId == playingInfo.liarNumber {
+                
+                liarNickName = user.nickName
+            }
+            
+        }
+        
+        announcement()
+        getGameChatting()
+        endGame()
+        
     }
     
     func blink(_ view: UIView) {
@@ -479,40 +720,22 @@ class PlayingRoom: UIViewController, UITextFieldDelegate {
     
     @objc func keyboardDidShow(_ noti: Notification) {
         
-        /* 키보드 등장 후 테이블 뷰 스크롤을 맨 밑으로 이동 */
         
-        guard let table = self.chatView else { return }
-        
-        
-        /*
-        /* 자유 채팅 순서일때만 이동*/
-        if currentOrder == players.count && chattings.count > 0 {
-            
-            table.scrollToRow(at: IndexPath(row: chattings.count-1, section: currentOrder), at: .bottom, animated: true)
-            
-        }
-         */
     }
     
     // MARK: - LifeCycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.navigationController?.isNavigationBarHidden = true
-        self.view.backgroundColor = .systemGray6
+        navigationController?.isNavigationBarHidden = true
+        view.backgroundColor = .systemGray6
     
-        self.gestureRecognizer.addTarget(self, action: #selector(self.hideKeyboard))
-        self.view.addGestureRecognizer(self.gestureRecognizer)
+        gestureRecognizer.addTarget(self, action: #selector(self.hideKeyboard))
+        view.addGestureRecognizer(self.gestureRecognizer)
         
-        self.addAnnouncemnetLabel()
-        self.addChatView()
-        self.addChatTextField()
-        self.addPlayerCollection()
-        self.addTimerView()
-        
-        
-        self.announcement()
-        
+        addSubViews()
+        prepareGame()
+
     }
     
     // MARK: - Initialization
@@ -529,8 +752,6 @@ class PlayingRoom: UIViewController, UITextFieldDelegate {
         self.roomId = roomId
         self.time = -1
         super.init(nibName: nil, bundle: nil)
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(getNewChatting(noti:)), name: Notification.Name("newChatNotification"), object: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         
@@ -565,7 +786,7 @@ extension PlayingRoom: UITableViewDataSource, UITableViewDelegate {
             
 //            let hint = hint[indexPath.section]
             
-            cell.chatting?.text = "예시"
+            cell.chatting?.text = hint[indexPath.section]
             
             return cell
             
@@ -644,30 +865,51 @@ extension PlayingRoom: UICollectionViewDataSource, UICollectionViewDelegate {
         return 1
     }
     
+    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        
-        guard let label = self.keywordLabel else {return}
         
         let player = userList[playingInfo.order[indexPath.row]]
         
-        label.text = "\(player.nickName)님에게 투표하시겠습니까?"
+        let alert = UIAlertController(title: "라이어 지명", message: "\(player.nickName)님에게 투표하시겠습니까?", preferredStyle: .alert)
         
-        UIView.animate(withDuration: 0.1, delay: 0, options: [.autoreverse, .curveEaseInOut, .allowUserInteraction]) {
-            label.transform = CGAffineTransform(scaleX: 1.05, y: 1.05)
-        } completion: { _ in
-            label.transform = CGAffineTransform(scaleX: 1.0, y: 1.0)
-        }
+        alert.addAction(UIAlertAction(title: "투표", style: .default, handler: { [unowned self] alert in
+            
+            SocketIOManager.shared.vote(roomId: roomId, targetId: player.userId)
+            
+            throwVoting = true
+            
+        }))
+        
+        alert.addAction(UIAlertAction(title: "취소", style: .cancel, handler: { alert in
+            collectionView.deselectItem(at: indexPath, animated: true)
+        }))
+        
+        self.present(alert, animated: true)
+        
+        
     }
     
     func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
         
-        /*
-        if myPlayerCell == collectionView.cellForItem(at: indexPath) {
-            return false
-        }
-        */
+        if currentStatus != .vote || throwVoting == true { return false }
         
         return true
+    }
+    
+}
+
+extension PlayingRoom: UITextFieldDelegate {
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        
+        guard let text = textField.text else { return false }
+        
+       checkChatStatus(text: text)
+        
+        textField.text = nil
+        
+        return true
+        
     }
     
 }

@@ -56,9 +56,16 @@ enum EditStatus: String, Codable {
 
 enum PlayStatus: String, Codable {
     
+    case ready = "READY"
     case hint = "HINT"
     case freeChat = "FREE_CHAT"
     case vote = "VOTE"
+}
+
+enum VoteStatus: String, Codable {
+    
+    case voteEnd = "VOTE_END"
+    case reVote = "RE_VOTE"
 }
 
 /* 주제 카테고리 (depth2) */
@@ -141,6 +148,15 @@ struct Chat: Codable {
     let message: String
 }
 
+struct GameChat: Codable {
+    
+    var roomId: String
+    var nickName: String
+    var status: PlayStatus
+    var message: String
+    
+}
+
 struct PlayingInfo: Codable {
     
     var keyword: String
@@ -154,6 +170,19 @@ struct TickTok: Codable {
     var time: Int
     var status: PlayStatus
     var order: Int
+    
+}
+
+struct VotedPlayer: Codable {
+    
+    var userId: Int
+    var count: Int
+}
+
+struct VoteResult: Codable {
+    
+    var status: VoteStatus
+    var result: [VotedPlayer]
     
 }
 

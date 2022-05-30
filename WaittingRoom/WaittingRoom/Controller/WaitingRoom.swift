@@ -314,6 +314,8 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
             
             self.navigationController?.pushViewController(playingRoom, animated: true)
             
+            readyButton?.isSelected = false
+            
         }
         
         
