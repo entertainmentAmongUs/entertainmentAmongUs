@@ -202,9 +202,9 @@ struct Profile: Codable {
     var score: Int
     var winCount: Int
     var loseCount: Int
-//    var victoryRate: Double {
-//        return Double(100*winCount/(loseCount+winCount))
-//    }
+    var victoryRate: Double {
+        return Double(100*winCount/(loseCount+winCount))
+    }
     
     enum CodingKeys: String, CodingKey {
         case userId = "user_id"

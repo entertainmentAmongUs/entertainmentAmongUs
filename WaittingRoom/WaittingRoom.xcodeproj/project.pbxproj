@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0D13954728461F8800212C9D /* LobbyProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D13954628461F8800212C9D /* LobbyProfileViewController.swift */; };
 		0D9DBA6C2820623500CF93A0 /* Lobby.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D9DBA6B2820623500CF93A0 /* Lobby.swift */; };
 		0D9DBA70282062C200CF93A0 /* RoomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D9DBA6F282062C200CF93A0 /* RoomCell.swift */; };
 		0D9DBA722820641F00CF93A0 /* SocketIOManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D9DBA712820641F00CF93A0 /* SocketIOManager.swift */; };
@@ -33,7 +32,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		0D13954628461F8800212C9D /* LobbyProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LobbyProfileViewController.swift; sourceTree = "<group>"; };
 		0D9DBA6B2820623500CF93A0 /* Lobby.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Lobby.swift; sourceTree = "<group>"; };
 		0D9DBA6F282062C200CF93A0 /* RoomCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RoomCell.swift; sourceTree = "<group>"; };
 		0D9DBA712820641F00CF93A0 /* SocketIOManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocketIOManager.swift; sourceTree = "<group>"; };
@@ -98,7 +96,6 @@
 				0D9DBB5B2821A4B900CF93A0 /* SideMenuViewController.swift */,
 				0DD3623A27C26A6D00C206E0 /* ChattingRoom.swift */,
 				0DD99D9327BE4B7B009FAD3F /* ProfileViewController.swift */,
-				0D13954628461F8800212C9D /* LobbyProfileViewController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -289,7 +286,6 @@
 				0D9DBA6C2820623500CF93A0 /* Lobby.swift in Sources */,
 				0D9DBB602821B47500CF93A0 /* UserCell.swift in Sources */,
 				0DD99D5C27BA9004009FAD3F /* AppDelegate.swift in Sources */,
-				0D13954728461F8800212C9D /* LobbyProfileViewController.swift in Sources */,
 				0DD99D9227BCFAD2009FAD3F /* ChatCell.swift in Sources */,
 				0DCBB7B92830F7F900914519 /* HintCell.swift in Sources */,
 				0DCBB7B32830F10000914519 /* PlayingRoom.swift in Sources */,

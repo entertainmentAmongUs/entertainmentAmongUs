@@ -187,7 +187,7 @@ class Lobby: UIViewController  {
         let sideMenuViewController = SideMenuViewController(userList: self.lobbyUserList)
         let sideMenuNavi = SideMenuNavigationController(rootViewController: sideMenuViewController)
         
-        sideMenuViewController.navigationItem.title = "사이드바"
+        sideMenuViewController.navigationItem.title = "메뉴"
         
         let appearance = UINavigationBarAppearance()
         appearance.configureWithTransparentBackground()
