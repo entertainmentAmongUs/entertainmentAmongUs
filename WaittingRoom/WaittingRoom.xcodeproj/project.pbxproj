@@ -7,28 +7,47 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0D9DBA6C2820623500CF93A0 /* Lobby.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D9DBA6B2820623500CF93A0 /* Lobby.swift */; };
+		0D9DBA70282062C200CF93A0 /* RoomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D9DBA6F282062C200CF93A0 /* RoomCell.swift */; };
+		0D9DBA722820641F00CF93A0 /* SocketIOManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D9DBA712820641F00CF93A0 /* SocketIOManager.swift */; };
+		0D9DBB5C2821A4B900CF93A0 /* SideMenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D9DBB5B2821A4B900CF93A0 /* SideMenuViewController.swift */; };
+		0D9DBB602821B47500CF93A0 /* UserCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D9DBB5F2821B47500CF93A0 /* UserCell.swift */; };
+		0D9DBB622821CD5400CF93A0 /* RoomCreating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D9DBB612821CD5400CF93A0 /* RoomCreating.swift */; };
+		0DCBB7B32830F10000914519 /* PlayingRoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DCBB7B22830F10000914519 /* PlayingRoom.swift */; };
+		0DCBB7B72830F7CC00914519 /* PlayerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DCBB7B62830F7CC00914519 /* PlayerCell.swift */; };
+		0DCBB7B92830F7F900914519 /* HintCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DCBB7B82830F7F900914519 /* HintCell.swift */; };
 		0DD3623727C0D7AA00C206E0 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD3623627C0D7AA00C206E0 /* Model.swift */; };
 		0DD3623B27C26A6D00C206E0 /* ChattingRoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD3623A27C26A6D00C206E0 /* ChattingRoom.swift */; };
 		0DD3623D27C54B0E00C206E0 /* RoomSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD3623C27C54B0E00C206E0 /* RoomSetting.swift */; };
 		0DD99D5C27BA9004009FAD3F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD99D5B27BA9004009FAD3F /* AppDelegate.swift */; };
 		0DD99D5E27BA9004009FAD3F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD99D5D27BA9004009FAD3F /* SceneDelegate.swift */; };
-		0DD99D6027BA9004009FAD3F /* WaittingRoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD99D5F27BA9004009FAD3F /* WaittingRoom.swift */; };
+		0DD99D6027BA9004009FAD3F /* WaitingRoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD99D5F27BA9004009FAD3F /* WaitingRoom.swift */; };
 		0DD99D6327BA9004009FAD3F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0DD99D6127BA9004009FAD3F /* Main.storyboard */; };
 		0DD99D6527BA9006009FAD3F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0DD99D6427BA9006009FAD3F /* Assets.xcassets */; };
 		0DD99D6827BA9006009FAD3F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0DD99D6627BA9006009FAD3F /* LaunchScreen.storyboard */; };
 		0DD99D9027BC0156009FAD3F /* ProfileCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD99D8F27BC0156009FAD3F /* ProfileCell.swift */; };
 		0DD99D9227BCFAD2009FAD3F /* ChatCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD99D9127BCFAD2009FAD3F /* ChatCell.swift */; };
 		0DD99D9427BE4B7B009FAD3F /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD99D9327BE4B7B009FAD3F /* ProfileViewController.swift */; };
+		EBAD3185F5B23A2A7F82F211 /* Pods_WaittingRoom.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E6987FC74B869DCC689A70C /* Pods_WaittingRoom.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0D9DBA6B2820623500CF93A0 /* Lobby.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Lobby.swift; sourceTree = "<group>"; };
+		0D9DBA6F282062C200CF93A0 /* RoomCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RoomCell.swift; sourceTree = "<group>"; };
+		0D9DBA712820641F00CF93A0 /* SocketIOManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocketIOManager.swift; sourceTree = "<group>"; };
+		0D9DBB5B2821A4B900CF93A0 /* SideMenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideMenuViewController.swift; sourceTree = "<group>"; };
+		0D9DBB5F2821B47500CF93A0 /* UserCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCell.swift; sourceTree = "<group>"; };
+		0D9DBB612821CD5400CF93A0 /* RoomCreating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomCreating.swift; sourceTree = "<group>"; };
+		0DCBB7B22830F10000914519 /* PlayingRoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayingRoom.swift; sourceTree = "<group>"; };
+		0DCBB7B62830F7CC00914519 /* PlayerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerCell.swift; sourceTree = "<group>"; };
+		0DCBB7B82830F7F900914519 /* HintCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintCell.swift; sourceTree = "<group>"; };
 		0DD3623627C0D7AA00C206E0 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 		0DD3623A27C26A6D00C206E0 /* ChattingRoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChattingRoom.swift; sourceTree = "<group>"; };
 		0DD3623C27C54B0E00C206E0 /* RoomSetting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomSetting.swift; sourceTree = "<group>"; };
 		0DD99D5827BA9004009FAD3F /* WaittingRoom.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WaittingRoom.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0DD99D5B27BA9004009FAD3F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0DD99D5D27BA9004009FAD3F /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		0DD99D5F27BA9004009FAD3F /* WaittingRoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaittingRoom.swift; sourceTree = "<group>"; };
+		0DD99D5F27BA9004009FAD3F /* WaitingRoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaitingRoom.swift; sourceTree = "<group>"; };
 		0DD99D6227BA9004009FAD3F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		0DD99D6427BA9006009FAD3F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0DD99D6727BA9006009FAD3F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -36,6 +55,9 @@
 		0DD99D8F27BC0156009FAD3F /* ProfileCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileCell.swift; sourceTree = "<group>"; };
 		0DD99D9127BCFAD2009FAD3F /* ChatCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatCell.swift; sourceTree = "<group>"; };
 		0DD99D9327BE4B7B009FAD3F /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
+		2D6CB041CA958D2FD7585836 /* Pods-WaittingRoom.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WaittingRoom.release.xcconfig"; path = "Target Support Files/Pods-WaittingRoom/Pods-WaittingRoom.release.xcconfig"; sourceTree = "<group>"; };
+		3E6987FC74B869DCC689A70C /* Pods_WaittingRoom.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_WaittingRoom.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		66E706B07F53DD33EBCF8006 /* Pods-WaittingRoom.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WaittingRoom.debug.xcconfig"; path = "Target Support Files/Pods-WaittingRoom/Pods-WaittingRoom.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -43,17 +65,56 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EBAD3185F5B23A2A7F82F211 /* Pods_WaittingRoom.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0DB9C1CF282CE81E0048F63C /* View */ = {
+			isa = PBXGroup;
+			children = (
+				0DD99D8F27BC0156009FAD3F /* ProfileCell.swift */,
+				0DD99D9127BCFAD2009FAD3F /* ChatCell.swift */,
+				0D9DBA6F282062C200CF93A0 /* RoomCell.swift */,
+				0DCBB7B62830F7CC00914519 /* PlayerCell.swift */,
+				0DCBB7B82830F7F900914519 /* HintCell.swift */,
+				0D9DBB5F2821B47500CF93A0 /* UserCell.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		0DB9C1D1282CE8480048F63C /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				0DD99D5F27BA9004009FAD3F /* WaitingRoom.swift */,
+				0DCBB7B22830F10000914519 /* PlayingRoom.swift */,
+				0DD3623C27C54B0E00C206E0 /* RoomSetting.swift */,
+				0D9DBB612821CD5400CF93A0 /* RoomCreating.swift */,
+				0D9DBA6B2820623500CF93A0 /* Lobby.swift */,
+				0D9DBB5B2821A4B900CF93A0 /* SideMenuViewController.swift */,
+				0DD3623A27C26A6D00C206E0 /* ChattingRoom.swift */,
+				0DD99D9327BE4B7B009FAD3F /* ProfileViewController.swift */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		0DB9C1D2282CE84F0048F63C /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				0DD3623627C0D7AA00C206E0 /* Model.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 		0DD99D4F27BA9004009FAD3F = {
 			isa = PBXGroup;
 			children = (
 				0DD99D5A27BA9004009FAD3F /* WaittingRoom */,
 				0DD99D5927BA9004009FAD3F /* Products */,
+				CE68CD0439D273D4049133DC /* Pods */,
+				419D782DB73479498ABBDA88 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -68,13 +129,10 @@
 		0DD99D5A27BA9004009FAD3F /* WaittingRoom */ = {
 			isa = PBXGroup;
 			children = (
-				0DD99D5F27BA9004009FAD3F /* WaittingRoom.swift */,
-				0DD3623C27C54B0E00C206E0 /* RoomSetting.swift */,
-				0DD3623A27C26A6D00C206E0 /* ChattingRoom.swift */,
-				0DD99D9327BE4B7B009FAD3F /* ProfileViewController.swift */,
-				0DD99D9127BCFAD2009FAD3F /* ChatCell.swift */,
-				0DD99D8F27BC0156009FAD3F /* ProfileCell.swift */,
-				0DD3623627C0D7AA00C206E0 /* Model.swift */,
+				0DB9C1D2282CE84F0048F63C /* Model */,
+				0DB9C1D1282CE8480048F63C /* Controller */,
+				0DB9C1CF282CE81E0048F63C /* View */,
+				0D9DBA712820641F00CF93A0 /* SocketIOManager.swift */,
 				0DD99D5B27BA9004009FAD3F /* AppDelegate.swift */,
 				0DD99D5D27BA9004009FAD3F /* SceneDelegate.swift */,
 				0DD99D6127BA9004009FAD3F /* Main.storyboard */,
@@ -85,6 +143,23 @@
 			path = WaittingRoom;
 			sourceTree = "<group>";
 		};
+		419D782DB73479498ABBDA88 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				3E6987FC74B869DCC689A70C /* Pods_WaittingRoom.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		CE68CD0439D273D4049133DC /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				66E706B07F53DD33EBCF8006 /* Pods-WaittingRoom.debug.xcconfig */,
+				2D6CB041CA958D2FD7585836 /* Pods-WaittingRoom.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -92,9 +167,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0DD99D6C27BA9006009FAD3F /* Build configuration list for PBXNativeTarget "WaittingRoom" */;
 			buildPhases = (
+				D95FAF4260E281EFA04C187F /* [CP] Check Pods Manifest.lock */,
 				0DD99D5427BA9004009FAD3F /* Sources */,
 				0DD99D5527BA9004009FAD3F /* Frameworks */,
 				0DD99D5627BA9004009FAD3F /* Resources */,
+				BDAC14FAF9AA66EE046A1D5C /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -151,20 +228,71 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		BDAC14FAF9AA66EE046A1D5C /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-WaittingRoom/Pods-WaittingRoom-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-WaittingRoom/Pods-WaittingRoom-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-WaittingRoom/Pods-WaittingRoom-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		D95FAF4260E281EFA04C187F /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-WaittingRoom-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		0DD99D5427BA9004009FAD3F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				0DD3623727C0D7AA00C206E0 /* Model.swift in Sources */,
+				0DCBB7B72830F7CC00914519 /* PlayerCell.swift in Sources */,
 				0DD3623D27C54B0E00C206E0 /* RoomSetting.swift in Sources */,
 				0DD3623B27C26A6D00C206E0 /* ChattingRoom.swift in Sources */,
 				0DD99D9427BE4B7B009FAD3F /* ProfileViewController.swift in Sources */,
-				0DD99D6027BA9004009FAD3F /* WaittingRoom.swift in Sources */,
+				0D9DBB5C2821A4B900CF93A0 /* SideMenuViewController.swift in Sources */,
+				0DD99D6027BA9004009FAD3F /* WaitingRoom.swift in Sources */,
 				0DD99D9027BC0156009FAD3F /* ProfileCell.swift in Sources */,
+				0D9DBA6C2820623500CF93A0 /* Lobby.swift in Sources */,
+				0D9DBB602821B47500CF93A0 /* UserCell.swift in Sources */,
 				0DD99D5C27BA9004009FAD3F /* AppDelegate.swift in Sources */,
 				0DD99D9227BCFAD2009FAD3F /* ChatCell.swift in Sources */,
+				0DCBB7B92830F7F900914519 /* HintCell.swift in Sources */,
+				0DCBB7B32830F10000914519 /* PlayingRoom.swift in Sources */,
+				0D9DBA722820641F00CF93A0 /* SocketIOManager.swift in Sources */,
 				0DD99D5E27BA9004009FAD3F /* SceneDelegate.swift in Sources */,
+				0D9DBA70282062C200CF93A0 /* RoomCell.swift in Sources */,
+				0D9DBB622821CD5400CF93A0 /* RoomCreating.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -308,6 +436,7 @@
 		};
 		0DD99D6D27BA9006009FAD3F /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 66E706B07F53DD33EBCF8006 /* Pods-WaittingRoom.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -335,6 +464,7 @@
 		};
 		0DD99D6E27BA9006009FAD3F /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2D6CB041CA958D2FD7585836 /* Pods-WaittingRoom.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
