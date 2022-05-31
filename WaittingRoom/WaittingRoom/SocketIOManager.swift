@@ -275,7 +275,9 @@ class SocketIOManager: NSObject {
         
     }
     
-    func vote(roomId: String, targetId: Int) {
+    func vote(roomId: String?, targetId: Int) {
+        
+        guard let roomId = roomId else { return }
         
         let voteData: [String: Any] = ["roomId" : roomId, "targetUserId" : targetId]
         

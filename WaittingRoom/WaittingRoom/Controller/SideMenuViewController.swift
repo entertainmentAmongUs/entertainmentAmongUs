@@ -261,9 +261,20 @@ extension SideMenuViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        AF.request("http://52.78.47.148:8080/profile/8/mypage").validate().response { response in
-            
+        
+        // baseURL 쓰면 500코드 오류 남
+        AF.request("http://52.78.47.148:8080/profile/10/mypage").validate().response { [weak self] response in
             print(response.description)
+            
+            guard let data = response.data else { return }
+            
+            print(String(data: data, encoding: .utf8)!)
+            
+//            guard let profile = try? JSONDecoder().decode(Profile.self, from: data) else { return }
+            
+//            let profileVC = LobbyProfileViewController(profile: profile)
+            
+//            self?.present(profileVC, animated: true)
             
             
         }
