@@ -3,10 +3,7 @@ package com.entertainment.user.service;
 import com.entertainment.user.entity.Profile;
 //import com.entertainment.user.entity.Role;
 import com.entertainment.user.repository.ProfileRepository;
-import com.entertainment.user.request.ChangePwReq;
-import com.entertainment.user.request.CodeReq;
-import com.entertainment.user.request.ProfileRegisterReq;
-import com.entertainment.user.request.RegisterReq;
+import com.entertainment.user.request.*;
 import com.entertainment.user.entity.User;
 import com.entertainment.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +16,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -207,11 +205,11 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public String showProfile(int profileId) {
+    public String showProfile(int userId) {
         List<Profile> list = profileRepository.findAll();
         String s="";
         for(Profile p : list){
-            if(p.getId()==profileId){
+            if(p.getUser().getId()==userId){
                 //"{\"code\": \"200, SUCCESS\", \"message\": "+"님 프로필이 조회되었습니다.}";
                 s+="{\"id\": "+p.getId()+", \"nickname\": \""+p.getNickname()+"\", \"score\": "+p.getScore()+", \"win_number\": "+p.getWin_number()+", \"lose_number\": "+p.getLose_number()+", \"user_id\": "+p.getUser().getId()+"}";
                 return s;
@@ -223,7 +221,6 @@ public class UserServiceImpl implements UserService{
     @Override
     public int getProfileIdByUserNickname(String nickname) {
         List<Profile> list = profileRepository.findAll();
-        String s="";
         for(Profile p : list){
             if(p.getNickname().equals(nickname)){
                 //"{\"code\": \"200, SUCCESS\", \"message\": "+"님 프로필이 조회되었습니다.}";
@@ -231,6 +228,38 @@ public class UserServiceImpl implements UserService{
             }
         }
         return -1;      //해당 프로필이 없을경우
+    }
+
+    @Override
+    public boolean gameOutCome(OutcomeReq outcomeReq) {
+        if(outcomeReq.getIsVictory()){
+            User user = userRepository.getById(outcomeReq.getUserId());
+            List<Profile> profiles=new LinkedList<>();
+            Profile profile=new Profile();
+            profiles=profileRepository.findAll();
+            for(Profile p:profiles){
+                if(p.getUser().getId()==user.getId()){
+                    profile=p;
+                }
+            }
+            int winnum=profile.getWin_number()+1;
+            profile.setWin_number(winnum);
+            profileRepository.save(profile);
+        }else{
+            User user = userRepository.getById(outcomeReq.getUserId());
+            List<Profile> profiles=new LinkedList<>();
+            Profile profile=new Profile();
+            profiles=profileRepository.findAll();
+            for(Profile p:profiles){
+                if(p.getUser().getId()==user.getId()){
+                    profile=p;
+                }
+            }
+            int losenum=profile.getLose_number()+1;
+            profile.setLose_number(losenum);
+            profileRepository.save(profile);
+        }
+        return true;
     }
 
 //    @Override
