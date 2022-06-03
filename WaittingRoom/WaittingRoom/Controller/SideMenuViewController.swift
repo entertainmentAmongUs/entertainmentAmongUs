@@ -128,10 +128,10 @@ class SideMenuViewController: UIViewController {
         
         self.profileImage.image = UIImage(named: "ic_user_loading")
         self.nicknameLabel.text = "닉네임: \(profile.nickName)"
-        self.victoryRateLabel.text = "승률: \(profile.victoryRate)"
-        self.winCountLabel.text = "이긴 횟수: \(profile.winCount)"
-        self.loseCountLabel.text = "진 횟수: \(profile.loseCount)"
-        self.scoreLabel.text = "점수: \(profile.score)"
+        self.victoryRateLabel.text = "승률: \(Int(profile.victoryRate))%"
+        self.winCountLabel.text = "이긴 횟수: \(profile.winCount)회"
+        self.loseCountLabel.text = "진 횟수: \(profile.loseCount)회"
+        self.scoreLabel.text = "점수: \(profile.score)점"
         
         
     }
