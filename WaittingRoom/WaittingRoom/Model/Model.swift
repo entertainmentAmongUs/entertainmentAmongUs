@@ -186,19 +186,37 @@ struct VoteResult: Codable {
     
 }
 
+struct Outcome: Codable {
+    
+    var isVictory: Bool
+    var userId: Int
+    
+}
 
 /* 유저의 프로필 정보 */
-struct Profile {
+struct Profile: Codable {
     
-    var userID: Int
-    var image: UIImage?
-    var nickname: String
+    var userId: Int
+    var profileId: Int
+    var nickName: String
     var score: Int
-    var victoryRate: Double {
-        return Double(100*winCount/(loseCount+winCount))
-    }
     var winCount: Int
     var loseCount: Int
+    var victoryRate: Double {
+        if winCount + loseCount == 0 {
+            return 0
+        }
+        return Double(100*winCount/(loseCount+winCount))
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case userId = "user_id"
+        case profileId = "id"
+        case nickName = "nickname"
+        case winCount = "win_number"
+        case loseCount = "lose_number"
+        case score
+    }
 }
 
 
@@ -223,3 +241,5 @@ let subjects = [Subject(title: "국가", category: ["아시아", "유럽", "아�
 
 /* 나의 친구 요청 목록 */
 var myFriendRequest: [FriendRequest] = []
+
+let baseURL = "http://52.78.47.148:8080/"

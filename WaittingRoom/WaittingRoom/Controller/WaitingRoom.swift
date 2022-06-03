@@ -448,12 +448,6 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
 
         let user = roomInfo.users[indexPath.row]
         
-        /*
-        if info.userID == nil {
-            return false
-        }
-        */
-        
         let profileView = ProfileViewController(roomId: roomId, userId: user.userId, myUserId: myUserId, hostId: roomInfo.hostId)
         
         self.present(profileView, animated: true, completion: nil)

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Alamofire
 
 class PlayingRoom: UIViewController {
     
@@ -38,6 +39,7 @@ class PlayingRoom: UIViewController {
     var myUserId: Int
     var roomId: String
     var liarNickName: String?
+    var isLiar: Bool
     
     var playingInfo: PlayingInfo
     var userList: [UserInRoom]
@@ -365,7 +367,7 @@ class PlayingRoom: UIViewController {
         guard let announce = self.announcementLabel else { return }
         guard let keyword = keywordLabel else { return }
         
-        if playingInfo.liarNumber == myUserId {
+        if isLiar {
             
             announce.text = "당신은 라이어입니다!"
             keyword.text = "다른 유저들의 힌트를 보고 키워드를 알아내세요."
@@ -492,7 +494,7 @@ class PlayingRoom: UIViewController {
             
             SocketIOManager.shared.reVoting(completionHandler: tickTokHandler)
             
-            SocketIOManager.shared.confirmVoting { result in
+            SocketIOManager.shared.confirmVoting {  result in
                 
                 if result.status == .reVote {
                     
@@ -515,13 +517,22 @@ class PlayingRoom: UIViewController {
                         
                     }
                     
-                    let message = targetId == self?.playingInfo.liarNumber ? "라이어가 패배했습니다" : "라이어가 승리했습니다."
+                    let isLiarDefeat = Bool(targetId == self?.playingInfo.liarNumber)
+                    guard let isLiar = self?.isLiar else { return }
+                    let isVictory = (isLiar && !isLiarDefeat) || (!isLiar && isLiarDefeat) ? true : false
+                    let message = isVictory ? "당신이 승리했습니다!" : "당신은 패배했습니다!"
                     
                     let alertController = UIAlertController(title: message, message: "라이어는 \(self?.liarNickName ?? "")님 이었습니다.", preferredStyle: .alert)
                     
                     alertController.addAction(UIAlertAction(title: "확인", style: .default))
                     
                     self?.present(alertController, animated: true)
+                    
+                    let outcome: [String: Any] = ["isVictory": isVictory, "userId": self?.myUserId ?? -1]
+            
+                    AF.request("http://52.78.47.148:8080/profile/outcome", method: .post, parameters: outcome, encoding: JSONEncoding(), headers: nil, interceptor: nil, requestModifier: nil).validate().response { response in
+                        print(response.description)
+                    }
                     
                 }
                 
@@ -751,6 +762,7 @@ class PlayingRoom: UIViewController {
         self.userList = userList
         self.roomId = roomId
         self.time = -1
+        self.isLiar = Bool(myUserId == playingInfo.liarNumber)
         super.init(nibName: nil, bundle: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
@@ -872,11 +884,11 @@ extension PlayingRoom: UICollectionViewDataSource, UICollectionViewDelegate {
         
         let alert = UIAlertController(title: "라이어 지명", message: "\(player.nickName)님에게 투표하시겠습니까?", preferredStyle: .alert)
         
-        alert.addAction(UIAlertAction(title: "투표", style: .default, handler: { [unowned self] alert in
+        alert.addAction(UIAlertAction(title: "투표", style: .default, handler: { [weak self] alert in
             
-            SocketIOManager.shared.vote(roomId: roomId, targetId: player.userId)
+            SocketIOManager.shared.vote(roomId: self?.roomId, targetId: player.userId)
             
-            throwVoting = true
+            self?.throwVoting = true
             
         }))
         

@@ -6,8 +6,9 @@
 //
 
 import UIKit
+import AlertsAndPickers
 
-class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate, UITextFieldDelegate {
+class RoomSetting: UIViewController, UITextFieldDelegate {
     
     
     // MARK: - Properties
@@ -20,9 +21,10 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
     var roomTitleTextField: UITextField?
     var passwordTextField: UITextField?
     var gameTypeSegment: UISegmentedControl?
-    var maxUserNumberPicker: UIPickerView?
+    var maxUserNumberButton: UIButton?
     var maxUserNumberLabel: UILabel?
-    var subjectPicker: UIPickerView?
+    var subjectButton: UIButton?
+    var categoryButton: UIButton?
     
     var buttonStackView: UIStackView?
     var backButton: UIButton?
@@ -33,6 +35,22 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
     var contentViewTopAnchor: CGFloat
     
     var roomInfo: Room
+    
+    var maxUserNumber: Int = 3 {
+        willSet {
+            self.maxUserNumberButton?.setTitle("\(newValue)명", for: .normal)
+        }
+    }
+    var subject = 0 {
+        willSet {
+            self.subjectButton?.setTitle(subjects[newValue].title, for: .normal)
+        }
+    }
+    var category = 0 {
+        willSet {
+            self.categoryButton?.setTitle(subjects[subject].category[newValue], for: .normal)
+        }
+    }
     
     // MARK: - Method
     
@@ -223,14 +241,13 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
             
             for i in 0...games.count-1 {
                 /* 세그먼트 변경에 대한 액션 */
-                let action = UIAction { [weak self] _ in
+                let action = UIAction { [unowned self] _ in
                     
                     infoLable.text = games[i].info
                     
-                    /* 변경된 게임의 최대 인원 수에 맞게 설정할 수 있는 인원 최댓값 조정*/
-                    guard let picker = self?.maxUserNumberPicker else {return}
+                    /* 최소 인원으로 변경 */
+                    self.maxUserNumber = 3
                     
-                    picker.reloadComponent(0)
                 }
                 action.title = games[i].title
                 segment.insertSegment(action: action, at: i, animated: true)
@@ -272,25 +289,25 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
             label.setContentHuggingPriority(.defaultHigh, for: .vertical)
             
             
-            /* 방 최대 인원 변경 컨트롤 (피커 뷰) */
-            let picker = UIPickerView()
+            let picker = UIButton(type: .system)
             
             view.addSubview(picker)
             
-            picker.dataSource = self
-            picker.delegate = self
-            picker.selectRow(roomInfo.maxUser-3, inComponent: 0, animated: true)
-            picker.tag = 0
+            picker.setTitle("\(maxUserNumber)명", for: .normal)
+            picker.setTitleColor(.black, for: .normal)
+            picker.titleLabel?.font = .systemFont(ofSize: 20, weight: .medium)
+            picker.backgroundColor = .systemGray6
+            picker.clipsToBounds = true
+            picker.layer.cornerRadius = 5
+            picker.addTarget(self, action: #selector(touchMaxUserButton(_:)), for: .touchUpInside)
             
             picker.translatesAutoresizingMaskIntoConstraints = false
             picker.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 5).isActive = true
             picker.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 15).isActive = true
             picker.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20).isActive = true
-            picker.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0).isActive = true
+            picker.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -10).isActive = true
             
-            
-            self.maxUserNumberPicker = picker
-            
+            self.maxUserNumberButton = picker
             
             return view
         }()
@@ -315,24 +332,46 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
             label.topAnchor.constraint(equalTo: view.topAnchor, constant:  10).isActive = true
             label.setContentHuggingPriority(.defaultHigh, for: .vertical)
             
-            /* 제시어 주제 변경 컨트롤 (피커 뷰) */
-            let picker = UIPickerView()
+            let subject = UIButton(type: .system)
             
-            view.addSubview(picker)
+            subject.setTitle(subjects[self.subject].title, for: .normal)
+            subject.setTitleColor(.black, for: .normal)
+            subject.titleLabel?.font = .systemFont(ofSize: 20, weight: .medium)
+            subject.backgroundColor = .systemGray6
+            subject.clipsToBounds = true
+            subject.layer.cornerRadius = 5
+            subject.addTarget(self, action: #selector(touchSubjectButton(_:)), for: .touchUpInside)
             
-            picker.dataSource = self
-            picker.delegate = self
-            picker.tag = 1
-            picker.selectRow(0, inComponent: 0, animated: false)
+            self.subjectButton = subject
             
-            picker.translatesAutoresizingMaskIntoConstraints = false
-            picker.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 0).isActive = true
-            picker.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 15).isActive = true
-            picker.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20).isActive = true
-            picker.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0).isActive = true
             
-            self.subjectPicker = picker
+            let category = UIButton(type: .system)
             
+            category.setTitle(subjects[self.subject].category[self.category], for: .normal)
+            category.setTitleColor(.black, for: .normal)
+            category.titleLabel?.font = .systemFont(ofSize: 20, weight: .medium)
+            category.backgroundColor = .systemGray6
+            category.clipsToBounds = true
+            category.layer.cornerRadius = 5
+            category.addTarget(self, action: #selector(touchCategoryButton(_:)), for: .touchUpInside)
+            
+            self.categoryButton = category
+            
+            
+            let stackView = UIStackView(arrangedSubviews: [subject, category])
+            
+            view.addSubview(stackView)
+            
+            stackView.axis = .horizontal
+            stackView.alignment = .center
+            stackView.distribution = .fillEqually
+            stackView.spacing = 20
+            
+            stackView.translatesAutoresizingMaskIntoConstraints = false
+            stackView.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 5).isActive = true
+            stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 15).isActive = true
+            stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20).isActive = true
+            stackView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -10).isActive = true
             
             return view
         }()
@@ -404,91 +443,7 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
     }
     
     
-    // MARK: - PickerView DataSource
-    
-    func numberOfComponents(in pickerView: UIPickerView) -> Int {
-        switch pickerView.tag {
-        /* tag 0 : 최대 인원 설정 */
-        case 0:
-            return 1
-        /* tag 1 : 제시어 주제 설정 */
-        case 1:
-            /* depth 1, 2*/
-            return 2
-        default:
-            return 0
-        }
-    }
-    
-    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        
-        switch pickerView.tag {
-            
-        case 0:
-            /* 선택된 게임의 가능한 최대 인원 수 */
-            guard let segment = self.gameTypeSegment else { return 0 }
-            let index = segment.selectedSegmentIndex
-            return games[index].maxUserNumber - 2
-            
-        case 1:
-            switch component {
-                
-            case 0:
-                /* 제시어 주제 개수 */
-                return subjects.count
-                
-            case 1:
-                /* 선택된 주제에 따른 카테고리 개수 */
-                let index = pickerView.selectedRow(inComponent: 0)
-                return subjects[index].category.count
-                
-            default: return 0
-                
-            }
-        default:
-            return 0
-            
-        }
-        
-    }
-    
-    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        
-        switch pickerView.tag {
-        case 0:
-            /* 설정 가능한 최대 인원 수 표시 */
-            return "\(row+3)명"
-        
-        case 1:
-            switch component {
-                
-            case 0:
-                /* 주제 제목(타이틀) */
-                return subjects[row].title
-                
-            case 1:
-                /* 선택한 주제에 따라 카테고리 표시 */
-                let index = pickerView.selectedRow(inComponent: 0)
-                return subjects[index].category[row]
-                
-            default:
-                return nil
-            }
-        default:
-            return nil
-        }
-    }
-    
-    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        
-        /* 주제 설정 뷰에서 0번 컴포넌트 (제시어 주제) 변경하면 카테고리 갱신 */
-        if pickerView.tag == 1 && component == 0 {
-            pickerView.reloadComponent(1)
-            pickerView.selectRow(0, inComponent: 1, animated: true)
-        }
-    }
-    
-
+   
     // MARK: - TextField Delegate
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -523,15 +478,8 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
         /* 현재 방 설정을 입력값으로 변경 */
         
         guard let title = roomTitleTextField?.text else {return}
-        guard let maxUserNumber = maxUserNumberPicker?.selectedRow(inComponent: 0) else {return}
         guard let gameType = gameTypeSegment?.selectedSegmentIndex else {return}
-        guard let subjectPicker = subjectPicker else {
-            return
-        }
         guard let passwordTextField = self.passwordTextField else { return }
-
-        
-        let topic = subjects[subjectPicker.selectedRow(inComponent: 0)].category[subjectPicker.selectedRow(inComponent: 1)]
         
         var password = passwordTextField.text
         
@@ -540,7 +488,7 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
             password = nil
         }
         
-        let roomInfo: [String:Any] = ["roomId": roomInfo.roomId, "title": title, "password": password, "gameType": games[gameType].type.rawValue, "subject": topic, "maxUser": maxUserNumber+3]
+        let roomInfo: [String:Any] = ["roomId": roomInfo.roomId, "title": title, "password": password, "gameType": games[gameType].type.rawValue, "subject": subjects[subject].category[category], "maxUser": maxUserNumber]
         
         SocketIOManager.shared.editRoom(room: roomInfo) { [weak self] status in
             
@@ -557,7 +505,6 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
             
         }
         
-//        self.dismiss(animated: true, completion: nil)
         
     }
     
@@ -570,6 +517,73 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
         
         text.text = nil
     
+    }
+    
+    @objc func touchMaxUserButton(_ sender: UIButton) {
+        
+        guard let gameIndex = gameTypeSegment?.selectedSegmentIndex else { return }
+
+        let alert = UIAlertController(title: "최대 인원", message: "방에 입장할 수 있는 최대 인원 수를 선택하세요", preferredStyle: .actionSheet)
+
+        let userNumbers: [Int] = (3...games[gameIndex].maxUserNumber).map { Int($0) }
+        let pickerViewValues: [[String]] = [userNumbers.map { "\($0)명" }]
+        let pickerViewSelectedValue: PickerViewViewController.Index = (column: 0, row: maxUserNumber-3)
+
+        alert.addPickerView(values: pickerViewValues, initialSelection: pickerViewSelectedValue) {
+            [unowned self] vc, picker, index, values in
+            
+            self.maxUserNumber = userNumbers[index.row]
+        }
+        
+        alert.addAction(title: "확인", style: .cancel)
+        
+        self.present(alert, animated: true)
+        
+    }
+    
+    @objc func touchSubjectButton(_ sender: UIButton){
+        
+        let alert = UIAlertController(title: "주제", message: "게임에 사용할 주제를 선택하세요", preferredStyle: .actionSheet)
+        
+        let subjectValue = (0..<subjects.count).map { $0 }
+        let pickerViewValues: [[String]] = [subjectValue.map { subjects[$0].title }]
+        let pickerViewSelectedValue: PickerViewViewController.Index = (column: 0, row: subject)
+        
+        
+        alert.addPickerView(values: pickerViewValues, initialSelection: pickerViewSelectedValue) {
+            [unowned self] vc, picker, index, values in
+            self.subject = index.row
+            self.category = 0
+        }
+        
+        alert.addAction(title: "확인", style: .cancel)
+        
+        self.present(alert, animated: true)
+        
+        
+    }
+    
+    @objc func touchCategoryButton(_ sender: UIButton){
+        
+//        guard let subject = subject else { return }
+
+        
+        let alert = UIAlertController(title: "카테고리", message: "세부 카테고리를 선택하세요", preferredStyle: .actionSheet)
+        
+        let subjectIndex = subjects[subject].category
+        let pickerViewValues = [subjectIndex]
+        let pickerViewSelectedValue: PickerViewViewController.Index = (column: 0, row: category)
+
+        alert.addPickerView(values: pickerViewValues, initialSelection: pickerViewSelectedValue) {
+            [unowned self] vc, picker, index, values in
+            
+            self.category = index.row
+        }
+        
+        alert.addAction(title: "확인", style: .cancel)
+        
+        self.present(alert, animated: true)
+        
     }
     
     @objc func hideKeyboard(){
@@ -592,20 +606,6 @@ class RoomSetting: UIViewController, UIPickerViewDataSource, UIPickerViewDelegat
         self.addButton()
         
     }
-    
-    
-    override func viewDidAppear(_ animated: Bool) {
-        
-        /* 현재 방에 설정돼있는 주제를 표시 */
-        guard let subject = subjectPicker else {return}
-        
-        
-        subject.selectRow(0, inComponent: 0, animated: false)
-        subject.selectRow(0, inComponent: 1, animated: false)
-        subject.reloadAllComponents()
-        
-    }
-    
 
     
     
