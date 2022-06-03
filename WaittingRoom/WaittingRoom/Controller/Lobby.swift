@@ -7,7 +7,6 @@
 
 import UIKit
 import SideMenu
-import Alamofire
 
 class Lobby: UIViewController  {
     
