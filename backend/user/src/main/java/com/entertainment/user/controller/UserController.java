@@ -5,11 +5,8 @@ import com.entertainment.user.entity.Profile;
 import com.entertainment.user.entity.SessionKey;
 //import com.entertainment.user.entity.SessionUser;
 import com.entertainment.user.repository.UserRepository;
-import com.entertainment.user.request.ChangePwReq;
-import com.entertainment.user.request.CodeReq;
-import com.entertainment.user.request.LoginReq;
+import com.entertainment.user.request.*;
 import com.entertainment.user.entity.User;
-import com.entertainment.user.request.RegisterReq;
 import com.entertainment.user.response.BaseRes;
 import com.entertainment.user.service.KakaoAPI;
 import com.entertainment.user.service.SessionService;
@@ -140,11 +137,11 @@ public class UserController {
     }
 
     //12번 기능
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/googleLogin")
-    public ResponseEntity googleLogin( @AuthenticationPrincipal OAuth2User user){
-        String email = user.getAttribute("email");
-        String nickname = user.getAttribute("name");
+    //@PreAuthorize("isAuthenticated()")
+    @PostMapping("/users/googleLogin")
+    public ResponseEntity googleLogin(@RequestBody GoogleLoginReq googleLoginReq){
+        String email = googleLoginReq.getEmail();
+        String nickname = googleLoginReq.getNickname();
         //String s=email+" "+nickname;
         String s="";
 
@@ -164,8 +161,7 @@ public class UserController {
 
             int userId = user1.getId();
             //테스트용
-            s = "{ \"Token\": \""+jwtTokenProvider.createToken(user1.getUsername())+"\"," +
-                    "\"profileId\": \""+profileId+"\"," +
+            s = "{\"profileId\": \""+profileId+"\"," +
                     "\"userId\": \""+user1.getId()+"\"," +
                     "\"nickname\": \""+user1.getNickname()+"\"}";
             //------------------------------------------------------
@@ -203,8 +199,7 @@ public class UserController {
 
             int userId = user1.getId();
             //테스트용
-            s = "{ \"Token\": \""+jwtTokenProvider.createToken(user1.getUsername())+"\"," +
-                    "\"profileId\": \""+profileId+"\"," +
+            s = "{\"profileId\": \""+profileId+"\"," +
                     "\"userId\": \""+user1.getId()+"\"," +
                     "\"nickname\": \""+user1.getNickname()+"\"}";
             //------------------------------------------------------
@@ -232,13 +227,113 @@ public class UserController {
         int userId = user1.getId();
         //테스트용
 
-        s = "{ \"Token\": \""+jwtTokenProvider.createToken(user1.getUsername())+"\"," +
-                "\"profileId\": \""+profileId+"\"," +
+        s = "{\"profileId\": \""+profileId+"\"," +
                 "\"userId\": \""+user1.getId()+"\"," +
                 "\"nickname\": \""+user1.getNickname()+"\"}";
 //        //------------------------------------------------------
         return ResponseEntity.status(HttpStatus.OK).body(s);
     }
+
+//    //12번 기능
+//    @PreAuthorize("isAuthenticated()")
+//    @GetMapping("/googleLogin")
+//    public ResponseEntity googleLogin( @AuthenticationPrincipal OAuth2User user){
+//        String email = user.getAttribute("email");
+//        String nickname = user.getAttribute("name");
+//        //String s=email+" "+nickname;
+//        String s="";
+//
+//        //회원이 처음 로그인 했다면 회원가입 하기
+//        //email 중복이라면 로그인하기
+//        if(checkEmail(email).getStatusCodeValue()!=200){
+//            //s = "{\"message\": \"이메일 중복\"}";
+//            //로그인 기능
+//            httpSession.setAttribute(SessionKey.LOGIN_USER_ID, email);
+//            sessionService.setRedisStringValue(email, sessionService.getSessionId(httpSession));
+//            User user1 = userService.getUserNicknameByUserEmail(email);
+//
+//            int profileId = userService.getProfileIdByUserNickname(user1.getNickname());
+//            if(profileId==-1){
+//                System.out.println("해당 유저의 프로필이 존재하지 않습니다.");
+//            }
+//
+//            int userId = user1.getId();
+//            //테스트용
+//            s = "{ \"Token\": \""+jwtTokenProvider.createToken(user1.getUsername())+"\"," +
+//                    "\"profileId\": \""+profileId+"\"," +
+//                    "\"userId\": \""+user1.getId()+"\"," +
+//                    "\"nickname\": \""+user1.getNickname()+"\"}";
+//            //------------------------------------------------------
+//            return ResponseEntity.status(HttpStatus.OK).body(s);
+//            //return s;
+//        }
+//
+//        //nickname 중복이라면 nickname+rand()해서 닉네임 입력
+//        else if(checkNickname(nickname).getStatusCodeValue()!=200){
+//            //s = "{\"message\": \"닉네임 중복\"}";
+//            //닉네임 랜덤 돌리기 기능
+//            while(true){
+//                String temp = createNickname();
+//                if(checkNickname(nickname+temp).getStatusCodeValue()==200){
+//                    nickname+=temp;
+//                    break;
+//                }
+//            }
+//            //-------------------------
+//            //회원가입 후 로그인
+//            //password random 값 입력
+//            String password = createPassword();
+//            RegisterReq registerDto = new RegisterReq(email, nickname, password);
+//            userService.registerUser(registerDto);
+//            //s = "{\"message\": \"회원가입이 되었습니다.\"}";
+//            //로그인 기능
+//            httpSession.setAttribute(SessionKey.LOGIN_USER_ID, email);
+//            sessionService.setRedisStringValue(email, sessionService.getSessionId(httpSession));
+//            User user1 = userService.getUserNicknameByUserEmail(email);
+//
+//            int profileId = userService.getProfileIdByUserNickname(user1.getNickname());
+//            if(profileId==-1){
+//                System.out.println("해당 유저의 프로필이 존재하지 않습니다.");
+//            }
+//
+//            int userId = user1.getId();
+//            //테스트용
+//            s = "{ \"Token\": \""+jwtTokenProvider.createToken(user1.getUsername())+"\"," +
+//                    "\"profileId\": \""+profileId+"\"," +
+//                    "\"userId\": \""+user1.getId()+"\"," +
+//                    "\"nickname\": \""+user1.getNickname()+"\"}";
+//            //------------------------------------------------------
+//            return ResponseEntity.status(HttpStatus.OK).body(s);
+//        }
+//        String password = createPassword();
+//        System.out.println("password Create");
+//        //회원가입 후 로그인
+//        //password random 값 입력
+//        RegisterReq registerDto = new RegisterReq(email,nickname, password);
+//        userService.registerUser(registerDto);
+//
+//        System.out.println("register success");
+//        //s = "{\"message\": \"회원가입이 되었습니다.\"}";
+//        //로그인 기능
+//        httpSession.setAttribute(SessionKey.LOGIN_USER_ID, email);
+//        sessionService.setRedisStringValue(email, sessionService.getSessionId(httpSession));
+//        User user1 = userService.getUserNicknameByUserEmail(email);
+//
+//        int profileId = userService.getProfileIdByUserNickname(user1.getNickname());
+//        if(profileId==-1){
+//            System.out.println("해당 유저의 프로필이 존재하지 않습니다.");
+//        }
+//
+//        int userId = user1.getId();
+//        //테스트용
+//
+//        s = "{ \"Token\": \""+jwtTokenProvider.createToken(user1.getUsername())+"\"," +
+//                "\"profileId\": \""+profileId+"\"," +
+//                "\"userId\": \""+user1.getId()+"\"," +
+//                "\"nickname\": \""+user1.getNickname()+"\"}";
+////        //------------------------------------------------------
+//        return ResponseEntity.status(HttpStatus.OK).body(s);
+//    }
 
     private String createNickname() {
         StringBuffer key = new StringBuffer();
@@ -309,61 +404,102 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(s);
         // 200;             //로그인 성공
     }
-
     //5번 기능
     @PostMapping("/users/auth")
-    public ResponseEntity auth(@RequestParam(name = "email") String email,HttpServletRequest request) {
+    public ResponseEntity auth(@RequestBody AuthReq authReq) {
         String s="";
-        String token = jwtTokenProvider.resolveToken(request);
+        //String token = jwtTokenProvider.resolveToken(request);
+        //System.out.println(request.getHeader(request.));
         try{
-            if(jwtTokenProvider.getUserEmail(token).equals(email)) {
+            if(jwtTokenProvider.getUserEmail(authReq.getToken()).equals(authReq.getEmail())) {
                 //name: message value: true
-                s = "{\"message\": \"토큰 인증\"}";
+                //s = "{\"message\": \"토큰 인증\"}";
+                User user = userService.getUserNicknameByUserEmail(authReq.getEmail());
+                int profileId = userService.getProfileIdByUserNickname(user.getNickname());
+                if(profileId==-1){
+                    System.out.println("해당 유저의 프로필이 존재하지 않습니다.");
+                }
+                s = "{\"profileId\": \""+profileId+"\"," +
+                        "\"userId\": \""+user.getId()+"\"," +
+                        "\"nickname\": \""+user.getNickname()+"\"}";
                 return ResponseEntity.status(HttpStatus.OK).body(s);
             }else{
                 s = "{\"message\": \"토큰 인증 불가\"}";
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(s);
             }
         }catch (ExpiredJwtException e){
-            s = "{ \"Token\": \""+jwtTokenProvider.createToken(email)+"\"," +
-                    "\"message\": \"토큰 인증\"}";
+//            s = "{ \"Token\": \""+jwtTokenProvider.createToken(authReq.getEmail())+"\"," +
+//                    "\"message\": \"토큰 인증\"}";
+            User user = userService.getUserNicknameByUserEmail(authReq.getEmail());
+            int profileId = userService.getProfileIdByUserNickname(user.getNickname());
+            if(profileId==-1){
+                System.out.println("해당 유저의 프로필이 존재하지 않습니다.");
+            }
+            s = "{\"profileId\": \""+profileId+"\"," +
+                    "\"userId\": \""+user.getId()+"\"," +
+                    "\"nickname\": \""+user.getNickname()+"\"}";
             return ResponseEntity.status(HttpStatus.OK).body(s);
         }
 
-//        if(jwtTokenProvider.getUserEmail(token).equals("z")){
-//            s = "{\"email\": "+"\"true\" }";
-//            return ResponseEntity.status(HttpStatus.OK).body(s);
-//        }
-//        else {
-//            s = "{\"email\": " + "\"false\" }";
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(s);
-//        }
-        //s += "{\"validate\": " + "\"true\" }";
-        //return ResponseEntity.status(HttpStatus.OK).body(s);
-
-
-//        if(jwtTokenProvider.validateToken(token)) {
-//            if(jwtTokenProvider.getUserEmail(token).equals("z")){
-//                s = "{\"email\": "+"\"true\" }";
-//            }
-//            else {
-//                s = "{\"email\": " + "\"false\" }";
-//            }
-//            s += "{\"validate\": " + "\"true\" }";
-//            return ResponseEntity.status(HttpStatus.OK).body(s);
-//        }else{
-//            s += "{\"validate\": "+"\"false\" }";
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(s);
-//        }
     }
 
-    //없앤 기능
-    @DeleteMapping("/users/logout/{email}")
-    public ResponseEntity logOut(@PathVariable(name = "email") String email, HttpSession httpSession) {
-        httpSession.removeAttribute(email);
-        String s = sessionService.deleteSessionId(email, httpSession);
-        return ResponseEntity.status(HttpStatus.OK).body(s);
-    }
+
+//    //5번 기능
+//    @PostMapping("/users/auth")
+//    public ResponseEntity auth(@RequestParam(name = "token") String token) {
+////    public ResponseEntity auth(@RequestParam(name = "email") String email, HttpServletRequest request) {
+//        String s="";
+//        String token = jwtTokenProvider.resolveToken(request);
+//        System.out.println(request.getHeader(request.));
+//        try{
+//            if(jwtTokenProvider.getUserEmail(token).equals(email)) {
+//                //name: message value: true
+//                s = "{\"message\": \"토큰 인증\"}";
+//                return ResponseEntity.status(HttpStatus.OK).body(s);
+//            }else{
+//                s = "{\"message\": \"토큰 인증 불가\"}";
+//                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(s);
+//            }
+//        }catch (ExpiredJwtException e){
+//            s = "{ \"Token\": \""+jwtTokenProvider.createToken(email)+"\"," +
+//                    "\"message\": \"토큰 인증\"}";
+//            return ResponseEntity.status(HttpStatus.OK).body(s);
+//        }
+//
+////        if(jwtTokenProvider.getUserEmail(token).equals("z")){
+////            s = "{\"email\": "+"\"true\" }";
+////            return ResponseEntity.status(HttpStatus.OK).body(s);
+////        }
+////        else {
+////            s = "{\"email\": " + "\"false\" }";
+////            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(s);
+////        }
+//        //s += "{\"validate\": " + "\"true\" }";
+//        //return ResponseEntity.status(HttpStatus.OK).body(s);
+//
+//
+////        if(jwtTokenProvider.validateToken(token)) {
+////            if(jwtTokenProvider.getUserEmail(token).equals("z")){
+////                s = "{\"email\": "+"\"true\" }";
+////            }
+////            else {
+////                s = "{\"email\": " + "\"false\" }";
+////            }
+////            s += "{\"validate\": " + "\"true\" }";
+////            return ResponseEntity.status(HttpStatus.OK).body(s);
+////        }else{
+////            s += "{\"validate\": "+"\"false\" }";
+////            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(s);
+////        }
+//    }
+//
+//    //없앤 기능
+//    @DeleteMapping("/users/logout/{email}")
+//    public ResponseEntity logOut(@PathVariable(name = "email") String email, HttpSession httpSession) {
+//        httpSession.removeAttribute(email);
+//        String s = sessionService.deleteSessionId(email, httpSession);
+//        return ResponseEntity.status(HttpStatus.OK).body(s);
+//    }
 
     //6번 기능
     @DeleteMapping("/users/{userId}")
@@ -437,13 +573,13 @@ public class UserController {
     }
 
     //10번 기능
-    @GetMapping("/profile/{profileId}/mypage")
-    public ResponseEntity myPage(@PathVariable(name = "profileId")int profileId) {
+    @GetMapping("/profile/{userId}/mypage")
+    public ResponseEntity myPage(@PathVariable(name = "userId")int userId) {
         String s;
-        String profile = userService.showProfile(profileId);
+        String profile = userService.showProfile(userId);
         if(!profile.isEmpty()){
             s = "{\"message\": \"프로필이 조회되었습니다.\"}";
-            return ResponseEntity.status(HttpStatus.OK).body(s+"\n"+profile);
+            return ResponseEntity.status(HttpStatus.OK).body(profile);
         }else{
             s = "{\"message\": \"프로필이 존재하지 않습니다.\"}";
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(s);
@@ -464,15 +600,28 @@ public class UserController {
 
 
     //11번 기능
-    @GetMapping("/profile/{profileId}/list-up")
-    public ResponseEntity listUp(@PathVariable(name = "profileId")int profileId) {
+    @GetMapping("/profile/{userId}/list-up")
+    public ResponseEntity listUp(@PathVariable(name = "userId")int userId) {
         String s;
-        String profile = userService.showProfile(profileId);
+        String profile = userService.showProfile(userId);
         if(!profile.equals("")){
             s = "{\"message\": \"프로필이 조회되었습니다.\"}";
-            return ResponseEntity.status(HttpStatus.OK).body(s+"\n"+profile);
+            return ResponseEntity.status(HttpStatus.OK).body(profile);
         }else{
             s = "{\"message\": \"프로필이 존재하지 않습니다.\"}";
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(s);
+        }
+    }
+
+    //12번 기능
+    @PostMapping("/profile/outcome")
+    public ResponseEntity result(@RequestBody OutcomeReq outcomeReq){
+        String s;
+        if(userService.gameOutCome(outcomeReq)){
+            s = "{\"message\": \"결과가 저장되었습니다.\"}";
+            return ResponseEntity.status(HttpStatus.OK).body(s);
+        }else{
+            s = "{\"message\": \"결과가 저장되지 않았습니다.\"}";
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(s);
         }
     }

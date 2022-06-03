@@ -3,6 +3,7 @@ package com.entertainment.user.service;
 import com.entertainment.user.entity.Profile;
 import com.entertainment.user.request.ChangePwReq;
 import com.entertainment.user.request.CodeReq;
+import com.entertainment.user.request.OutcomeReq;
 import com.entertainment.user.request.RegisterReq;
 import com.entertainment.user.entity.User;
 import org.springframework.http.ResponseEntity;
@@ -31,5 +32,6 @@ public interface UserService extends UserDetailsService {
 
     int getProfileIdByUserNickname(String nickname);
 
+    boolean gameOutCome(OutcomeReq outcomeReq);
     //Optional<User> findByEmail(String email);
 }
