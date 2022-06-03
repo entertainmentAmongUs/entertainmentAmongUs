@@ -34,8 +34,6 @@ class RoomCreating: UIViewController, UITextFieldDelegate {
     var contentViewHeight: CGFloat
     var contentViewTopAnchor: CGFloat
     
-    var roomInfo: Room?
-    
     var maxUserNumber: Int = 3 {
         willSet {
             self.maxUserNumberButton?.setTitle("\(newValue)명", for: .normal)
