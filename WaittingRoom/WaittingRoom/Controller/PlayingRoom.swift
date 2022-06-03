@@ -528,9 +528,11 @@ class PlayingRoom: UIViewController {
                     
                     self?.present(alertController, animated: true)
                     
-                    let outcome = Outcome(isVictory: isVictory, userId: self?.myUserId ?? -1)
-                    
-                    AF.request("\(baseURL)/profile/outcome", method: .post, parameters: outcome, encoder: .json(), headers: nil, interceptor: nil, requestModifier: nil).validate()
+                    let outcome: [String: Any] = ["isVictory": isVictory, "userId": self?.myUserId ?? -1]
+            
+                    AF.request("http://52.78.47.148:8080/profile/outcome", method: .post, parameters: outcome, encoding: JSONEncoding(), headers: nil, interceptor: nil, requestModifier: nil).validate().response { response in
+                        print(response.description)
+                    }
                     
                 }
                 

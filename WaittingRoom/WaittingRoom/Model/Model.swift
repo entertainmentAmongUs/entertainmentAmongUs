@@ -203,6 +203,9 @@ struct Profile: Codable {
     var winCount: Int
     var loseCount: Int
     var victoryRate: Double {
+        if winCount + loseCount == 0 {
+            return 0
+        }
         return Double(100*winCount/(loseCount+winCount))
     }
     

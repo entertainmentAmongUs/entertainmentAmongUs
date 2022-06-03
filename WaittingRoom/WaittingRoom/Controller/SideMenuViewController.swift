@@ -211,18 +211,13 @@ extension SideMenuViewController: UITableViewDataSource, UITableViewDelegate {
         
         
         // baseURL 쓰면 500코드 오류 남
-        AF.request("http://52.78.47.148:8080/profile/10/mypage").validate().response { [weak self] response in
-//            print(response.description)
+        AF.request("http://52.78.47.148:8080/profile/\(lobbyUserList[indexPath.row].userId)/mypage").validate().response { [weak self] response in
             
             guard let data = response.data else { return }
             
             guard let profile = try? JSONDecoder().decode(Profile.self, from: data) else { return }
             
             self?.settingUserInfo(profile: profile)
-//            let profileVC = LobbyProfileViewController(profile: profile)
-            
-//            self?.navigationController?.pushViewController(profileVC, animated: true)
-//            self?.present(profileVC, animated: true)
             
             
         }
