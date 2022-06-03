@@ -31,7 +31,7 @@ class RoomCell: UITableViewCell {
         
         let roomTitle = UILabel()
         
-        roomTitle.font = UIFont.systemFont(ofSize: 18, weight: .medium)
+        roomTitle.font = UIFont.systemFont(ofSize: 15, weight: .medium)
         roomTitle.lineBreakMode = .byTruncatingTail
         roomTitle.textAlignment = .center
         roomTitle.setContentHuggingPriority(.defaultLow, for: .horizontal)
@@ -40,8 +40,6 @@ class RoomCell: UITableViewCell {
         
         self.roomTitleLabel = roomTitle
         
-        
-    
         
         let image = UIImageView()
         image.setContentHuggingPriority(.defaultHigh, for: .horizontal)

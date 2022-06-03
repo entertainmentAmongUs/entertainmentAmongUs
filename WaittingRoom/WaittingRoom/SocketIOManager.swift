@@ -13,7 +13,7 @@ class SocketIOManager: NSObject {
     static let shared = SocketIOManager()
     
     var manager = SocketManager(socketURL: URL(string: "ws://13.209.69.156:8080")!, config: [
-        .log(true),
+        //.log(true),
         .forceWebsockets(true),
         .reconnects(true)
       ])

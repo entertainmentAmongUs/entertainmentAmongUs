@@ -57,6 +57,8 @@ class Lobby: UIViewController  {
         table.dataSource = self
         table.register(RoomCell.self, forCellReuseIdentifier: self.roomCellIdentifier)
         table.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        table.backgroundColor = .systemGray6
+        table.sectionHeaderTopPadding = 0
         
         
         table.translatesAutoresizingMaskIntoConstraints = false
@@ -155,7 +157,7 @@ class Lobby: UIViewController  {
         
         table.layer.cornerRadius = 3
         table.clipsToBounds = true
-        table.backgroundColor = .systemGray5
+        table.backgroundColor = .systemGray6
         table.separatorStyle = .none
         table.allowsSelection = false
         table.sectionHeaderHeight = 0
@@ -176,14 +178,7 @@ class Lobby: UIViewController  {
     
     
     @objc func touchSideMenuButton(_ sender: UIButton) {
-        /* 그냥 처음에 대충 넣은 것.
-         let sideBar = SideMenuViewController()
-         self.navigationController?.pushViewController(SideBar, animated: true)
-         
-         이번엔 present이용해서 사용.
-         present(sideBar, animated: true, completion: nil)
-         */
-        
+       
         let sideMenuViewController = SideMenuViewController(userList: self.lobbyUserList)
         let sideMenuNavi = SideMenuNavigationController(rootViewController: sideMenuViewController)
         
@@ -203,14 +198,6 @@ class Lobby: UIViewController  {
     
     
     @objc func touchRoomCreateButton(_ sender: UIButton){
-        
-        /*
-         let roomCreateButtonView = RoomCreateButtonController()
-         roomCreateButtonView.modalTransitionStyle = .crossDissolve
-         roomCreateButtonView.modalPresentationStyle = .overCurrentContext
-         //present로 화면 전환 해보는 것 응용함.
-         present(roomCreateButtonView,animated: true, completion: nil)
-         */
         
         guard let height = self.roomListTableView?.frame.height else { return }
         guard let top = self.navigationController?.navigationBar.frame.height else { return }
@@ -371,7 +358,6 @@ extension Lobby: UITableViewDelegate, UITableViewDataSource {
             let room = roomList[indexPath.row]
             
             cell.gameTypeLabel?.text = room.gameType.rawValue
-//            games[room.gameType.rawValue]
             
             cell.roomTitleLabel?.text = room.title
             
@@ -402,12 +388,14 @@ extension Lobby: UITableViewDelegate, UITableViewDataSource {
         }
     }
     
+    
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        
         
         if tableView == self.roomListTableView {
             
             let view = UIView()
-            view.backgroundColor = .white
+            view.backgroundColor = .systemGray6
             
             let gameType = UILabel()
             
@@ -416,6 +404,7 @@ extension Lobby: UITableViewDelegate, UITableViewDataSource {
             gameType.textAlignment = .center
             gameType.setContentHuggingPriority(.defaultHigh, for: .horizontal)
             gameType.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
+            gameType.textColor = .gray
             
             let roomTitle = UILabel()
             
@@ -424,18 +413,21 @@ extension Lobby: UITableViewDelegate, UITableViewDataSource {
             roomTitle.textAlignment = .center
             roomTitle.setContentHuggingPriority(.defaultLow, for: .horizontal)
             roomTitle.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+            roomTitle.textColor = .gray
             
             let password = UILabel()
             
             password.font = UIFont.systemFont(ofSize: 15, weight: .bold)
             password.text = "암호"
             password.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+            password.textColor = .gray
             
             let userCount = UILabel()
             
             userCount.font = UIFont.systemFont(ofSize: 15, weight: .bold)
             userCount.text = "인원"
             userCount.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+            userCount.textColor = .gray
             
             let stackView = UIStackView(arrangedSubviews: [gameType, roomTitle, password, userCount])
             stackView.axis = .horizontal
@@ -446,17 +438,20 @@ extension Lobby: UITableViewDelegate, UITableViewDataSource {
             view.addSubview(stackView)
             
             stackView.translatesAutoresizingMaskIntoConstraints = false
-            stackView.topAnchor.constraint(equalTo: view.topAnchor, constant: 0).isActive = true
+            stackView.topAnchor.constraint(equalTo: view.topAnchor, constant: 5).isActive = true
             stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10).isActive = true
             stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10).isActive = true
-            stackView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -10).isActive = true
+            stackView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -5).isActive = true
             
             return view
             
         }
         
         return nil
+         
     }
+     
+    
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
@@ -494,6 +489,7 @@ extension Lobby: UITableViewDelegate, UITableViewDataSource {
             alertController.addTextField()
             
             let cancleAction = UIAlertAction(title: "취소", style: .cancel)
+            
             let okAction = UIAlertAction(title: "확인", style: .default) { [unowned self] action in
                 let password = alertController.textFields?[0].text
                 
@@ -511,19 +507,10 @@ extension Lobby: UITableViewDelegate, UITableViewDataSource {
             SocketIOManager.shared.joinRoom(roomId: roomInfo.roomId, userId: myUserId, password: nil, completionHandler: completionHandler)
             
         }
+        
+        tableView.deselectRow(at: indexPath, animated: true)
                                                 
-       
-        /*
-        let roomId = roomList[indexPath.row].roomId
-        
-        SocketIOManager.shared.joinRoom(roomId: <#T##String#>, completionHanlder: <#T##([[String : Any]]) -> Void##([[String : Any]]) -> Void##(_ userList: [[String : Any]]) -> Void#>)
-        
-        let waittingRoom = WaittingRoom(userId: self.myUserId, nickName: self.myNickName, roomId: roomId)
-        
-        self.navigationController?.pushViewController(waittingRoom, animated: true)
-        */
     }
-    
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         
