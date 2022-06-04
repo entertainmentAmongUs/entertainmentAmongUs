@@ -43,17 +43,17 @@ class Lobby: UIViewController  {
     
     func setNavigationItem() {
         
-        guard let naviBar = self.navigationController?.navigationBar else { return }
+//        guard let naviBar = self.navigationController?.navigationBar else { return }
         
         let naviItem = self.navigationItem
         
-        naviBar.barStyle = .default
-        
-        naviItem.titleView = {
+        let titleView: UILabel = {
             let label = UILabel()
-            label.font = .systemFont(ofSize: 20, weight: .bold)
+            label.font = .systemFont(ofSize: 25, weight: .bold)
             label.textColor = .black
             label.text = "로비"
+            label.textAlignment = .left
+            
             return label
             
         }()
@@ -66,14 +66,14 @@ class Lobby: UIViewController  {
         
         
         /* 로비의 네비게이션 바 버튼 아이템 설정 */
-        let sideButton = UIBarButtonItem(image: UIImage(systemName: "list.bullet"), style: .plain, target: self, action: #selector(touchSideMenuButton(_:)))
+        let sideButton = UIBarButtonItem(image: .init(systemName: "list.bullet")?.withConfiguration(UIImage.SymbolConfiguration(weight: .semibold)), style: .plain, target: self, action: #selector(touchSideMenuButton(_:)))
         
-         let createButton = UIBarButtonItem(image: UIImage(systemName: "plus"), style: .plain, target: self, action: #selector(touchRoomCreateButton(_:)))
+         let createButton = UIBarButtonItem(image: UIImage(systemName: "plus")?.withConfiguration(UIImage.SymbolConfiguration(weight: .semibold)), style: .plain, target: self, action: #selector(touchRoomCreateButton(_:)))
         
-        let filterButton = UIBarButtonItem(image: UIImage(systemName: "magnifyingglass"), style: .plain, target: self, action: #selector(touchRoomFilterButton(_:)))
+        let filterButton = UIBarButtonItem(image: UIImage(systemName: "magnifyingglass")?.withConfiguration(UIImage.SymbolConfiguration(weight: .semibold)), style: .plain, target: self, action: #selector(touchRoomFilterButton(_:)))
         
-        naviItem.setRightBarButtonItems([sideButton, createButton], animated: true)
-        naviItem.setLeftBarButton(filterButton, animated: true)
+        naviItem.setRightBarButtonItems([sideButton, createButton, filterButton], animated: true)
+        naviItem.setLeftBarButton(UIBarButtonItem(customView: titleView), animated: true)
         
         self.sideMenuButton = sideButton
         self.roomCreateButton = createButton
@@ -94,6 +94,7 @@ class Lobby: UIViewController  {
         table.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         table.backgroundColor = .systemGray6
         table.sectionHeaderTopPadding = 10
+        
         table.refreshControl = {
             let refresh = UIRefreshControl()
             refresh.addTarget(self, action: #selector(touchRoomRefreshButton(_:)), for: .valueChanged)
@@ -114,6 +115,7 @@ class Lobby: UIViewController  {
         
     }
     
+    /*
     func addButton(){
         
         guard let roomListTableView = self.roomListTableView else { return }
@@ -140,9 +142,13 @@ class Lobby: UIViewController  {
         
     }
     
+    */
+    
     func addChatView(){
         
-        guard let buttonStack = self.buttonStack else { return }
+        guard let roomListTableView = roomListTableView else {
+            return
+        }
         
         let textField = UITextField()
         
@@ -174,16 +180,16 @@ class Lobby: UIViewController  {
         table.layer.cornerRadius = 3
         table.clipsToBounds = true
         table.backgroundColor = .systemGray6
-        table.separatorStyle = .none
+        table.separatorStyle = .singleLine
         table.allowsSelection = false
-        table.sectionHeaderHeight = 0
+        table.sectionHeaderTopPadding = 10
         
         
         table.translatesAutoresizingMaskIntoConstraints = false
         table.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        table.topAnchor.constraint(equalTo: buttonStack.bottomAnchor, constant: 10).isActive = true
-        table.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 20).isActive = true
-        table.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -20).isActive = true
+        table.topAnchor.constraint(equalTo: roomListTableView.bottomAnchor, constant: 10).isActive = true
+        table.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
+        table.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -0).isActive = true
         table.bottomAnchor.constraint(equalTo: textField.topAnchor, constant: -5 ).isActive = true
         
         self.chatTableView = table
@@ -318,7 +324,7 @@ class Lobby: UIViewController  {
         
         self.setNavigationItem()
         self.addRoomListTableView()
-        self.addButton()
+//        self.addButton()
         self.addChatView()
         
         tryConnectionToWebSocketServer()
@@ -469,6 +475,12 @@ extension Lobby: UITableViewDelegate, UITableViewDataSource {
          
     }
      
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        if tableView == self.chatTableView {
+            return "로비 채팅"
+        }
+        return nil
+    }
     
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
