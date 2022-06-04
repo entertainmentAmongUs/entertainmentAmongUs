@@ -17,13 +17,10 @@ class Lobby: UIViewController  {
     var roomListTableView: UITableView?
     let roomCellIdentifier = "roomCell"
     
-//    var roomCreateButton: UIButton?
     var roomCreateButton: UIBarButtonItem?
     var sideMenuButton: UIBarButtonItem?
-    var roomRefreshButton: UIBarButtonItem?
+    var roomFilterButton: UIBarButtonItem?
     
-    var roomSearchButton: UIButton?
-//    var roomRefreshButton: UIButton?
     var buttonStack: UIStackView?
     
     var chatTextField: UITextField?
@@ -73,14 +70,14 @@ class Lobby: UIViewController  {
         
          let createButton = UIBarButtonItem(image: UIImage(systemName: "plus"), style: .plain, target: self, action: #selector(touchRoomCreateButton(_:)))
         
-        let refreshButton = UIBarButtonItem(image: UIImage(systemName: "arrow.clockwise"), style: .plain, target: self, action: #selector(touchRoomRefreshButton(_:)))
+        let filterButton = UIBarButtonItem(image: UIImage(systemName: "magnifyingglass"), style: .plain, target: self, action: #selector(touchRoomFilterButton(_:)))
         
         naviItem.setRightBarButtonItems([sideButton, createButton], animated: true)
-        naviItem.setLeftBarButton(refreshButton, animated: true)
+        naviItem.setLeftBarButton(filterButton, animated: true)
         
         self.sideMenuButton = sideButton
         self.roomCreateButton = createButton
-        self.roomRefreshButton = refreshButton
+        self.roomFilterButton = filterButton
         
         
     }
@@ -96,7 +93,12 @@ class Lobby: UIViewController  {
         table.register(RoomCell.self, forCellReuseIdentifier: self.roomCellIdentifier)
         table.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         table.backgroundColor = .systemGray6
-        table.sectionHeaderTopPadding = 0
+        table.sectionHeaderTopPadding = 10
+        table.refreshControl = {
+            let refresh = UIRefreshControl()
+            refresh.addTarget(self, action: #selector(touchRoomRefreshButton(_:)), for: .valueChanged)
+            return refresh
+        }()
         
         
         table.translatesAutoresizingMaskIntoConstraints = false
@@ -116,37 +118,10 @@ class Lobby: UIViewController  {
         
         guard let roomListTableView = self.roomListTableView else { return }
         
-        let searchButton = UIButton(type: .system)
-        searchButton.setTitle("방 검색", for: .normal)
-        searchButton.titleLabel?.font = .systemFont(ofSize: 20,weight: .regular)
-        searchButton.addTarget(self, action: #selector(self.touchRoomSearchButton(_:)), for: .touchUpInside)
-        searchButton.setTitleColor(.systemBlue, for: .normal)
         
-        self.roomSearchButton = searchButton
-        
-        
-        /*
-        let createButton = UIButton(type: .system)
-        createButton.setTitle("방 생성", for: .normal)
-        createButton.titleLabel?.font = UIFont.systemFont(ofSize: 20,weight: .regular)
-        createButton.addTarget(self, action: #selector(self.touchRoomCreateButton(_:)), for: .touchUpInside)
-        createButton.setTitleColor(.systemBlue, for: .normal)
-        
-        self.roomCreateButton = createButton
-         
-        
-        let refreshButton = UIButton(type: .system)
-        refreshButton.setTitle("새로고침", for: .normal)
-        refreshButton.titleLabel?.font = UIFont.systemFont(ofSize: 20,weight: .regular)
-        refreshButton.addTarget(self, action: #selector(self.touchRoomRefreshButton(_:)), for: .touchUpInside)
-        refreshButton.setTitleColor(.systemBlue, for: .normal)
-        
-        self.roomRefreshButton = refreshButton
-        
-         */
         
         let stackView: UIStackView = {
-            let stackView = UIStackView(arrangedSubviews: [searchButton])
+            let stackView = UIStackView(arrangedSubviews: [])
             stackView.translatesAutoresizingMaskIntoConstraints = false
             stackView.axis = .horizontal
             stackView.alignment = .fill
@@ -250,7 +225,7 @@ class Lobby: UIViewController  {
     }
     
     
-    @objc func touchRoomSearchButton(_ sender: UIButton){
+    @objc func touchRoomFilterButton(_ sender: UIButton){
         
         //let SignUpView = SignUpViewController()
         //self.navigationController?.pushViewController(SignUpView, animated: true)
@@ -326,7 +301,10 @@ class Lobby: UIViewController  {
             
             self?.roomList = roomList
             
-            self?.roomListTableView?.reloadData()
+            DispatchQueue.main.asyncAfter(deadline: .now()+0.5) {
+                self?.roomListTableView?.reloadData()
+                self?.roomListTableView?.refreshControl?.endRefreshing()
+            }
             
         }
     }
