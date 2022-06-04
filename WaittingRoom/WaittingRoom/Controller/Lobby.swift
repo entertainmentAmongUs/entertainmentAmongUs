@@ -17,9 +17,13 @@ class Lobby: UIViewController  {
     var roomListTableView: UITableView?
     let roomCellIdentifier = "roomCell"
     
-    var roomCreateButton: UIButton?
+//    var roomCreateButton: UIButton?
+    var roomCreateButton: UIBarButtonItem?
+    var sideMenuButton: UIBarButtonItem?
+    var roomRefreshButton: UIBarButtonItem?
+    
     var roomSearchButton: UIButton?
-    var roomRefreshButton: UIButton?
+//    var roomRefreshButton: UIButton?
     var buttonStack: UIStackView?
     
     var chatTextField: UITextField?
@@ -35,17 +39,51 @@ class Lobby: UIViewController  {
     var lobbyChattings: [Chat] = []
     
     
-    lazy var sideMenuButton: UIBarButtonItem = {
-        let button = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(touchSideMenuButton(_:)))
-        
-        return button
-    }()
-    
-    
     
     // MARK: - Method
     
     // MARK: Create View Method
+    
+    func setNavigationItem() {
+        
+        guard let naviBar = self.navigationController?.navigationBar else { return }
+        
+        let naviItem = self.navigationItem
+        
+        naviBar.barStyle = .default
+        
+        naviItem.titleView = {
+            let label = UILabel()
+            label.font = .systemFont(ofSize: 20, weight: .bold)
+            label.textColor = .black
+            label.text = "로비"
+            return label
+            
+        }()
+        
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithDefaultBackground()
+        
+        naviItem.scrollEdgeAppearance = appearance
+        naviItem.standardAppearance = appearance
+        
+        
+        /* 로비의 네비게이션 바 버튼 아이템 설정 */
+        let sideButton = UIBarButtonItem(image: UIImage(systemName: "list.bullet"), style: .plain, target: self, action: #selector(touchSideMenuButton(_:)))
+        
+         let createButton = UIBarButtonItem(image: UIImage(systemName: "plus"), style: .plain, target: self, action: #selector(touchRoomCreateButton(_:)))
+        
+        let refreshButton = UIBarButtonItem(image: UIImage(systemName: "arrow.clockwise"), style: .plain, target: self, action: #selector(touchRoomRefreshButton(_:)))
+        
+        naviItem.setRightBarButtonItems([sideButton, createButton], animated: true)
+        naviItem.setLeftBarButton(refreshButton, animated: true)
+        
+        self.sideMenuButton = sideButton
+        self.roomCreateButton = createButton
+        self.roomRefreshButton = refreshButton
+        
+        
+    }
     
     func addRoomListTableView(){
         
@@ -67,8 +105,8 @@ class Lobby: UIViewController  {
         
         table.topAnchor.constraint(equalTo: layoutGuide.topAnchor,constant: 0).isActive = true
         table.bottomAnchor.constraint(equalTo: layoutGuide.bottomAnchor,constant: -layoutGuide.layoutFrame.size.height/3).isActive = true
-        table.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor,constant: 20).isActive = true
-        table.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor,constant: -20).isActive = true
+        table.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor,constant: 0).isActive = true
+        table.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor,constant: -0).isActive = true
         
         self.roomListTableView = table
         
@@ -87,6 +125,7 @@ class Lobby: UIViewController  {
         self.roomSearchButton = searchButton
         
         
+        /*
         let createButton = UIButton(type: .system)
         createButton.setTitle("방 생성", for: .normal)
         createButton.titleLabel?.font = UIFont.systemFont(ofSize: 20,weight: .regular)
@@ -94,6 +133,7 @@ class Lobby: UIViewController  {
         createButton.setTitleColor(.systemBlue, for: .normal)
         
         self.roomCreateButton = createButton
+         
         
         let refreshButton = UIButton(type: .system)
         refreshButton.setTitle("새로고침", for: .normal)
@@ -103,9 +143,10 @@ class Lobby: UIViewController  {
         
         self.roomRefreshButton = refreshButton
         
+         */
         
         let stackView: UIStackView = {
-            let stackView = UIStackView(arrangedSubviews: [searchButton, refreshButton, createButton])
+            let stackView = UIStackView(arrangedSubviews: [searchButton])
             stackView.translatesAutoresizingMaskIntoConstraints = false
             stackView.axis = .horizontal
             stackView.alignment = .fill
@@ -296,9 +337,8 @@ class Lobby: UIViewController  {
         
         super.viewDidLoad()
         self.view.backgroundColor = .white
-        self.navigationItem.title = "로비"
-        self.navigationItem.rightBarButtonItem = self.sideMenuButton
         
+        self.setNavigationItem()
         self.addRoomListTableView()
         self.addButton()
         self.addChatView()
