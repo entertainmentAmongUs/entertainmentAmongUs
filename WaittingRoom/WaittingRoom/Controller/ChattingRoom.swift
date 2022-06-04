@@ -39,13 +39,18 @@ class ChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataSource
         table.register(ChatCell.self, forCellReuseIdentifier: self.chatIdentifier)
         table.delegate = self
         table.dataSource = self
-        table.separatorStyle = .singleLine
+        
+        table.layer.cornerRadius = 3
+        table.clipsToBounds = true
+        table.backgroundColor = .systemGray6
+        table.separatorStyle = .none
         table.allowsSelection = false
+        table.sectionHeaderTopPadding = 10
         
         table.translatesAutoresizingMaskIntoConstraints = false
         table.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor,constant: 20).isActive = true
-        table.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor,constant: 20).isActive = true
-        table.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor,constant: -20).isActive = true
+        table.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor,constant: 0).isActive = true
+        table.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor,constant: -0).isActive = true
         table.bottomAnchor.constraint(equalTo: textField.topAnchor, constant: -10).isActive = true
         table.setContentHuggingPriority(.defaultLow, for: .vertical)
         table.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
@@ -167,7 +172,7 @@ class ChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataSource
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.backgroundColor = .white
+        self.view.backgroundColor = .systemGray6
         
         
         let gesture = UITapGestureRecognizer()

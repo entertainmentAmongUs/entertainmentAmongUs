@@ -41,10 +41,26 @@ class Lobby: UIViewController  {
     
     // MARK: Create View Method
     
-    func setNavigationItem() {
+    func setNavigationController() {
         
-//        guard let naviBar = self.navigationController?.navigationBar else { return }
+        /* 툴바 설정 */
         
+        guard let toolBar = self.navigationController?.toolbar else { return }
+        
+        let toolBarAppearance = UIToolbarAppearance()
+        toolBarAppearance.configureWithDefaultBackground()
+        
+        self.navigationController?.isToolbarHidden = false
+        toolBar.standardAppearance = toolBarAppearance
+        toolBar.scrollEdgeAppearance = toolBarAppearance
+        
+        let chatButton = UIBarButtonItem(image: UIImage(systemName: "bubble.left.and.bubble.right")?.withConfiguration(UIImage.SymbolConfiguration(weight: .semibold)), style: .plain, target: self, action: #selector(touchChatButton(_:)))
+    
+        toolbarItems = [UIBarButtonItem.flexibleSpace(),chatButton, UIBarButtonItem.flexibleSpace()]
+        
+        
+        
+        /* 네비게이션 아이템 설정 */
         let naviItem = self.navigationItem
         
         let titleView: UILabel = {
@@ -94,6 +110,16 @@ class Lobby: UIViewController  {
         table.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         table.backgroundColor = .systemGray6
         table.sectionHeaderTopPadding = 10
+        
+        /*
+        table.layer.shadowOffset = CGSize(width: 1, height: 1)
+        table.layer.shadowOpacity = 0.5
+        table.layer.shadowColor = CGColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0)
+        table.layer.shadowRadius = 0
+        table.layer.masksToBounds = false
+        */
+        
+        
         
         table.refreshControl = {
             let refresh = UIRefreshControl()
@@ -150,6 +176,7 @@ class Lobby: UIViewController  {
             return
         }
         
+        /*
         let textField = UITextField()
         
         self.view.addSubview(textField)
@@ -166,6 +193,7 @@ class Lobby: UIViewController  {
         textField.heightAnchor.constraint(equalToConstant: 30).isActive = true
         
         self.chatTextField = textField
+         */
         
         
         // ChattingTableView Setting
@@ -180,7 +208,7 @@ class Lobby: UIViewController  {
         table.layer.cornerRadius = 3
         table.clipsToBounds = true
         table.backgroundColor = .systemGray6
-        table.separatorStyle = .singleLine
+        table.separatorStyle = .none
         table.allowsSelection = false
         table.sectionHeaderTopPadding = 10
         
@@ -190,7 +218,7 @@ class Lobby: UIViewController  {
         table.topAnchor.constraint(equalTo: roomListTableView.bottomAnchor, constant: 10).isActive = true
         table.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
         table.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -0).isActive = true
-        table.bottomAnchor.constraint(equalTo: textField.topAnchor, constant: -5 ).isActive = true
+        table.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor, constant: 0 ).isActive = true
         
         self.chatTableView = table
     }
@@ -241,6 +269,15 @@ class Lobby: UIViewController  {
     @objc func touchRoomRefreshButton(_ sender: UIButton){
         
         SocketIOManager.shared.refreshRoomList()
+        
+    }
+    
+    @objc func touchChatButton(_ sender: UIButton){
+        
+        let chatRoom = ChattingRoom(roomId: "LOBBY",nickName: self.myNickName, chattings: self.lobbyChattings)
+        
+        self.present(chatRoom, animated: true, completion: nil)
+        
         
     }
     
@@ -322,7 +359,7 @@ class Lobby: UIViewController  {
         super.viewDidLoad()
         self.view.backgroundColor = .white
         
-        self.setNavigationItem()
+        self.setNavigationController()
         self.addRoomListTableView()
 //        self.addButton()
         self.addChatView()

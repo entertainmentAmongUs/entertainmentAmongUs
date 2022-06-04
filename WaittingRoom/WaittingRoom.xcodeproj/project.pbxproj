@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0D7CC119284BC334001EE95D /* MessageLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D7CC118284BC334001EE95D /* MessageLabel.swift */; };
 		0D9DBA6C2820623500CF93A0 /* Lobby.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D9DBA6B2820623500CF93A0 /* Lobby.swift */; };
 		0D9DBA70282062C200CF93A0 /* RoomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D9DBA6F282062C200CF93A0 /* RoomCell.swift */; };
 		0D9DBA722820641F00CF93A0 /* SocketIOManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D9DBA712820641F00CF93A0 /* SocketIOManager.swift */; };
@@ -32,6 +33,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0D7CC118284BC334001EE95D /* MessageLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageLabel.swift; sourceTree = "<group>"; };
 		0D9DBA6B2820623500CF93A0 /* Lobby.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Lobby.swift; sourceTree = "<group>"; };
 		0D9DBA6F282062C200CF93A0 /* RoomCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RoomCell.swift; sourceTree = "<group>"; };
 		0D9DBA712820641F00CF93A0 /* SocketIOManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocketIOManager.swift; sourceTree = "<group>"; };
@@ -77,6 +79,7 @@
 			children = (
 				0DD99D8F27BC0156009FAD3F /* ProfileCell.swift */,
 				0DD99D9127BCFAD2009FAD3F /* ChatCell.swift */,
+				0D7CC118284BC334001EE95D /* MessageLabel.swift */,
 				0D9DBA6F282062C200CF93A0 /* RoomCell.swift */,
 				0DCBB7B62830F7CC00914519 /* PlayerCell.swift */,
 				0DCBB7B82830F7F900914519 /* HintCell.swift */,
@@ -285,6 +288,7 @@
 				0DD99D9027BC0156009FAD3F /* ProfileCell.swift in Sources */,
 				0D9DBA6C2820623500CF93A0 /* Lobby.swift in Sources */,
 				0D9DBB602821B47500CF93A0 /* UserCell.swift in Sources */,
+				0D7CC119284BC334001EE95D /* MessageLabel.swift in Sources */,
 				0DD99D5C27BA9004009FAD3F /* AppDelegate.swift in Sources */,
 				0DD99D9227BCFAD2009FAD3F /* ChatCell.swift in Sources */,
 				0DCBB7B92830F7F900914519 /* HintCell.swift in Sources */,
