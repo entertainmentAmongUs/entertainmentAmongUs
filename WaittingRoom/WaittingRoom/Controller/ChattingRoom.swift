@@ -61,17 +61,19 @@ class ChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataSource
     
     func addChatTextField() {
         
-        let textField = UITextField()
+        let textField = UnderlineTextField()
         
         self.view.addSubview(textField)
         
+        textField.placeholder = "욕설이나 비방 채팅은 삼가주세요"
+        textField.borderInactiveColor = .black
+        textField.borderActiveColor = .black
+        
+        textField.font = UIFont.systemFont(ofSize: 18)
         textField.delegate = self
-        textField.borderStyle = .bezel
         textField.autocorrectionType = .no
         textField.autocapitalizationType = .none
         textField.enablesReturnKeyAutomatically = true
-        textField.font = UIFont.systemFont(ofSize: 18)
-        textField.placeholder = "욕설이나 비방 채팅은 삼가주세요"
         
         textField.translatesAutoresizingMaskIntoConstraints = false
         

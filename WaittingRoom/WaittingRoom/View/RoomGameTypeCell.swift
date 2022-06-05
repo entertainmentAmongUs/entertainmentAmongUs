@@ -19,7 +19,7 @@ class RoomGameTypeCell: UITableViewCell {
         
         contentView.addSubview(label)
         
-        label.text = "게임 타입"
+        label.text = "게임 선택"
         label.font = .systemFont(ofSize: 20, weight: .semibold)
         
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -32,19 +32,18 @@ class RoomGameTypeCell: UITableViewCell {
         
         
         /* 게임 설명을 표시하는 레이블을 설정 */
-        let infoLabel = UILabel()
+        let infoLabel = MessageLabel()
         
         contentView.addSubview(infoLabel)
         
         infoLabel.text = games[0].info
-        infoLabel.font = .systemFont(ofSize: 25, weight: .medium)
+        infoLabel.font = .systemFont(ofSize: 25, weight: .regular)
         infoLabel.backgroundColor = .systemGray6
-        infoLabel.clipsToBounds = true
-        infoLabel.layer.cornerRadius = 5
-//        infoLable.adjustsFontSizeToFitWidth = true
-        infoLabel.numberOfLines = 0
+        infoLabel.adjustsFontSizeToFitWidth = true
+        infoLabel.numberOfLines = 1
         infoLabel.lineBreakMode = .byWordWrapping
         infoLabel.textAlignment = .center
+
 //        infoLable.shadowColor = .white
 //        infoLable.shadowOffset = CGSize(width: 3, height: 3)
         
@@ -62,9 +61,10 @@ class RoomGameTypeCell: UITableViewCell {
         
         contentView.addSubview(segment)
         
+        segment.title(font: .systemFont(ofSize: 15, weight: .medium))
         segment.translatesAutoresizingMaskIntoConstraints = false
         segment.leadingAnchor.constraint(equalTo: label.trailingAnchor, constant: 15).isActive = true
-        segment.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20).isActive = true
+        segment.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor, constant: -20).isActive = true
         segment.centerYAnchor.constraint(equalTo: label.centerYAnchor).isActive = true
         segment.setContentHuggingPriority(.defaultLow, for: .horizontal)
         

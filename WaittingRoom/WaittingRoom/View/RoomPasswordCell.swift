@@ -10,6 +10,7 @@ import UIKit
 class RoomPasswordCell: UITableViewCell {
     
     var passwordLabel: UILabel?
+    var checkBox: UISwitch?
     var inputTextField: UITextField?
     
     func addView(){
@@ -42,6 +43,7 @@ class RoomPasswordCell: UITableViewCell {
         checkBox.centerYAnchor.constraint(equalTo: label.centerYAnchor).isActive = true
         checkBox.isOn = active
         
+        self.checkBox = checkBox
         
         let textField = UnderlineTextField()
         

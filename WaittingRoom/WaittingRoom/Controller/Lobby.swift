@@ -73,7 +73,6 @@ class Lobby: UIViewController  {
             
         }()
         
-        naviItem.backButtonTitle = "뒤로"
         
         let appearance = UINavigationBarAppearance()
         appearance.configureWithDefaultBackground()
@@ -142,59 +141,12 @@ class Lobby: UIViewController  {
         
     }
     
-    /*
-    func addButton(){
-        
-        guard let roomListTableView = self.roomListTableView else { return }
-        
-        
-        
-        let stackView: UIStackView = {
-            let stackView = UIStackView(arrangedSubviews: [])
-            stackView.translatesAutoresizingMaskIntoConstraints = false
-            stackView.axis = .horizontal
-            stackView.alignment = .fill
-            stackView.distribution = .fillEqually
-            return stackView
-        }()
-        
-        view.addSubview(stackView)
-        
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        stackView.topAnchor.constraint(equalTo: roomListTableView.bottomAnchor,constant: 10).isActive = true
-        stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 20).isActive = true
-        stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor,constant: -20).isActive = true
-        
-        self.buttonStack = stackView
-        
-    }
-    
-    */
     
     func addChatView(){
         
         guard let roomListTableView = roomListTableView else {
             return
         }
-        
-        /*
-        let textField = UITextField()
-        
-        self.view.addSubview(textField)
-        
-        textField.placeholder = "채팅을 입력하세요"
-        textField.borderStyle = .roundedRect
-        textField.delegate = self
-        
-        
-        textField.translatesAutoresizingMaskIntoConstraints = false
-        textField.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor).isActive = true
-        textField.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 20).isActive = true
-        textField.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant:  -20).isActive = true
-        textField.heightAnchor.constraint(equalToConstant: 30).isActive = true
-        
-        self.chatTextField = textField
-         */
         
         
         // ChattingTableView Setting
@@ -363,7 +315,6 @@ class Lobby: UIViewController  {
         
         self.setNavigationController()
         self.addRoomListTableView()
-//        self.addButton()
         self.addChatView()
         
         tryConnectionToWebSocketServer()

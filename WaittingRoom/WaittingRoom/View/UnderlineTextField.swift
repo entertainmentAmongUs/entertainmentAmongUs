@@ -75,7 +75,7 @@ import UIKit
     private let inactiveBorderLayer = CALayer()
     private let activeBorderLayer = CALayer()    
     private var activePlaceholderPoint: CGPoint = CGPoint.zero
-    private let padding = UIEdgeInsets(top: 13, left: 10, bottom: 5, right: 10)
+    private let padding = UIEdgeInsets(top: 10, left: 5, bottom: 5, right: 10)
     
     // MARK: - TextFieldEffects
     

@@ -364,15 +364,11 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
     
     @objc func touchSettingButton(_ sender: UIButton){
         
-        guard let height = self.waitUserCollection?.frame.height else { return }
-
-        guard let top = self.navigationController?.navigationBar.frame.height else { return }
-        
         guard let roomInfo = roomInfo else { return }
 
-        let view = RoomSetting(roomInfo, height, top)
+        let view = SettingRoom(userId: myUserId, roomInfo: roomInfo)
         
-        self.present(view, animated: true, completion: nil)
+        self.navigationController?.pushViewController(view, animated: true)
         
     }
     
@@ -498,7 +494,7 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = .white
-        self.navigationItem.hidesBackButton = true
+        self.navigationItem.backButtonTitle = "뒤로"
         
         self.addWaitingUserView()
         self.addButtons()

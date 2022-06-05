@@ -31,6 +31,7 @@ class SettingRoomController: UITableViewController {
     
     var roomTitleTextField: UITextField?
     var passwordTextField: UITextField?
+    var passwordCheckBox: UISwitch?
     var gameTypeSegment: UISegmentedControl?
     var maxUserNumberButton: UIButton?
     var subjectButton: UIButton?
@@ -149,7 +150,7 @@ class SettingRoomController: UITableViewController {
         
     }
     
-    @objc func touchCompleteButton(_ sender: UIButton) {
+    @objc open func touchCompleteButton(_ sender: UIBarButtonItem) {
         
         /* 현재 방 설정을 입력값으로 변경 */
         
@@ -180,7 +181,7 @@ class SettingRoomController: UITableViewController {
     
     // MARK: - LifeCycle
     
-    override func viewDidLoad() {
+    override open func viewDidLoad() {
         super.viewDidLoad()
         
         let gesture = UITapGestureRecognizer()
@@ -217,7 +218,7 @@ class SettingRoomController: UITableViewController {
         
         if let passwordCell = cell as? RoomPasswordCell {
             self.passwordTextField = passwordCell.inputTextField
-            
+            self.passwordCheckBox = passwordCell.checkBox
             passwordTextField?.delegate = self
         }
         
