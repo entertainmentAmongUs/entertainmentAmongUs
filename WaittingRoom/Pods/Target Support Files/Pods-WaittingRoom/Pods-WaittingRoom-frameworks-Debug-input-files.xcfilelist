@@ -4,4 +4,3 @@ ${BUILT_PRODUCTS_DIR}/AlertsAndPickers/AlertsAndPickers.framework
 ${BUILT_PRODUCTS_DIR}/SideMenu/SideMenu.framework
 ${BUILT_PRODUCTS_DIR}/Socket.IO-Client-Swift/SocketIO.framework
 ${BUILT_PRODUCTS_DIR}/Starscream/Starscream.framework
-${BUILT_PRODUCTS_DIR}/TextFieldEffects/TextFieldEffects.framework

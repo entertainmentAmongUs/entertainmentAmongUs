@@ -11,6 +11,5 @@ target 'WaittingRoom' do
   pod 'Socket.IO-Client-Swift', '~> 16.0.0'
   pod 'Alamofire'
   pod 'AlertsAndPickers'
-  pod 'TextFieldEffects'
 
 end
