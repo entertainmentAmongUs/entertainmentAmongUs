@@ -29,6 +29,12 @@
 		0DD99D9027BC0156009FAD3F /* ProfileCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD99D8F27BC0156009FAD3F /* ProfileCell.swift */; };
 		0DD99D9227BCFAD2009FAD3F /* ChatCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD99D9127BCFAD2009FAD3F /* ChatCell.swift */; };
 		0DD99D9427BE4B7B009FAD3F /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD99D9327BE4B7B009FAD3F /* ProfileViewController.swift */; };
+		0DE4536E284CAAD00004410F /* RoomTitleCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE4536D284CAAD00004410F /* RoomTitleCell.swift */; };
+		0DE45370284CABEE0004410F /* RoomPasswordCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE4536F284CABEE0004410F /* RoomPasswordCell.swift */; };
+		0DE45372284CAD2E0004410F /* RoomGameTypeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE45371284CAD2E0004410F /* RoomGameTypeCell.swift */; };
+		0DE45374284CAF6F0004410F /* RoomMaxUserCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE45373284CAF6F0004410F /* RoomMaxUserCell.swift */; };
+		0DE45376284CB0CC0004410F /* RoomSubjectCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE45375284CB0CC0004410F /* RoomSubjectCell.swift */; };
+		0DE45378284CB33D0004410F /* SettingRoomController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE45377284CB33D0004410F /* SettingRoomController.swift */; };
 		EBAD3185F5B23A2A7F82F211 /* Pods_WaittingRoom.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E6987FC74B869DCC689A70C /* Pods_WaittingRoom.framework */; };
 /* End PBXBuildFile section */
 
@@ -57,6 +63,12 @@
 		0DD99D8F27BC0156009FAD3F /* ProfileCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileCell.swift; sourceTree = "<group>"; };
 		0DD99D9127BCFAD2009FAD3F /* ChatCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatCell.swift; sourceTree = "<group>"; };
 		0DD99D9327BE4B7B009FAD3F /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
+		0DE4536D284CAAD00004410F /* RoomTitleCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomTitleCell.swift; sourceTree = "<group>"; };
+		0DE4536F284CABEE0004410F /* RoomPasswordCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomPasswordCell.swift; sourceTree = "<group>"; };
+		0DE45371284CAD2E0004410F /* RoomGameTypeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomGameTypeCell.swift; sourceTree = "<group>"; };
+		0DE45373284CAF6F0004410F /* RoomMaxUserCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RoomMaxUserCell.swift; path = WaittingRoom/Controller/RoomMaxUserCell.swift; sourceTree = SOURCE_ROOT; };
+		0DE45375284CB0CC0004410F /* RoomSubjectCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RoomSubjectCell.swift; path = WaittingRoom/Controller/RoomSubjectCell.swift; sourceTree = SOURCE_ROOT; };
+		0DE45377284CB33D0004410F /* SettingRoomController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingRoomController.swift; sourceTree = "<group>"; };
 		2D6CB041CA958D2FD7585836 /* Pods-WaittingRoom.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WaittingRoom.release.xcconfig"; path = "Target Support Files/Pods-WaittingRoom/Pods-WaittingRoom.release.xcconfig"; sourceTree = "<group>"; };
 		3E6987FC74B869DCC689A70C /* Pods_WaittingRoom.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_WaittingRoom.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		66E706B07F53DD33EBCF8006 /* Pods-WaittingRoom.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WaittingRoom.debug.xcconfig"; path = "Target Support Files/Pods-WaittingRoom/Pods-WaittingRoom.debug.xcconfig"; sourceTree = "<group>"; };
@@ -84,6 +96,11 @@
 				0DCBB7B62830F7CC00914519 /* PlayerCell.swift */,
 				0DCBB7B82830F7F900914519 /* HintCell.swift */,
 				0D9DBB5F2821B47500CF93A0 /* UserCell.swift */,
+				0DE45375284CB0CC0004410F /* RoomSubjectCell.swift */,
+				0DE45373284CAF6F0004410F /* RoomMaxUserCell.swift */,
+				0DE4536D284CAAD00004410F /* RoomTitleCell.swift */,
+				0DE4536F284CABEE0004410F /* RoomPasswordCell.swift */,
+				0DE45371284CAD2E0004410F /* RoomGameTypeCell.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -95,6 +112,7 @@
 				0DCBB7B22830F10000914519 /* PlayingRoom.swift */,
 				0DD3623C27C54B0E00C206E0 /* RoomSetting.swift */,
 				0D9DBB612821CD5400CF93A0 /* RoomCreating.swift */,
+				0DE45377284CB33D0004410F /* SettingRoomController.swift */,
 				0D9DBA6B2820623500CF93A0 /* Lobby.swift */,
 				0D9DBB5B2821A4B900CF93A0 /* SideMenuViewController.swift */,
 				0DD3623A27C26A6D00C206E0 /* ChattingRoom.swift */,
@@ -281,20 +299,26 @@
 				0DD3623727C0D7AA00C206E0 /* Model.swift in Sources */,
 				0DCBB7B72830F7CC00914519 /* PlayerCell.swift in Sources */,
 				0DD3623D27C54B0E00C206E0 /* RoomSetting.swift in Sources */,
+				0DE45372284CAD2E0004410F /* RoomGameTypeCell.swift in Sources */,
 				0DD3623B27C26A6D00C206E0 /* ChattingRoom.swift in Sources */,
 				0DD99D9427BE4B7B009FAD3F /* ProfileViewController.swift in Sources */,
 				0D9DBB5C2821A4B900CF93A0 /* SideMenuViewController.swift in Sources */,
 				0DD99D6027BA9004009FAD3F /* WaitingRoom.swift in Sources */,
 				0DD99D9027BC0156009FAD3F /* ProfileCell.swift in Sources */,
 				0D9DBA6C2820623500CF93A0 /* Lobby.swift in Sources */,
+				0DE4536E284CAAD00004410F /* RoomTitleCell.swift in Sources */,
 				0D9DBB602821B47500CF93A0 /* UserCell.swift in Sources */,
+				0DE45374284CAF6F0004410F /* RoomMaxUserCell.swift in Sources */,
 				0D7CC119284BC334001EE95D /* MessageLabel.swift in Sources */,
+				0DE45378284CB33D0004410F /* SettingRoomController.swift in Sources */,
+				0DE45370284CABEE0004410F /* RoomPasswordCell.swift in Sources */,
 				0DD99D5C27BA9004009FAD3F /* AppDelegate.swift in Sources */,
 				0DD99D9227BCFAD2009FAD3F /* ChatCell.swift in Sources */,
 				0DCBB7B92830F7F900914519 /* HintCell.swift in Sources */,
 				0DCBB7B32830F10000914519 /* PlayingRoom.swift in Sources */,
 				0D9DBA722820641F00CF93A0 /* SocketIOManager.swift in Sources */,
 				0DD99D5E27BA9004009FAD3F /* SceneDelegate.swift in Sources */,
+				0DE45376284CB0CC0004410F /* RoomSubjectCell.swift in Sources */,
 				0D9DBA70282062C200CF93A0 /* RoomCell.swift in Sources */,
 				0D9DBB622821CD5400CF93A0 /* RoomCreating.swift in Sources */,
 			);

@@ -59,7 +59,6 @@ class Lobby: UIViewController  {
         toolbarItems = [UIBarButtonItem.flexibleSpace(),chatButton, UIBarButtonItem.flexibleSpace()]
         
         
-        
         /* 네비게이션 아이템 설정 */
         let naviItem = self.navigationItem
         
@@ -73,6 +72,8 @@ class Lobby: UIViewController  {
             return label
             
         }()
+        
+        naviItem.backButtonTitle = "뒤로"
         
         let appearance = UINavigationBarAppearance()
         appearance.configureWithDefaultBackground()
@@ -252,9 +253,10 @@ class Lobby: UIViewController  {
         guard let height = self.roomListTableView?.frame.height else { return }
         guard let top = self.navigationController?.navigationBar.frame.height else { return }
         
-        let roomSettingController = RoomCreating(myUserId, height, top)
-        
-        present(roomSettingController, animated: true)
+//        let roomSettingController = RoomCreating(myUserId, height, top)
+        let roomSettingController = SettingRoomController(userId: myUserId)
+    
+        self.navigationController?.pushViewController(roomSettingController, animated: true)
         
     }
     
