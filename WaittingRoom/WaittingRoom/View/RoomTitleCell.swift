@@ -26,15 +26,18 @@ class RoomTitleCell: UITableViewCell {
 
         self.titleLabel = label
         
-        let textField = UITextField()
+        let textField = UnderlineTextField()
         
         contentView.addSubview(textField)
         
-        textField.borderStyle = .roundedRect
-        textField.font = .systemFont(ofSize: 25, weight: .regular)
+        textField.borderActiveColor = .systemBlue
+        textField.placeholderColor = .gray
+        textField.borderInactiveColor = .black
+        textField.placeholder = "방 제목을 입력하세요"
+        
+        textField.font = .systemFont(ofSize: 20, weight: .regular)
         textField.autocorrectionType = .no
         textField.autocapitalizationType = .none
-        textField.placeholder = "방 제목을 입력하세요"
         textField.enablesReturnKeyAutomatically = true
         
         textField.translatesAutoresizingMaskIntoConstraints = false

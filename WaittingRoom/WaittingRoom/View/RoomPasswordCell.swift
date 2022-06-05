@@ -35,6 +35,7 @@ class RoomPasswordCell: UITableViewCell {
         
         /* 스위치 크기 변경 */
         checkBox.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
+        checkBox.onTintColor = .systemBlue
         
         checkBox.translatesAutoresizingMaskIntoConstraints = false
         checkBox.leadingAnchor.constraint(equalTo: label.trailingAnchor, constant: 0).isActive = true
@@ -42,21 +43,24 @@ class RoomPasswordCell: UITableViewCell {
         checkBox.isOn = active
         
         
-        let textField = UITextField()
+        let textField = UnderlineTextField()
         
         contentView.addSubview(textField)
         
-        textField.borderStyle = .roundedRect
-        textField.font = .systemFont(ofSize: 15, weight: .regular)
+        textField.placeholder = "방 비밀번호를 입력하세요"
+        textField.placeholderColor = .gray
+        textField.borderActiveColor = .systemBlue
+        textField.borderInactiveColor = .black
+        
+        textField.font = .systemFont(ofSize: 20, weight: .regular)
         textField.autocorrectionType = .no
         textField.autocapitalizationType = .none
         textField.isEnabled = active
         textField.isHidden = !active
-        textField.placeholder = "방 비밀번호를 입력하세요"
         textField.enablesReturnKeyAutomatically = true
         
         textField.translatesAutoresizingMaskIntoConstraints = false
-        textField.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 5).isActive = true
+        textField.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 10).isActive = true
         textField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 15).isActive = true
         textField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor,constant: -20).isActive = true
         textField.bottomAnchor.constraint(equalTo: contentView.bottomAnchor,constant: -15).isActive = true
