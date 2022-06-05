@@ -5,12 +5,14 @@ PODS:
   - Socket.IO-Client-Swift (16.0.1):
     - Starscream (~> 4.0)
   - Starscream (4.0.4)
+  - TextFieldEffects (1.6.0)
 
 DEPENDENCIES:
   - Alamofire
   - AlertsAndPickers
   - SideMenu
   - Socket.IO-Client-Swift (~> 16.0.0)
+  - TextFieldEffects
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
@@ -19,6 +21,7 @@ SPEC REPOS:
     - SideMenu
     - Socket.IO-Client-Swift
     - Starscream
+    - TextFieldEffects
 
 SPEC CHECKSUMS:
   Alamofire: 87bd8c952f9a4454320fce00d9cc3de57bcadaf5
@@ -26,7 +29,8 @@ SPEC CHECKSUMS:
   SideMenu: f583187d21c5b1dd04c72002be544b555a2627a2
   Socket.IO-Client-Swift: c116d6dc9fd6be9c259bacfe143f8725bce7d79e
   Starscream: 5178aed56b316f13fa3bc55694e583d35dd414d9
+  TextFieldEffects: 529b8aff706fb40f82c41c780c0777941a893796
 
-PODFILE CHECKSUM: b2782686880f94704ceda53d3cc97c1828df3e00
+PODFILE CHECKSUM: e9b9a881ae863cfebec19c8851835d2f334e88fa
 
 COCOAPODS: 1.11.3

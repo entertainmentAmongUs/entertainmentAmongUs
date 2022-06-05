@@ -22,7 +22,7 @@ class RoomPasswordCell: UITableViewCell {
         label.font = .systemFont(ofSize: 20 , weight: .semibold)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.leadingAnchor.constraint(equalTo: contentView.leadingAnchor,constant: 10).isActive = true
-        label.topAnchor.constraint(equalTo: contentView.topAnchor,constant: 10).isActive = true
+        label.topAnchor.constraint(equalTo: contentView.topAnchor,constant: 15).isActive = true
         
         /* 방 비밀번호의 존재 여부에 따라 패스워드 입력 필드 상태 변경 */
         let active = false
@@ -59,7 +59,7 @@ class RoomPasswordCell: UITableViewCell {
         textField.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 5).isActive = true
         textField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 15).isActive = true
         textField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor,constant: -20).isActive = true
-        textField.bottomAnchor.constraint(equalTo: contentView.bottomAnchor,constant: -10).isActive = true
+        textField.bottomAnchor.constraint(equalTo: contentView.bottomAnchor,constant: -15).isActive = true
         
         self.inputTextField = textField
         

@@ -22,7 +22,7 @@ class RoomTitleCell: UITableViewCell {
         label.font = .systemFont(ofSize: 20, weight: .semibold)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.leadingAnchor.constraint(equalTo: contentView.leadingAnchor,constant: 10).isActive = true
-        label.topAnchor.constraint(equalTo: contentView.topAnchor,constant: 10).isActive = true
+        label.topAnchor.constraint(equalTo: contentView.topAnchor,constant: 15).isActive = true
 
         self.titleLabel = label
         
@@ -41,7 +41,7 @@ class RoomTitleCell: UITableViewCell {
         textField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 15).isActive = true
         textField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor,constant: -20).isActive = true
         textField.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 10).isActive = true
-        textField.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
+        textField.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -15).isActive = true
         
         self.inputTextField = textField
         

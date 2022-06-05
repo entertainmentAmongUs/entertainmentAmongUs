@@ -22,7 +22,7 @@ class RoomMaxUserCell: UITableViewCell {
         label.font = .systemFont(ofSize: 20, weight: .semibold)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.leadingAnchor.constraint(equalTo: contentView.leadingAnchor,constant: 10).isActive = true
-        label.topAnchor.constraint(equalTo: contentView.topAnchor, constant:  10).isActive = true
+        label.topAnchor.constraint(equalTo: contentView.topAnchor, constant:  15).isActive = true
         label.setContentHuggingPriority(.defaultHigh, for: .vertical)
         
         self.maxUserLabel = label
@@ -42,7 +42,7 @@ class RoomMaxUserCell: UITableViewCell {
         picker.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 5).isActive = true
         picker.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 15).isActive = true
         picker.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20).isActive = true
-        picker.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
+        picker.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -15).isActive = true
         
         self.maxUserNumberButton = picker
         

@@ -24,7 +24,7 @@ class RoomGameTypeCell: UITableViewCell {
         
         label.translatesAutoresizingMaskIntoConstraints = false
         label.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
-        label.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10).isActive = true
+        label.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 15).isActive = true
         label.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         label.setContentHuggingPriority(.defaultHigh, for: .vertical)
         
@@ -52,7 +52,7 @@ class RoomGameTypeCell: UITableViewCell {
         infoLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 15).isActive = true
         infoLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20).isActive = true
         infoLabel.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 10).isActive = true
-        infoLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
+        infoLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -15).isActive = true
         infoLabel.setContentHuggingPriority(.defaultLow, for: .vertical)
         
         self.gameInfoLabel = infoLabel

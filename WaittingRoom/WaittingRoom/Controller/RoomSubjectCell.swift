@@ -23,7 +23,7 @@ class RoomSubjectCell: UITableViewCell {
         label.font = .systemFont(ofSize: 20, weight: .semibold)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.leadingAnchor.constraint(equalTo: contentView.leadingAnchor,constant: 10).isActive = true
-        label.topAnchor.constraint(equalTo: contentView.topAnchor, constant:  10).isActive = true
+        label.topAnchor.constraint(equalTo: contentView.topAnchor, constant:  15).isActive = true
         label.setContentHuggingPriority(.defaultHigh, for: .vertical)
         
         
@@ -65,7 +65,7 @@ class RoomSubjectCell: UITableViewCell {
         stackView.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 5).isActive = true
         stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 15).isActive = true
         stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20).isActive = true
-        stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
+        stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -15).isActive = true
         
     }
     
