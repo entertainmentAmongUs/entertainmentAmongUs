@@ -109,39 +109,54 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
         
     }
     
-    func addButtons(){
+    func addReadyButton(){
         
         guard let view = self.waitUserView else { return }
         
-        
         // readButton Setting
         
-        let ready = UIButton(type: .system)
+        var config = UIButton.Configuration.plain()
+        config.buttonSize = .small
+        config.cornerStyle = .capsule
+        config.titleAlignment = .center
+        
+        let ready = UIButton(configuration: config)
         
         self.view.addSubview(ready)
         
         ready.addTarget(self, action: #selector(self.touchReadyButton(_:)), for: .touchUpInside)
         
-        /* 버튼 외관 설정 */
+        ready.configurationUpdateHandler = { button in
+            
+            var container = AttributeContainer()
+            container.font = .systemFont(ofSize: 20, weight: .bold)
+            
+            var configuration = button.configuration
+            
+            switch button.state {
+                
+            case .selected:
+                container.foregroundColor = .white
+                configuration?.background.backgroundColor = .systemBlue
+                configuration?.attributedTitle = AttributedString("준비 완료!", attributes: container)
+            default:
+                container.foregroundColor = .black
+                configuration?.background.backgroundColor = .systemGray6
+                configuration?.attributedTitle = AttributedString("준비", attributes: container)
+                
+            }
+            
+            button.configuration = configuration
+            
+        }
         
-        ready.backgroundColor = .white
-        ready.titleLabel?.font = .systemFont(ofSize: 25, weight: .bold)
-        ready.setTitle("준비", for: .normal)
-        ready.setTitle("준비 완료!", for: .selected)
-        ready.setTitleColor(.white, for: .selected)
-        ready.titleLabel?.textAlignment = .center
-        
-        
-        
-        
-        ready.layer.cornerRadius = 10
-        
+        /*
         /* 그림자 */
-        ready.layer.shadowOffset = CGSize(width: 0, height: 5)
+        ready.layer.shadowOffset = CGSize(width: 0, height: 3)
         ready.layer.shadowOpacity = 1.0
         ready.layer.shadowColor = UIColor.gray.cgColor
-        ready.layer.shadowRadius = 0
-        
+        ready.layer.shadowRadius = 1
+        */
         
         ready.translatesAutoresizingMaskIntoConstraints = false
         ready.centerXAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.centerXAnchor).isActive = true
@@ -461,7 +476,7 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
         
         self.setNavigationController()
         self.addWaitingUserView()
-        self.addButtons()
+        self.addReadyButton()
         self.addWaitUserCollectionView()
         self.addChatView()
         
