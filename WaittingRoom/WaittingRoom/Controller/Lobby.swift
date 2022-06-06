@@ -76,12 +76,13 @@ class Lobby: UIViewController  {
         }()
         
         
+        /*
         let appearance = UINavigationBarAppearance()
         appearance.configureWithDefaultBackground()
         
         naviItem.scrollEdgeAppearance = appearance
         naviItem.standardAppearance = appearance
-        
+        */
         
         /* 로비의 네비게이션 바 버튼 아이템 설정 */
         let sideButton = UIBarButtonItem(image: .init(systemName: "list.bullet")?.withConfiguration(UIImage.SymbolConfiguration(weight: .semibold)), style: .plain, target: self, action: #selector(touchSideMenuButton(_:)))
@@ -110,7 +111,7 @@ class Lobby: UIViewController  {
         table.dataSource = self
         table.register(RoomCell.self, forCellReuseIdentifier: self.roomCellIdentifier)
         table.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-        table.backgroundColor = .systemGray6
+        table.backgroundColor = .white
         table.sectionHeaderTopPadding = 10
         
         /*
@@ -411,7 +412,11 @@ extension Lobby: UITableViewDelegate, UITableViewDataSource {
         if tableView == self.roomListTableView {
             
             let view = UIView()
-            view.backgroundColor = .systemGray6
+            view.backgroundColor = .white
+            view.layer.shadowOffset = CGSize(width: 0, height: 1)
+            view.layer.shadowColor = UIColor.gray.cgColor
+            view.layer.shadowOpacity = 0.5
+            view.layer.shadowRadius = 0.7
             
             let gameType = UILabel()
             
