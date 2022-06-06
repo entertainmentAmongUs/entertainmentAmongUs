@@ -31,7 +31,7 @@ class RoomSubjectCell: UITableViewCell {
         
         
         subject.setTitleColor(.black, for: .normal)
-        subject.titleLabel?.font = .systemFont(ofSize: 25, weight: .medium)
+        subject.titleLabel?.font = .systemFont(ofSize: 20, weight: .medium)
         subject.backgroundColor = .systemGray6
         subject.clipsToBounds = true
         subject.layer.cornerRadius = 5
@@ -44,7 +44,7 @@ class RoomSubjectCell: UITableViewCell {
         
 
         category.setTitleColor(.black, for: .normal)
-        category.titleLabel?.font = .systemFont(ofSize: 25, weight: .medium)
+        category.titleLabel?.font = .systemFont(ofSize: 20, weight: .medium)
         category.backgroundColor = .systemGray6
         category.clipsToBounds = true
         category.layer.cornerRadius = 5

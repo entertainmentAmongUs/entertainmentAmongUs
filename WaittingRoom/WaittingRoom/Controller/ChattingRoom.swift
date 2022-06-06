@@ -68,6 +68,7 @@ class ChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataSource
         textField.placeholder = "욕설이나 비방 채팅은 삼가주세요"
         textField.borderInactiveColor = .black
         textField.borderActiveColor = .black
+        textField.placeholderColor = .gray
         
         textField.font = UIFont.systemFont(ofSize: 18)
         textField.delegate = self

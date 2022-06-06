@@ -62,6 +62,8 @@ class Lobby: UIViewController  {
         /* 네비게이션 아이템 설정 */
         let naviItem = self.navigationItem
         
+        naviItem.backButtonTitle = "뒤로"
+        
         let titleView: UILabel = {
             let label = UILabel()
             label.font = .systemFont(ofSize: 25, weight: .bold)

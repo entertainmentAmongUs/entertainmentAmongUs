@@ -38,6 +38,7 @@ class SettingRoomController: UITableViewController {
     var categoryButton: UIButton?
     
     var completeButton: UIBarButtonItem?
+    var cancleButton: UIBarButtonItem?
     
     /* Cell Identifier */
     
@@ -77,14 +78,24 @@ class SettingRoomController: UITableViewController {
         let completeButton = UIBarButtonItem(image: UIImage(systemName: "checkmark")?.withConfiguration(UIImage.SymbolConfiguration(weight: .semibold)), style: .plain, target: self, action: #selector(touchCompleteButton(_:)))
         completeButton.isEnabled = false
         
+        let cancleButton = UIBarButtonItem(image: .init(systemName: "xmark")?.withConfiguration(UIImage.SymbolConfiguration(weight: .semibold)), style: .plain, target: self, action: #selector(touchCancleButton(_:)))
+        
         naviItem.setRightBarButtonItems([completeButton], animated: true)
+        naviItem.setLeftBarButton(cancleButton, animated: true)
         
         self.completeButton = completeButton
+        self.cancleButton = cancleButton
         
         
     }
     
     // MARK: - Action
+    
+    @objc func touchCancleButton(_ sender: UIBarButtonItem){
+        
+        self.navigationController?.popViewController(animated: true)
+        
+    }
     
     @objc func touchSubjectButton(_ sender: UIButton){
         

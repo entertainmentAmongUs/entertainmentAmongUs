@@ -37,7 +37,7 @@ class RoomGameTypeCell: UITableViewCell {
         contentView.addSubview(infoLabel)
         
         infoLabel.text = games[0].info
-        infoLabel.font = .systemFont(ofSize: 25, weight: .regular)
+        infoLabel.font = .systemFont(ofSize: 20, weight: .regular)
         infoLabel.backgroundColor = .systemGray6
         infoLabel.adjustsFontSizeToFitWidth = true
         infoLabel.numberOfLines = 1

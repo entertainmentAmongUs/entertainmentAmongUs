@@ -28,23 +28,23 @@ class RoomMaxUserCell: UITableViewCell {
         self.maxUserLabel = label
         
         
-        let picker = UIButton(type: .system)
+        let button = UIButton(type: .system)
         
-        contentView.addSubview(picker)
+        contentView.addSubview(button)
         
-        picker.setTitleColor(.black, for: .normal)
-        picker.titleLabel?.font = .systemFont(ofSize: 25, weight: .medium)
-        picker.backgroundColor = .systemGray6
-        picker.clipsToBounds = true
-        picker.layer.cornerRadius = 5
+        button.setTitleColor(.black, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 20, weight: .medium)
+        button.backgroundColor = .systemGray6
+        button.clipsToBounds = true
+        button.layer.cornerRadius = 5
         
-        picker.translatesAutoresizingMaskIntoConstraints = false
-        picker.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 5).isActive = true
-        picker.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 15).isActive = true
-        picker.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20).isActive = true
-        picker.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -15).isActive = true
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 5).isActive = true
+        button.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 15).isActive = true
+        button.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20).isActive = true
+        button.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -15).isActive = true
         
-        self.maxUserNumberButton = picker
+        self.maxUserNumberButton = button
         
         
     }
