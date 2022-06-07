@@ -626,6 +626,22 @@ public class UserController {
         }
     }
 
+    /**
+     * 닉네임 변경
+     */
+    @PatchMapping("/users/nickname")
+    public ResponseEntity changeNickname(@RequestBody ChangeNicknameReq changeNicknameReq){
+        String s;
+        String temp = userService.changeNickname(changeNicknameReq);
+        if(temp.equals("user와 profile 업데이트 완료")){
+            s = "{\"message\": \""+temp+"\"}";
+            return ResponseEntity.status(HttpStatus.OK).body(s);
+        }else{
+            s = "{\"message\": \""+temp+"\"}";
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(s);
+        }
+    }
+
     public static String createPassword() {
         StringBuffer key = new StringBuffer();
         Random rnd = new Random();

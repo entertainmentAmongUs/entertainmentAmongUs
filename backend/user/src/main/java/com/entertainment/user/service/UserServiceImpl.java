@@ -262,6 +262,51 @@ public class UserServiceImpl implements UserService{
         return true;
     }
 
+    @Override
+    public String changeNickname(ChangeNicknameReq changeNicknameReq) {
+        List<User> userList = userRepository.findAll();
+        //닉네임 중복인지 확인
+        for(User user : userList){
+            if(user.getNickname().equals(changeNicknameReq.getNickname())){
+                return "닉네임 중복";
+            }
+        }
+
+        User user1 = new User();
+        user1.setId(0);
+        for(User user : userList){
+            if(user.getId() == changeNicknameReq.getUserId()){
+                //USER의 닉네임 변경
+                user1 = user;
+                user1.setNickname(changeNicknameReq.getNickname());
+
+                //PROFILE의 닉네임 변경
+                List<Profile> profileList = profileRepository.findAll();
+                Profile profile1 = new Profile();
+                User newuser = new User();
+                newuser.setId(0);
+                profile1.setUser(newuser);
+                for(Profile p : profileList){
+                    if(p.getUser().getId()==changeNicknameReq.getUserId()){
+                        profile1 = p;
+                        profile1.setNickname(changeNicknameReq.getNickname());
+                        profileRepository.save(profile1);
+                        userRepository.save(user1);
+                        return "user와 profile 업데이트 완료";
+                    }
+                }
+                if(profile1.getUser().getId()==0){
+                    return "profile에 해당 userId 없음";
+                }
+                return "이게 보이면 안되는데??";
+            }
+        }
+        if(user1.getId()==0){
+            return "user에 해당 userId 없음";
+        }
+        return "이거는 진짜 보이면 안되는데??";
+    }
+
 //    @Override
 //    public String showProfile(String nickName) {
 //        List<Profile> list = profileRepository.findAll();
