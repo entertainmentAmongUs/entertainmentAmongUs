@@ -164,9 +164,13 @@ class ChattingRoom: UIViewController, UITableViewDelegate, UITableViewDataSource
         
         chattings.append(newChat)
         
-        chatTableView?.reloadData()
+        let newIndex = IndexPath(row: chattings.count-1, section: 0)
         
-        chatTableView?.scrollToRow(at: IndexPath(row: chattings.count-1, section: 0), at: .bottom, animated: true)
+        chatTableView?.insertRows(at: [newIndex], with: .top)
+        
+//        chatTableView?.reloadData()
+        
+        chatTableView?.scrollToRow(at: newIndex, at: .bottom, animated: true)
         
     }
     

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Spring
 
 class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource  {
     
@@ -120,13 +121,19 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
         config.cornerStyle = .capsule
         config.titleAlignment = .center
         
-        let ready = UIButton(configuration: config)
+//        let ready = UIButton(configuration: config)
+        let ready = SpringButton(configuration: config)
+        ready.animation = "pop"
+        ready.curve = "easeInOut"
+        ready.duration = 0.5
         
         self.view.addSubview(ready)
         
         ready.addTarget(self, action: #selector(self.touchReadyButton(_:)), for: .touchUpInside)
         
         ready.configurationUpdateHandler = { button in
+            
+            guard let button = button as? SpringButton else { return }
             
             var container = AttributeContainer()
             container.font = .systemFont(ofSize: 20, weight: .bold)
@@ -139,6 +146,11 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
                 container.foregroundColor = .white
                 configuration?.background.backgroundColor = .systemBlue
                 configuration?.attributedTitle = AttributedString("준비 완료!", attributes: container)
+                button.animation = "pop"
+                button.curve = "spring"
+                button.duration = 0.5
+                button.force = 0.3
+                button.animate()
             default:
                 container.foregroundColor = .black
                 configuration?.background.backgroundColor = .systemGray6
