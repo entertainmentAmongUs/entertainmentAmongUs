@@ -118,14 +118,11 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
         
         var config = UIButton.Configuration.plain()
         config.buttonSize = .small
-        config.cornerStyle = .capsule
+        config.cornerStyle = .dynamic
         config.titleAlignment = .center
         
 //        let ready = UIButton(configuration: config)
         let ready = SpringButton(configuration: config)
-        ready.animation = "pop"
-        ready.curve = "easeInOut"
-        ready.duration = 0.5
         
         self.view.addSubview(ready)
         
@@ -151,10 +148,17 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
                 button.duration = 0.5
                 button.force = 0.3
                 button.animate()
+            case .highlighted:
+                break
             default:
                 container.foregroundColor = .black
                 configuration?.background.backgroundColor = .systemGray6
                 configuration?.attributedTitle = AttributedString("준비", attributes: container)
+                button.animation = "shake"
+                button.curve = "spring"
+                button.duration = 0.5
+                button.force = 0.3
+                button.animate()
                 
             }
             
@@ -384,9 +388,13 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
         
         chattings.append(newChat)
         
-        chatTableView?.reloadData()
+        let newIndex = IndexPath(row: chattings.count-1, section: 0)
         
-        chatTableView?.scrollToRow(at: IndexPath(row: chattings.count-1, section: 0), at: .bottom, animated: true)
+        chatTableView?.insertRows(at: [newIndex], with: .left)
+        
+//        chatTableView?.reloadData()
+        
+        chatTableView?.scrollToRow(at: newIndex, at: .bottom, animated: true)
         
         
     }
