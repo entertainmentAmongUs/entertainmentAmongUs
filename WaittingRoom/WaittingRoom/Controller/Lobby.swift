@@ -55,7 +55,8 @@ class Lobby: UIViewController  {
         toolBar.scrollEdgeAppearance = toolBarAppearance
         
         let chatButton = UIBarButtonItem(image: UIImage(systemName: "bubble.left.and.bubble.right")?.withConfiguration(UIImage.SymbolConfiguration(weight: .semibold)), style: .plain, target: self, action: #selector(touchChatButton(_:)))
-    
+        
+        // setToolbarItem 메소드 말고
         toolbarItems = [UIBarButtonItem.flexibleSpace(),chatButton, UIBarButtonItem.flexibleSpace()]
         
         
