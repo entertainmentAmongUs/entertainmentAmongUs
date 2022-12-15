@@ -242,4 +242,4 @@ let subjects = [Subject(title: "국가", category: ["아시아", "유럽", "아�
 /* 나의 친구 요청 목록 */
 var myFriendRequest: [FriendRequest] = []
 
-let baseURL = "http://52.78.47.148:8080/"
+let baseURL = "http://13.124.201.154:8080/"
