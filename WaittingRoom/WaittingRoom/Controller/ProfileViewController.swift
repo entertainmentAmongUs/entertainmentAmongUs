@@ -169,7 +169,7 @@ class ProfileViewController: UIViewController {
         
         /* 레이블에 유저 프로필 정보 입력 */
         
-        AF.request("http://52.78.47.148:8080/profile/\(userId)/mypage").validate().response { [weak self] response in
+        AF.request(baseURL + "profile/\(userId)/mypage").validate().response { [weak self] response in
             
             guard let data = response.data else { return }
             
