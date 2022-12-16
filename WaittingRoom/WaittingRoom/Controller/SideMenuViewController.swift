@@ -208,20 +208,28 @@ extension SideMenuViewController: UITableViewDataSource, UITableViewDelegate {
     
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let id = lobbyUserList[indexPath.row].userId
         
         
-        // baseURL 쓰면 500코드 오류 남
-        AF.request("http://52.78.47.148:8080/profile/\(lobbyUserList[indexPath.row].userId)/mypage").validate().response { [weak self] response in
+        AF.request(baseURL + "profile/\(id)/mypage", method: .get).responseDecodable(of: Profile.self) { [weak self] response in
+            switch response.result {
+            case let .success(profile):
+                self?.settingUserInfo(profile: profile)
+            case let .failure(error):
+                print(error)
+            }
+        }
+        
+        /*
+        AF.request("http://13.124.201.154:8080/profile/\(lobbyUserList[indexPath.row].userId)/mypage").validate().response { [weak self] response in
             
             guard let data = response.data else { return }
             
             guard let profile = try? JSONDecoder().decode(Profile.self, from: data) else { return }
             
             self?.settingUserInfo(profile: profile)
-            
-            
         }
-        
+        */
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {

@@ -20,6 +20,7 @@ class RoomSetting: UIViewController, UITextFieldDelegate {
     var settingStackView: UIStackView?
     var roomTitleTextField: UITextField?
     var passwordTextField: UITextField?
+    var passwordCheckBox: UISwitch?
     var gameTypeSegment: UISegmentedControl?
     var maxUserNumberButton: UIButton?
     var maxUserNumberLabel: UILabel?
@@ -159,6 +160,8 @@ class RoomSetting: UIViewController, UITextFieldDelegate {
             checkBox.leadingAnchor.constraint(equalTo: label.trailingAnchor, constant: 0).isActive = true
             checkBox.centerYAnchor.constraint(equalTo: label.centerYAnchor).isActive = true
             checkBox.isOn = active
+            
+            self.passwordCheckBox = checkBox
             
             
             let textField = UITextField()

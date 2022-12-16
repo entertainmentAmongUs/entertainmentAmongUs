@@ -21,14 +21,12 @@ class RoomCreating: UIViewController, UITextFieldDelegate {
     var roomTitleTextField: UITextField?
     var passwordTextField: UITextField?
     var gameTypeSegment: UISegmentedControl?
-    var maxUserNumberButton: UIButton?
     var maxUserNumberLabel: UILabel?
+    var maxUserNumberButton: UIButton?
     var subjectButton: UIButton?
     var categoryButton: UIButton?
     
-    var buttonStackView: UIStackView?
-    var backButton: UIButton?
-    var completeButton: UIButton?
+    var completeButton: UIBarButtonItem?
     
     /* MARK: Others */
     var contentViewHeight: CGFloat
@@ -55,6 +53,51 @@ class RoomCreating: UIViewController, UITextFieldDelegate {
     
     // MARK: - Method
     
+    func setNavigationController() {
+        
+        
+        /* 네비게이션 아이템 설정 */
+        let naviItem = self.navigationItem
+        
+        let titleView: UILabel = {
+            let label = UILabel()
+            label.font = .systemFont(ofSize: 20, weight: .bold)
+            label.textColor = .black
+            label.text = "방 만들기"
+            label.textAlignment = .center
+            
+            return label
+            
+        }()
+        
+        naviItem.titleView = titleView
+        
+        /*
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithDefaultBackground()
+        
+        naviItem.scrollEdgeAppearance = appearance
+        naviItem.standardAppearance = appearance
+        */
+        
+        /* 로비의 네비게이션 바 버튼 아이템 설정 */
+        /*
+        let sideButton = UIBarButtonItem(image: .init(systemName: "list.bullet")?.withConfiguration(UIImage.SymbolConfiguration(weight: .semibold)), style: .plain, target: self, action: #selector(touchSideMenuButton(_:)))
+        
+         let createButton = UIBarButtonItem(image: UIImage(systemName: "plus")?.withConfiguration(UIImage.SymbolConfiguration(weight: .semibold)), style: .plain, target: self, action: #selector(touchRoomCreateButton(_:)))
+        */
+        
+        let completeButton = UIBarButtonItem(image: UIImage(systemName: "checkmark")?.withConfiguration(UIImage.SymbolConfiguration(weight: .semibold)), style: .plain, target: self, action: #selector(touchCompleteButton(_:)))
+        completeButton.isEnabled = false
+        
+        naviItem.setRightBarButtonItems([completeButton], animated: true)
+//        naviItem.setLeftBarButton(UIBarButtonItem(customView: titleView), animated: true)
+        
+        self.completeButton = completeButton
+        
+        
+    }
+    
     func addContentView() {
         
         /* 다른 뷰들을 담는 컨테이너 뷰 설정 */
@@ -65,11 +108,14 @@ class RoomCreating: UIViewController, UITextFieldDelegate {
         view.clipsToBounds = true
         view.layer.cornerRadius = 5
         
+        
+        let safeLayout = self.view.safeAreaLayoutGuide
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: contentViewTopAnchor).isActive = true
-        view.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 20).isActive = true
-        view.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -20).isActive = true
-        view.heightAnchor.constraint(equalToConstant: contentViewHeight).isActive = true
+        view.topAnchor.constraint(equalTo: safeLayout.topAnchor, constant: 20).isActive = true
+        view.leadingAnchor.constraint(equalTo: safeLayout.leadingAnchor, constant: 20).isActive = true
+        view.trailingAnchor.constraint(equalTo: safeLayout.trailingAnchor, constant: -20).isActive = true
+        view.bottomAnchor.constraint(equalTo: safeLayout.bottomAnchor, constant: -20).isActive = true
+//        view.heightAnchor.constraint(equalToConstant: contentViewHeight).isActive = true
         
         self.contentView = view
         
@@ -398,7 +444,7 @@ class RoomCreating: UIViewController, UITextFieldDelegate {
         
     }
     
-    
+    /*
     func addButton() {
         
         guard let content = self.contentView else {return}
@@ -442,6 +488,7 @@ class RoomCreating: UIViewController, UITextFieldDelegate {
         
         
     }
+    */
     
 
     // MARK: - TextField Delegate
@@ -493,7 +540,7 @@ class RoomCreating: UIViewController, UITextFieldDelegate {
          
         SocketIOManager.shared.createRoom(room: newRoom)
         
-        self.dismiss(animated: true, completion: nil)
+        self.navigationController?.popViewController(animated: true)
         
     }
     
@@ -584,15 +631,16 @@ class RoomCreating: UIViewController, UITextFieldDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.00)
+        self.view.backgroundColor = .white
         
         let gesture = UITapGestureRecognizer()
         gesture.addTarget(self, action: #selector(self.hideKeyboard))
         self.view.addGestureRecognizer(gesture)
         
+        self.setNavigationController()
         self.addContentView()
         self.addSettingView()
-        self.addButton()
+//        self.addButton()
         
     }
 
@@ -610,8 +658,8 @@ class RoomCreating: UIViewController, UITextFieldDelegate {
         myUserId = userId
         super.init(nibName: nil, bundle: nil)
         
-        self.modalTransitionStyle = .crossDissolve
-        self.modalPresentationStyle = .overFullScreen
+//        self.modalTransitionStyle = .crossDissolve
+//        self.modalPresentationStyle = .overFullScreen
     }
         
     deinit {
