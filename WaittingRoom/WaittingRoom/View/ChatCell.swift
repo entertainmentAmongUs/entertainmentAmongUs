@@ -11,55 +11,71 @@ class ChatCell: UITableViewCell {
     
     var nickname: UILabel?
     var chatting: UILabel?
+    var profileImage: UIImageView?
     
-    func addNicknameLabel() {
+    func addView() {
         
-        // nicknameLabel Setting
+        let content = self.contentView
+        content.backgroundColor = .systemGray6
+        
+        /* 프로필 이미지 */
+        
+        let imageSize = content.frame.width/8
+        
+        let imageView = UIImageView(image: UIImage(named: "ic_user_loading"))
+        
+        content.addSubview(imageView)
+        
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = imageSize/2
+        imageView.backgroundColor = .white
+        
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.topAnchor.constraint(equalTo: content.topAnchor, constant: 10).isActive = true
+        imageView.leadingAnchor.constraint(equalTo: content.leadingAnchor, constant: 20).isActive = true
+        imageView.heightAnchor.constraint(equalToConstant: imageSize).isActive = true
+        imageView.widthAnchor.constraint(equalToConstant: imageSize).isActive = true
+        
+        self.profileImage = imageView
+        
+        
+        // 닉네임 레이블
         
         let nickname = UILabel()
 
-        self.contentView.addSubview(nickname)
+        content.addSubview(nickname)
         
-        nickname.font = UIFont.systemFont(ofSize: 18, weight: .medium)
+        nickname.font = UIFont.systemFont(ofSize: 15, weight: .semibold)
         nickname.numberOfLines = 1
         nickname.lineBreakMode = .byTruncatingTail
         
         nickname.translatesAutoresizingMaskIntoConstraints = false
-        nickname.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor, constant: 5).isActive = true
-        nickname.topAnchor.constraint(equalTo: self.contentView.topAnchor, constant: 5).isActive = true
-        nickname.widthAnchor.constraint(equalToConstant: 70).isActive = true
+        nickname.topAnchor.constraint(equalTo: content.topAnchor, constant: 5).isActive = true
+        nickname.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: 5).isActive = true
+        nickname.trailingAnchor.constraint(equalTo: content.trailingAnchor, constant: -5).isActive = true
         
         self.nickname = nickname
         
-    }
-    
-    func addChattingLabel() {
-        
-        guard let nickname = self.nickname else {
-            return
-        }
         
         // chattingLabel Setting
         
-        let chatting = UILabel()
+        let chatting = MessageLabel()
         
-        self.contentView.addSubview(chatting)
+        content.addSubview(chatting)
         
         chatting.font = UIFont.systemFont(ofSize: 18)
-        chatting.numberOfLines = 0
-        chatting.lineBreakMode = .byWordWrapping
+        chatting.backgroundColor = .white
         
         chatting.translatesAutoresizingMaskIntoConstraints = false
-        chatting.topAnchor.constraint(equalTo: self.contentView.topAnchor, constant: 5).isActive = true
-        chatting.leadingAnchor.constraint(equalTo: nickname.trailingAnchor, constant: 5).isActive = true
-        chatting.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor, constant: -5).isActive = true
-        chatting.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor, constant: -5).isActive = true
+        chatting.topAnchor.constraint(equalTo: nickname.bottomAnchor, constant: 5).isActive = true
+        chatting.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: 5).isActive = true
+        chatting.trailingAnchor.constraint(lessThanOrEqualTo: content.trailingAnchor, constant: -10).isActive = true
+        chatting.bottomAnchor.constraint(equalTo: content.bottomAnchor, constant: -10).isActive = true
         
         self.chatting = chatting
         
         
     }
-    
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -78,9 +94,9 @@ class ChatCell: UITableViewCell {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        
-        self.addNicknameLabel()
-        self.addChattingLabel()
+        self.addView()
+//        self.addNicknameLabel()
+//        self.addChattingLabel()
     }
 
 }

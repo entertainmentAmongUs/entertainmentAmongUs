@@ -13,90 +13,22 @@ class SideMenuViewController: UIViewController {
     
     // MARK: - Properties
     
-    var scoreLabel: UILabel?
-    var score: UILabel?
-    
-    var gameruleButton: UIButton?
-    
     var userTableView: UITableView?
-    let userCellIdentifier = "userCell"
+    var contentView: UIView?
     
-    var settingButton: UIButton?
-    var logoutButton: UIButton?
+    var labelStackView: UIStackView?
+    var profileImage = UIImageView()
+    var nicknameLabel = UILabel()
+    var victoryRateLabel = UILabel()
+    var winCountLabel = UILabel()
+    var loseCountLabel = UILabel()
+    var scoreLabel = UILabel()
+    let userCellIdentifier = "userCell"
     
     var lobbyUserList: [User]
     
     
     // MARK: - Method
-    
-    func addpicture() {
-        
-        let scoreLabel: UILabel = {
-            let ascoreLabel = UILabel()
-            ascoreLabel.text = "점수"
-            ascoreLabel.font = UIFont.systemFont(ofSize: 20,weight: .heavy)
-            ascoreLabel.clipsToBounds = true
-            ascoreLabel.textAlignment = .left
-            ascoreLabel.numberOfLines = 1
-            ascoreLabel.textColor = .white
-            ascoreLabel.translatesAutoresizingMaskIntoConstraints = false
-            return ascoreLabel
-        }()
-        
-        view.addSubview(scoreLabel)
-        self.scoreLabel = scoreLabel
-        
-        scoreLabel.translatesAutoresizingMaskIntoConstraints = false
-        scoreLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        scoreLabel.topAnchor.constraint(equalTo: view.topAnchor,constant: 75).isActive = true
-        scoreLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12).isActive = true
-        scoreLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor,constant: -12).isActive = true
-        
-        let score: UILabel = {
-            let ascore = UILabel()
-            ascore.text = "20437점"
-            ascore.font = UIFont.systemFont(ofSize: 20,weight: .heavy)
-            ascore.clipsToBounds = true
-            ascore.textAlignment = .left
-            ascore.numberOfLines = 1
-            ascore.textColor = .white
-            ascore.translatesAutoresizingMaskIntoConstraints = false
-            return ascore
-        }()
-        
-        view.addSubview(score)
-        self.score = score
-        
-        score.translatesAutoresizingMaskIntoConstraints = false
-        score.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        score.topAnchor.constraint(equalTo: scoreLabel.bottomAnchor,constant: 20).isActive = true
-        score.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12).isActive = true
-        score.trailingAnchor.constraint(equalTo: view.trailingAnchor,constant: -12).isActive = true
-        
-    }
-    
-    func addgamerule(){
-        guard let score = self.score else { return }
-        let gamerule: UIButton = {
-            let agamerule = UIButton()
-            agamerule.setTitle("게임 설명 버튼", for: .normal)
-            agamerule.titleLabel?.font = UIFont.systemFont(ofSize: 18,weight: .semibold)
-            agamerule.addTarget(self, action: #selector(self.explainButton(_:)),for: .touchUpInside)
-            agamerule.setTitleColor(.systemBlue, for: .normal)
-            return agamerule
-        }()
-        
-        view.addSubview(gamerule)
-        self.gameruleButton = gamerule
-        gamerule.translatesAutoresizingMaskIntoConstraints = false
-        gamerule.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        gamerule.topAnchor.constraint(equalTo: score.bottomAnchor,constant: 20).isActive = true
-        gamerule.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12).isActive = true
-        gamerule.trailingAnchor.constraint(equalTo: view.trailingAnchor,constant: -12).isActive = true
-        
-        
-    }
-    
     
     func addUserListTableView(){
         
@@ -106,7 +38,8 @@ class SideMenuViewController: UIViewController {
         table.delegate = self
         table.dataSource = self
         
-        table.backgroundColor = .green
+        table.backgroundColor = .systemGray6
+        table.sectionHeaderTopPadding = 0
         
         self.view.addSubview(table)
         
@@ -116,80 +49,96 @@ class SideMenuViewController: UIViewController {
         table.topAnchor.constraint(equalTo: layoutGuide.topAnchor,constant: 20).isActive = true
         table.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor, constant: 10).isActive = true
         table.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor, constant: -10).isActive = true
-        table.bottomAnchor.constraint(equalTo: layoutGuide.bottomAnchor, constant: -layoutGuide.layoutFrame.height/3).isActive = true
+        table.bottomAnchor.constraint(equalTo: layoutGuide.bottomAnchor, constant: -layoutGuide.layoutFrame.height/2).isActive = true
         
         self.userTableView = table
         
     }
     
-    
-    func addButton(){
-        guard let friendTableView = userTableView else { return }
+    func addProfileView() {
         
-        let setting: UIButton = {
-            let asetting = UIButton()
-            asetting.setTitle("Setting", for: .normal)
-            asetting.titleLabel?.font = UIFont.systemFont(ofSize: 18,weight: .semibold)
-            asetting.addTarget(self, action: #selector(self.settingButton(_:)),for: .touchUpInside)
-            asetting.setTitleColor(.systemBlue, for: .normal)
-            return asetting
-        }()
+        guard let userTableView = userTableView else { return }
+
         
-        view.addSubview(setting)
-        self.settingButton = setting
-        setting.translatesAutoresizingMaskIntoConstraints = false
-        setting.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        setting.topAnchor.constraint(equalTo: friendTableView.bottomAnchor,constant: 20).isActive = true
-        setting.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12).isActive = true
-        setting.trailingAnchor.constraint(equalTo: view.trailingAnchor,constant: -12).isActive = true
+        let content = UIView()
         
-        let logout: UIButton = {
-            let alogout = UIButton()
-            alogout.setTitle("뒤로가기", for: .normal)
-            alogout.titleLabel?.font = UIFont.systemFont(ofSize: 18,weight: .semibold)
-            alogout.addTarget(self, action: #selector(self.logoutButton(_:)),for: .touchUpInside)
-            alogout.setTitleColor(.systemBlue, for: .normal)
-            return alogout
-        }()
+        self.view.addSubview(content)
         
-        view.addSubview(logout)
-        self.logoutButton = logout
-        logout.translatesAutoresizingMaskIntoConstraints = false
-        logout.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        logout.topAnchor.constraint(equalTo: setting.bottomAnchor,constant: 20).isActive = true
-        logout.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12).isActive = true
-        logout.trailingAnchor.constraint(equalTo: view.trailingAnchor,constant: -12).isActive = true
+        content.backgroundColor = .systemGray6
+        content.layer.cornerRadius = 30
+        content.clipsToBounds = true
         
+        content.translatesAutoresizingMaskIntoConstraints = false
+        let layoutGuide = self.view.safeAreaLayoutGuide
+        content.topAnchor.constraint(equalTo: userTableView.bottomAnchor, constant: 20).isActive = true
+        content.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor, constant: 10).isActive = true
+        content.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor, constant: -10).isActive = true
+        content.bottomAnchor.constraint(equalTo: layoutGuide.bottomAnchor, constant: -layoutGuide.layoutFrame.height/4).isActive = true
+        
+        self.contentView = content
         
         
     }
+    
+    func addInfoLabel() {
+        
+        guard let content = self.contentView else { return }
+        let layout = self.view.safeAreaLayoutGuide
+        let length = layout.layoutFrame.height/10
+        
+        /* 프로필 사진 이미지 뷰 설정*/
+        
+        let image = self.profileImage
+        
+        image.layer.cornerRadius = length/2
+        image.backgroundColor = .white
+        image.clipsToBounds = true
+        
+        content.addSubview(image)
+        
+        image.translatesAutoresizingMaskIntoConstraints = false
+        image.topAnchor.constraint(equalTo: content.topAnchor, constant: 10).isActive = true
+        image.widthAnchor.constraint(equalToConstant: length).isActive = true
+        image.heightAnchor.constraint(equalToConstant: length).isActive = true
+        image.centerXAnchor.constraint(equalTo: content.centerXAnchor).isActive = true
+        
+        
+        /* 유저 정보 모아놓은 스택 뷰 설정*/
+        
+        let stack = UIStackView(arrangedSubviews: [nicknameLabel, scoreLabel, victoryRateLabel, winCountLabel, loseCountLabel])
+        
+        content.addSubview(stack)
+        
+        stack.axis = .vertical
+        stack.distribution = .fillEqually
+        stack.alignment = .center
+        stack.spacing = 3
+        
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.topAnchor.constraint(equalTo: image.bottomAnchor, constant: 5).isActive = true
+        stack.leadingAnchor.constraint(equalTo: content.leadingAnchor).isActive = true
+        stack.trailingAnchor.constraint(equalTo: content.trailingAnchor).isActive = true
+        stack.bottomAnchor.constraint(equalTo: content.bottomAnchor, constant: -5).isActive = true
+        
+    }
+    
+    func settingUserInfo(profile: Profile) {
+        
+        /* 레이블에 유저 프로필 정보 입력 */
+        
+        self.profileImage.image = UIImage(named: "ic_user_loading")
+        self.nicknameLabel.text = "닉네임: \(profile.nickName)"
+        self.victoryRateLabel.text = "승률: \(Int(profile.victoryRate))%"
+        self.winCountLabel.text = "이긴 횟수: \(profile.winCount)회"
+        self.loseCountLabel.text = "진 횟수: \(profile.loseCount)회"
+        self.scoreLabel.text = "점수: \(profile.score)점"
+        
+        
+    }
+    
+    
     
     // MARK:  Action Mehotd
-    
-    @objc func explainButton(_ sender: UIButton) {
-        
-        /*
-         let explainButtonView = ExplainButtonController()
-         explainButtonView.modalTransitionStyle = .crossDissolve
-         explainButtonView.modalPresentationStyle = .overCurrentContext
-         
-         present(explainButtonView,animated: true, completion: nil)
-         */
-        
-    }
-    
-    @objc func settingButton(_ sender: UIButton){
-        //아직미완
-    }
-    
-    @objc func logoutButton(_ sender: UIButton){
-        //self.dismiss(animated: true, completion: nil)
-        //self.navigationController?.popToRootViewController(animated: true)
-        self.view.window!.rootViewController?.dismiss(animated: false,completion: nil)
-        
-        
-        
-    }
     
     @objc func getLobbyUserList(noti:Notification) {
         
@@ -209,9 +158,8 @@ class SideMenuViewController: UIViewController {
         view.backgroundColor = .white
         
         addUserListTableView()
-//        addpicture()
-//        addgamerule()
-//        addButton()
+        addProfileView()
+        addInfoLabel()
         
         
     }
@@ -260,14 +208,32 @@ extension SideMenuViewController: UITableViewDataSource, UITableViewDelegate {
     
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let id = lobbyUserList[indexPath.row].userId
         
-        AF.request("http://52.78.47.148:8080/profile/8/mypage").validate().response { response in
-            
-            print(response.description)
-            
-            
+        
+        AF.request(baseURL + "profile/\(id)/mypage", method: .get).responseDecodable(of: Profile.self) { [weak self] response in
+            switch response.result {
+            case let .success(profile):
+                self?.settingUserInfo(profile: profile)
+            case let .failure(error):
+                print(error)
+            }
         }
         
+        /*
+        AF.request("http://13.124.201.154:8080/profile/\(lobbyUserList[indexPath.row].userId)/mypage").validate().response { [weak self] response in
+            
+            guard let data = response.data else { return }
+            
+            guard let profile = try? JSONDecoder().decode(Profile.self, from: data) else { return }
+            
+            self?.settingUserInfo(profile: profile)
+        }
+        */
+    }
+    
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return "접속중인 유저"
     }
     
     

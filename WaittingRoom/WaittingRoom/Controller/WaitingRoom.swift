@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Spring
 
 class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource  {
     
@@ -13,13 +14,13 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
     // MARK: - Properties
     
     /* MARK: View */
-    var buttonStackView: UIStackView?
-    var roomSettingButton: UIButton?
-    var exitButton: UIButton?
+    
+    var roomSettingButton: UIBarButtonItem?
+    var exitButton: UIBarButtonItem?
     var readyButton: UIButton?
+    
     var waitUserCollection: UICollectionView?
     var waitUserView: UIView?
-    var chatTextfield: UITextField?
     var chatTableView: UITableView?
     
     /* MARK: Others */
@@ -32,13 +33,53 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
     var myUserId: Int
     var roomId: String
     
-    
     var roomInfo: Room?
     var chattings: [Chat] = []
     
     
     // MARK: - Method
     
+    func setNavigationController() {
+        
+        /* 툴바 설정 */
+        
+        let chatButton = UIBarButtonItem(image: UIImage(systemName: "bubble.left.and.bubble.right")?.withConfiguration(UIImage.SymbolConfiguration(weight: .semibold)), style: .plain, target: self, action: #selector(touchChatButton(_:)))
+    
+        toolbarItems = [UIBarButtonItem.flexibleSpace(),chatButton, UIBarButtonItem.flexibleSpace()]
+        
+        
+        /* 네비게이션 아이템 설정 */
+        let naviItem = self.navigationItem
+        
+        let titleView: UILabel = {
+            let label = UILabel()
+            label.font = .systemFont(ofSize: 25, weight: .bold)
+            label.textColor = .black
+            label.text = roomInfo?.title
+            label.textAlignment = .center
+            
+            return label
+            
+        }()
+        
+        naviItem.titleView = titleView
+        
+        
+        /* 로비의 네비게이션 바 버튼 아이템 설정 */
+        let settingButton = UIBarButtonItem(image: .init(systemName: "gearshape")?.withConfiguration(UIImage.SymbolConfiguration(weight: .semibold)), style: .plain, target: self, action: #selector(touchSettingButton(_:)))
+        settingButton.isEnabled = myUserId == roomInfo?.hostId ? true : false
+        
+         let exitButton = UIBarButtonItem(image: UIImage(systemName: "arrow.backward")?.withConfiguration(UIImage.SymbolConfiguration(weight: .semibold)), style: .plain, target: self, action: #selector(touchExitButton(_:)))
+        
+        
+        naviItem.setRightBarButton(settingButton, animated: true)
+        naviItem.setLeftBarButton(exitButton, animated: true)
+        
+        self.roomSettingButton = settingButton
+        self.exitButton = exitButton
+        
+        
+    }
     
     /* MARK: Create View Method */
     func addWaitingUserView() {
@@ -51,7 +92,7 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
         view.backgroundColor = .systemGray3
         
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.topAnchor.constraint(equalTo: layoutGuide.topAnchor, constant: 0).isActive = true
+        view.topAnchor.constraint(equalTo: layoutGuide.topAnchor, constant: 20).isActive = true
         view.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor, constant: 20).isActive = true
         view.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor, constant: -20).isActive = true
         view.bottomAnchor.constraint(equalTo: layoutGuide.bottomAnchor, constant: -layoutGuide.layoutFrame.height/3).isActive = true
@@ -69,67 +110,79 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
         
     }
     
-    func addButtons(){
+    func addReadyButton(){
         
         guard let view = self.waitUserView else { return }
         
-        
         // readButton Setting
         
-        let ready = UIButton(type: .system)
+        var config = UIButton.Configuration.plain()
+        config.buttonSize = .small
+        config.cornerStyle = .dynamic
+        config.titleAlignment = .center
         
-        ready.backgroundColor = .white
+//        let ready = UIButton(configuration: config)
+        let ready = SpringButton(configuration: config)
+        
+        self.view.addSubview(ready)
+        
         ready.addTarget(self, action: #selector(self.touchReadyButton(_:)), for: .touchUpInside)
-        ready.titleLabel?.font = UIFont.systemFont(ofSize: 20, weight: .bold)
-        ready.setTitle("준비", for: .normal)
-        ready.setTitle("준비 완료!", for: .selected)
+        
+        ready.configurationUpdateHandler = { button in
+            
+            guard let button = button as? SpringButton else { return }
+            
+            var container = AttributeContainer()
+            container.font = .systemFont(ofSize: 20, weight: .bold)
+            
+            var configuration = button.configuration
+            
+            switch button.state {
+                
+            case .selected:
+                container.foregroundColor = .white
+                configuration?.background.backgroundColor = .systemBlue
+                configuration?.attributedTitle = AttributedString("준비 완료!", attributes: container)
+                button.animation = "pop"
+                button.curve = "spring"
+                button.duration = 0.5
+                button.force = 0.3
+                button.animate()
+            case .highlighted:
+                break
+            default:
+                container.foregroundColor = .black
+                configuration?.background.backgroundColor = .systemGray6
+                configuration?.attributedTitle = AttributedString("준비", attributes: container)
+                button.animation = "shake"
+                button.curve = "spring"
+                button.duration = 0.5
+                button.force = 0.3
+                button.animate()
+                
+            }
+            
+            button.configuration = configuration
+            
+        }
+        
+        /*
+        /* 그림자 */
+        ready.layer.shadowOffset = CGSize(width: 0, height: 3)
+        ready.layer.shadowOpacity = 1.0
+        ready.layer.shadowColor = UIColor.gray.cgColor
+        ready.layer.shadowRadius = 1
+        */
+        
+        ready.translatesAutoresizingMaskIntoConstraints = false
+        ready.centerXAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.centerXAnchor).isActive = true
+        ready.topAnchor.constraint(equalTo: view.bottomAnchor, constant: 10).isActive = true
+        ready.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 20).isActive = true
+        ready.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -20).isActive = true
+        
         
         self.readyButton = ready
         
-        
-        // exitButton Setting
-        
-        let exit = UIButton(type: .system)
-        
-        exit.backgroundColor = .white
-        exit.addTarget(self, action: #selector(self.touchExitButton(_:)), for: .touchUpInside)
-        exit.titleLabel?.font = UIFont.systemFont(ofSize: 20, weight: .medium)
-        exit.setTitle("나가기", for: .normal)
-        
-        self.exitButton = exit
-        
-        
-        // roomSettingButton Setting
-        
-        let setting = UIButton(type: .system)
-        
-        setting.backgroundColor = .white
-        setting.setTitle("방 설정", for: .normal)
-        setting.addTarget(self, action: #selector(self.touchSettingButton(_:)), for: .touchUpInside)
-        setting.titleLabel?.font = UIFont.systemFont(ofSize: 20, weight: .medium)
-        setting.isEnabled = roomInfo?.hostId == myUserId ? true : false
-        
-        self.roomSettingButton = setting
-        
-        
-        /* 버튼을 모아놓은 스택 뷰 설정 */
-        
-        let stack = UIStackView(arrangedSubviews: [exit, ready, setting])
-        
-        self.view.addSubview(stack)
-        stack.axis = .horizontal
-        stack.distribution = .fillEqually
-        stack.alignment = .center
-        
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        stack.centerXAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.centerXAnchor).isActive = true
-        stack.topAnchor.constraint(equalTo: view.bottomAnchor, constant: 10).isActive = true
-        stack.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 20).isActive = true
-        stack.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -20).isActive = true
-        stack.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
-        stack.setContentHuggingPriority(.defaultHigh, for: .vertical)
-        
-        self.buttonStackView = stack
         
     }
     
@@ -171,29 +224,9 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
     
     func addChatView() {
         
-        guard let buttons = self.buttonStackView else { return }
-        
-        
-        // ChattingTextField Setting
-        
-        let textField = UITextField()
+        guard let buttons = self.readyButton else { return }
+
         let layoutGuide = self.view.safeAreaLayoutGuide
-        
-        self.view.addSubview(textField)
-        
-        textField.placeholder = "채팅을 입력하세요"
-        textField.borderStyle = .roundedRect
-        textField.delegate = self
-        
-        textField.translatesAutoresizingMaskIntoConstraints = false
-        textField.bottomAnchor.constraint(equalTo: layoutGuide.bottomAnchor).isActive = true
-        textField.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor, constant: 20).isActive = true
-        textField.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor, constant:  -20).isActive = true
-//        textField.heightAnchor.constraint(equalToConstant: 30).isActive = true
-        textField.setContentHuggingPriority(.defaultHigh, for: .vertical)
-        
-        self.chatTextfield = textField
-        
         
         // ChattingTableView Setting
         
@@ -210,14 +243,15 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
         table.clipsToBounds = true
         table.separatorStyle = .none
         table.allowsSelection = false
+        table.backgroundColor = .systemGray6
         
         
         /* 채팅 테이블 뷰 오토 레이아웃 */
         table.translatesAutoresizingMaskIntoConstraints = false
         table.topAnchor.constraint(equalTo: buttons.bottomAnchor, constant: 10).isActive = true
-        table.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor, constant: 20).isActive = true
-        table.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor, constant: -20).isActive = true
-        table.bottomAnchor.constraint(equalTo: textField.topAnchor, constant: -5 ).isActive = true
+        table.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor, constant: 0).isActive = true
+        table.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor, constant: -0).isActive = true
+        table.bottomAnchor.constraint(equalTo: layoutGuide.bottomAnchor, constant: 0 ).isActive = true
         table.setContentHuggingPriority(.defaultLow, for: .vertical)
         table.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
         
@@ -241,24 +275,6 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
         
     }
     
-    func exile(_ index: Int) {
-        
-        /* 유저 리스트에서 특정 인덱스의 유저 삭제 */
-        
-        /*
-        guard let collection = self.waitUserCollection else { return }
-        
-        let new = Profile(userID: 0, image: nil, nickname: "", score: 0, winCount: 0, loseCount: 0)
-        
-        Myroom.users.insert(new, at: 8)
-        collection.insertItems(at: [IndexPath(row: 8, section: 0)])
-        
-        Myroom.users.remove(at: index)
-        collection.deleteItems(at: [IndexPath(row: index, section: 0)])
-        
-        */
-        
-    }
 
     func getRoomInfo(){
         
@@ -266,7 +282,7 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
             
             self?.roomInfo = roomInfo
             
-            self?.navigationItem.title = roomInfo.title
+            (self?.navigationItem.titleView as? UILabel)?.text = roomInfo.title
             
             self?.waitUserCollection?.reloadData()
             
@@ -328,31 +344,12 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
         
         sender.isSelected.toggle()
         
-//        self.myProfileCell?.isReady.toggle()
-        
         SocketIOManager.shared.getReady(roomId: roomId, userId: myUserId)
         
     }
     
-    @objc func touchExitButton(_ sender: UIButton) {
+    @objc func touchExitButton(_ sender: UIBarButtonItem) {
         
-        /*
-        guard let collection = self.waitUserCollection else { return }
-        guard let cell = self.myProfileCell else { return }
-        guard let index = collection.indexPath(for: cell) else { return }
-         
-        self.exile(index.row)
-        
-        /* 내가 방장일때 다른 유저에게 권한 위임 */
-        if Myroom.masterUserID == myProfile.userID {
-            Myroom.masterUserID = Myroom.users[index.row].userID ?? 0
-            collection.reloadItems(at: [index])
-            
-        }
-        
-        /* 내가 방장일때 방 설정 버튼 활성화 */
-        self.roomSettingButton?.isEnabled = Bool(Myroom.masterUserID == myProfile.userID)
-         */
         
         SocketIOManager.shared.leaveRoom(roomId: roomId, userId: myUserId)
         
@@ -361,18 +358,25 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
         
     }
     
-    
-    @objc func touchSettingButton(_ sender: UIButton){
+    @objc func touchChatButton(_ sender: UIBarButtonItem){
         
-        guard let height = self.waitUserCollection?.frame.height else { return }
-
-        guard let top = self.navigationController?.navigationBar.frame.height else { return }
+        guard let roomId = roomInfo?.roomId else { return }
+        
+        let chatRoom = ChattingRoom(roomId: roomId, nickName: self.myNickName, chattings: self.chattings)
+        
+        self.present(chatRoom, animated: true, completion: nil)
+        
+        
+    }
+    
+    
+    @objc func touchSettingButton(_ sender: UIBarButtonItem){
         
         guard let roomInfo = roomInfo else { return }
 
-        let view = RoomSetting(roomInfo, height, top)
+        let view = SettingRoom(userId: myUserId, roomInfo: roomInfo)
         
-        self.present(view, animated: true, completion: nil)
+        self.navigationController?.pushViewController(view, animated: true)
         
     }
     
@@ -384,9 +388,13 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
         
         chattings.append(newChat)
         
-        chatTableView?.reloadData()
+        let newIndex = IndexPath(row: chattings.count-1, section: 0)
         
-        chatTableView?.scrollToRow(at: IndexPath(row: chattings.count-1, section: 0), at: .bottom, animated: true)
+        chatTableView?.insertRows(at: [newIndex], with: .left)
+        
+//        chatTableView?.reloadData()
+        
+        chatTableView?.scrollToRow(at: newIndex, at: .bottom, animated: true)
         
         
     }
@@ -448,12 +456,6 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
 
         let user = roomInfo.users[indexPath.row]
         
-        /*
-        if info.userID == nil {
-            return false
-        }
-        */
-        
         let profileView = ProfileViewController(roomId: roomId, userId: user.userId, myUserId: myUserId, hostId: roomInfo.hostId)
         
         self.present(profileView, animated: true, completion: nil)
@@ -486,28 +488,15 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
     }
     
     
-    // MARK: - TextField Delegate
-    
-    func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
-        
-        
-        let chatRoom = ChattingRoom(roomId: roomId, nickName: myNickName, chattings: chattings)
-        
-        self.present(chatRoom, animated: true, completion: nil)
-         
-        return false
-    }
-    
-    
     // MARK: - LifeCycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = .white
-        self.navigationItem.hidesBackButton = true
         
+        self.setNavigationController()
         self.addWaitingUserView()
-        self.addButtons()
+        self.addReadyButton()
         self.addWaitUserCollectionView()
         self.addChatView()
         
@@ -543,7 +532,6 @@ class WaitingRoom: UIViewController, UICollectionViewDelegate, UICollectionViewD
         super.init(nibName: nil, bundle: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(getNewChatting(noti:)), name: Notification.Name("newChatNotification"), object: nil)
-        
         
     }
     

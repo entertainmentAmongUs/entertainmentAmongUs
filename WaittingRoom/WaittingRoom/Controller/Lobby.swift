@@ -17,9 +17,10 @@ class Lobby: UIViewController  {
     var roomListTableView: UITableView?
     let roomCellIdentifier = "roomCell"
     
-    var roomCreateButton: UIButton?
-    var roomSearchButton: UIButton?
-    var roomRefreshButton: UIButton?
+    var roomCreateButton: UIBarButtonItem?
+    var sideMenuButton: UIBarButtonItem?
+    var roomFilterButton: UIBarButtonItem?
+    
     var buttonStack: UIStackView?
     
     var chatTextField: UITextField?
@@ -35,17 +36,71 @@ class Lobby: UIViewController  {
     var lobbyChattings: [Chat] = []
     
     
-    lazy var sideMenuButton: UIBarButtonItem = {
-        let button = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(touchSideMenuButton(_:)))
-        
-        return button
-    }()
-    
-    
     
     // MARK: - Method
     
     // MARK: Create View Method
+    
+    func setNavigationController() {
+        
+        /* 툴바 설정 */
+        
+        guard let toolBar = self.navigationController?.toolbar else { return }
+        
+        let toolBarAppearance = UIToolbarAppearance()
+        toolBarAppearance.configureWithDefaultBackground()
+        
+        self.navigationController?.isToolbarHidden = false
+        toolBar.standardAppearance = toolBarAppearance
+        toolBar.scrollEdgeAppearance = toolBarAppearance
+        
+        let chatButton = UIBarButtonItem(image: UIImage(systemName: "bubble.left.and.bubble.right")?.withConfiguration(UIImage.SymbolConfiguration(weight: .semibold)), style: .plain, target: self, action: #selector(touchChatButton(_:)))
+        
+        // setToolbarItem 메소드 말고
+        toolbarItems = [UIBarButtonItem.flexibleSpace(),chatButton, UIBarButtonItem.flexibleSpace()]
+        
+        
+        /* 네비게이션 아이템 설정 */
+        let naviItem = self.navigationItem
+        
+        naviItem.backButtonTitle = "뒤로"
+        
+        let titleView: UILabel = {
+            let label = UILabel()
+            label.font = .systemFont(ofSize: 25, weight: .bold)
+            label.textColor = .black
+            label.text = "로비"
+            label.textAlignment = .left
+            
+            return label
+            
+        }()
+        
+        
+        /*
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithDefaultBackground()
+        
+        naviItem.scrollEdgeAppearance = appearance
+        naviItem.standardAppearance = appearance
+        */
+        
+        /* 로비의 네비게이션 바 버튼 아이템 설정 */
+        let sideButton = UIBarButtonItem(image: .init(systemName: "list.bullet")?.withConfiguration(UIImage.SymbolConfiguration(weight: .semibold)), style: .plain, target: self, action: #selector(touchSideMenuButton(_:)))
+        
+         let createButton = UIBarButtonItem(image: UIImage(systemName: "plus")?.withConfiguration(UIImage.SymbolConfiguration(weight: .semibold)), style: .plain, target: self, action: #selector(touchRoomCreateButton(_:)))
+        
+        let filterButton = UIBarButtonItem(image: UIImage(systemName: "magnifyingglass")?.withConfiguration(UIImage.SymbolConfiguration(weight: .semibold)), style: .plain, target: self, action: #selector(touchRoomFilterButton(_:)))
+        
+        naviItem.setRightBarButtonItems([sideButton, createButton, filterButton], animated: true)
+        naviItem.setLeftBarButton(UIBarButtonItem(customView: titleView), animated: true)
+        
+        self.sideMenuButton = sideButton
+        self.roomCreateButton = createButton
+        self.roomFilterButton = filterButton
+        
+        
+    }
     
     func addRoomListTableView(){
         
@@ -57,6 +112,24 @@ class Lobby: UIViewController  {
         table.dataSource = self
         table.register(RoomCell.self, forCellReuseIdentifier: self.roomCellIdentifier)
         table.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        table.backgroundColor = .white
+        table.sectionHeaderTopPadding = 10
+        
+        /*
+        table.layer.shadowOffset = CGSize(width: 1, height: 1)
+        table.layer.shadowOpacity = 0.5
+        table.layer.shadowColor = CGColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0)
+        table.layer.shadowRadius = 0
+        table.layer.masksToBounds = false
+        */
+        
+        
+        
+        table.refreshControl = {
+            let refresh = UIRefreshControl()
+            refresh.addTarget(self, action: #selector(touchRoomRefreshButton(_:)), for: .valueChanged)
+            return refresh
+        }()
         
         
         table.translatesAutoresizingMaskIntoConstraints = false
@@ -65,83 +138,19 @@ class Lobby: UIViewController  {
         
         table.topAnchor.constraint(equalTo: layoutGuide.topAnchor,constant: 0).isActive = true
         table.bottomAnchor.constraint(equalTo: layoutGuide.bottomAnchor,constant: -layoutGuide.layoutFrame.size.height/3).isActive = true
-        table.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor,constant: 20).isActive = true
-        table.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor,constant: -20).isActive = true
+        table.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor,constant: 0).isActive = true
+        table.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor,constant: -0).isActive = true
         
         self.roomListTableView = table
         
     }
     
-    func addButton(){
-        
-        guard let roomListTableView = self.roomListTableView else { return }
-        
-        let searchButton = UIButton(type: .system)
-        searchButton.setTitle("방 검색", for: .normal)
-        searchButton.titleLabel?.font = .systemFont(ofSize: 20,weight: .regular)
-        searchButton.addTarget(self, action: #selector(self.touchRoomSearchButton(_:)), for: .touchUpInside)
-        searchButton.setTitleColor(.systemBlue, for: .normal)
-        
-        self.roomSearchButton = searchButton
-        
-        
-        let createButton = UIButton(type: .system)
-        createButton.setTitle("방 생성", for: .normal)
-        createButton.titleLabel?.font = UIFont.systemFont(ofSize: 20,weight: .regular)
-        createButton.addTarget(self, action: #selector(self.touchRoomCreateButton(_:)), for: .touchUpInside)
-        createButton.setTitleColor(.systemBlue, for: .normal)
-        
-        self.roomCreateButton = createButton
-        
-        let refreshButton = UIButton(type: .system)
-        refreshButton.setTitle("새로고침", for: .normal)
-        refreshButton.titleLabel?.font = UIFont.systemFont(ofSize: 20,weight: .regular)
-        refreshButton.addTarget(self, action: #selector(self.touchRoomRefreshButton(_:)), for: .touchUpInside)
-        refreshButton.setTitleColor(.systemBlue, for: .normal)
-        
-        self.roomRefreshButton = refreshButton
-        
-        
-        let stackView: UIStackView = {
-            let stackView = UIStackView(arrangedSubviews: [searchButton, refreshButton, createButton])
-            stackView.translatesAutoresizingMaskIntoConstraints = false
-            stackView.axis = .horizontal
-            stackView.alignment = .fill
-            stackView.distribution = .fillEqually
-            return stackView
-        }()
-        
-        view.addSubview(stackView)
-        
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        stackView.topAnchor.constraint(equalTo: roomListTableView.bottomAnchor,constant: 10).isActive = true
-        stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 20).isActive = true
-        stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor,constant: -20).isActive = true
-        
-        self.buttonStack = stackView
-        
-    }
     
     func addChatView(){
         
-        guard let buttonStack = self.buttonStack else { return }
-        
-        let textField = UITextField()
-        
-        self.view.addSubview(textField)
-        
-        textField.placeholder = "채팅을 입력하세요"
-        textField.borderStyle = .roundedRect
-        textField.delegate = self
-        
-        
-        textField.translatesAutoresizingMaskIntoConstraints = false
-        textField.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor).isActive = true
-        textField.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 20).isActive = true
-        textField.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant:  -20).isActive = true
-        textField.heightAnchor.constraint(equalToConstant: 30).isActive = true
-        
-        self.chatTextField = textField
+        guard let roomListTableView = roomListTableView else {
+            return
+        }
         
         
         // ChattingTableView Setting
@@ -155,18 +164,18 @@ class Lobby: UIViewController  {
         
         table.layer.cornerRadius = 3
         table.clipsToBounds = true
-        table.backgroundColor = .systemGray5
+        table.backgroundColor = .systemGray6
         table.separatorStyle = .none
         table.allowsSelection = false
-        table.sectionHeaderHeight = 0
+        table.sectionHeaderTopPadding = 10
         
         
         table.translatesAutoresizingMaskIntoConstraints = false
         table.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        table.topAnchor.constraint(equalTo: buttonStack.bottomAnchor, constant: 10).isActive = true
-        table.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 20).isActive = true
-        table.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -20).isActive = true
-        table.bottomAnchor.constraint(equalTo: textField.topAnchor, constant: -5 ).isActive = true
+        table.topAnchor.constraint(equalTo: roomListTableView.bottomAnchor, constant: 10).isActive = true
+        table.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
+        table.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -0).isActive = true
+        table.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor, constant: 0 ).isActive = true
         
         self.chatTableView = table
     }
@@ -176,18 +185,11 @@ class Lobby: UIViewController  {
     
     
     @objc func touchSideMenuButton(_ sender: UIButton) {
-        /* 그냥 처음에 대충 넣은 것.
-         let sideBar = SideMenuViewController()
-         self.navigationController?.pushViewController(SideBar, animated: true)
-         
-         이번엔 present이용해서 사용.
-         present(sideBar, animated: true, completion: nil)
-         */
-        
+       
         let sideMenuViewController = SideMenuViewController(userList: self.lobbyUserList)
         let sideMenuNavi = SideMenuNavigationController(rootViewController: sideMenuViewController)
         
-        sideMenuViewController.navigationItem.title = "사이드바"
+        sideMenuViewController.navigationItem.title = "메뉴"
         
         let appearance = UINavigationBarAppearance()
         appearance.configureWithTransparentBackground()
@@ -204,25 +206,18 @@ class Lobby: UIViewController  {
     
     @objc func touchRoomCreateButton(_ sender: UIButton){
         
-        /*
-         let roomCreateButtonView = RoomCreateButtonController()
-         roomCreateButtonView.modalTransitionStyle = .crossDissolve
-         roomCreateButtonView.modalPresentationStyle = .overCurrentContext
-         //present로 화면 전환 해보는 것 응용함.
-         present(roomCreateButtonView,animated: true, completion: nil)
-         */
-        
         guard let height = self.roomListTableView?.frame.height else { return }
         guard let top = self.navigationController?.navigationBar.frame.height else { return }
         
-        let roomSettingController = RoomCreating(myUserId, height, top)
-        
-        present(roomSettingController, animated: true)
+//        let roomSettingController = RoomCreating(myUserId, height, top)
+        let roomSettingController = SettingRoomController(userId: myUserId)
+    
+        self.navigationController?.pushViewController(roomSettingController, animated: true)
         
     }
     
     
-    @objc func touchRoomSearchButton(_ sender: UIButton){
+    @objc func touchRoomFilterButton(_ sender: UIButton){
         
         //let SignUpView = SignUpViewController()
         //self.navigationController?.pushViewController(SignUpView, animated: true)
@@ -232,6 +227,15 @@ class Lobby: UIViewController  {
     @objc func touchRoomRefreshButton(_ sender: UIButton){
         
         SocketIOManager.shared.refreshRoomList()
+        
+    }
+    
+    @objc func touchChatButton(_ sender: UIButton){
+        
+        let chatRoom = ChattingRoom(roomId: "LOBBY",nickName: self.myNickName, chattings: self.lobbyChattings)
+        
+        self.present(chatRoom, animated: true, completion: nil)
+        
         
     }
     
@@ -245,9 +249,13 @@ class Lobby: UIViewController  {
         
         lobbyChattings.append(newChat)
         
-        chatTableView?.reloadData()
+        let newIndex = IndexPath(row: lobbyChattings.count-1, section: 0)
         
-        chatTableView?.scrollToRow(at: IndexPath(row: lobbyChattings.count-1, section: 0), at: .bottom, animated: true)
+        chatTableView?.insertRows(at: [newIndex], with: .left)
+        
+//        chatTableView?.reloadData()
+        
+        chatTableView?.scrollToRow(at: newIndex, at: .bottom, animated: true)
         
         
     }
@@ -298,7 +306,10 @@ class Lobby: UIViewController  {
             
             self?.roomList = roomList
             
-            self?.roomListTableView?.reloadData()
+            DispatchQueue.main.asyncAfter(deadline: .now()+0.5) {
+                self?.roomListTableView?.reloadData()
+                self?.roomListTableView?.refreshControl?.endRefreshing()
+            }
             
         }
     }
@@ -309,11 +320,9 @@ class Lobby: UIViewController  {
         
         super.viewDidLoad()
         self.view.backgroundColor = .white
-        self.navigationItem.title = "로비"
-        self.navigationItem.rightBarButtonItem = self.sideMenuButton
         
+        self.setNavigationController()
         self.addRoomListTableView()
-        self.addButton()
         self.addChatView()
         
         tryConnectionToWebSocketServer()
@@ -371,7 +380,6 @@ extension Lobby: UITableViewDelegate, UITableViewDataSource {
             let room = roomList[indexPath.row]
             
             cell.gameTypeLabel?.text = room.gameType.rawValue
-//            games[room.gameType.rawValue]
             
             cell.roomTitleLabel?.text = room.title
             
@@ -402,12 +410,18 @@ extension Lobby: UITableViewDelegate, UITableViewDataSource {
         }
     }
     
+    
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        
         
         if tableView == self.roomListTableView {
             
             let view = UIView()
             view.backgroundColor = .white
+            view.layer.shadowOffset = CGSize(width: 0, height: 1)
+            view.layer.shadowColor = UIColor.gray.cgColor
+            view.layer.shadowOpacity = 0.5
+            view.layer.shadowRadius = 0.7
             
             let gameType = UILabel()
             
@@ -416,6 +430,7 @@ extension Lobby: UITableViewDelegate, UITableViewDataSource {
             gameType.textAlignment = .center
             gameType.setContentHuggingPriority(.defaultHigh, for: .horizontal)
             gameType.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
+            gameType.textColor = .gray
             
             let roomTitle = UILabel()
             
@@ -424,18 +439,21 @@ extension Lobby: UITableViewDelegate, UITableViewDataSource {
             roomTitle.textAlignment = .center
             roomTitle.setContentHuggingPriority(.defaultLow, for: .horizontal)
             roomTitle.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+            roomTitle.textColor = .gray
             
             let password = UILabel()
             
             password.font = UIFont.systemFont(ofSize: 15, weight: .bold)
             password.text = "암호"
             password.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+            password.textColor = .gray
             
             let userCount = UILabel()
             
             userCount.font = UIFont.systemFont(ofSize: 15, weight: .bold)
             userCount.text = "인원"
             userCount.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+            userCount.textColor = .gray
             
             let stackView = UIStackView(arrangedSubviews: [gameType, roomTitle, password, userCount])
             stackView.axis = .horizontal
@@ -446,17 +464,26 @@ extension Lobby: UITableViewDelegate, UITableViewDataSource {
             view.addSubview(stackView)
             
             stackView.translatesAutoresizingMaskIntoConstraints = false
-            stackView.topAnchor.constraint(equalTo: view.topAnchor, constant: 0).isActive = true
+            stackView.topAnchor.constraint(equalTo: view.topAnchor, constant: 5).isActive = true
             stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10).isActive = true
             stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10).isActive = true
-            stackView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -10).isActive = true
+            stackView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -5).isActive = true
             
             return view
             
         }
         
         return nil
+         
     }
+     
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        if tableView == self.chatTableView {
+            return "로비 채팅"
+        }
+        return nil
+    }
+    
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
@@ -494,6 +521,7 @@ extension Lobby: UITableViewDelegate, UITableViewDataSource {
             alertController.addTextField()
             
             let cancleAction = UIAlertAction(title: "취소", style: .cancel)
+            
             let okAction = UIAlertAction(title: "확인", style: .default) { [unowned self] action in
                 let password = alertController.textFields?[0].text
                 
@@ -511,19 +539,10 @@ extension Lobby: UITableViewDelegate, UITableViewDataSource {
             SocketIOManager.shared.joinRoom(roomId: roomInfo.roomId, userId: myUserId, password: nil, completionHandler: completionHandler)
             
         }
+        
+        tableView.deselectRow(at: indexPath, animated: true)
                                                 
-       
-        /*
-        let roomId = roomList[indexPath.row].roomId
-        
-        SocketIOManager.shared.joinRoom(roomId: <#T##String#>, completionHanlder: <#T##([[String : Any]]) -> Void##([[String : Any]]) -> Void##(_ userList: [[String : Any]]) -> Void#>)
-        
-        let waittingRoom = WaittingRoom(userId: self.myUserId, nickName: self.myNickName, roomId: roomId)
-        
-        self.navigationController?.pushViewController(waittingRoom, animated: true)
-        */
     }
-    
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         

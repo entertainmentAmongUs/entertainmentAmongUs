@@ -1,6 +1,6 @@
 # Uncomment the next line to define a global platform for your project
 source 'https://github.com/CocoaPods/Specs.git'
-platform :ios, '10.0'
+platform :ios, '11.0'
 
 target 'WaittingRoom' do
   # Comment the next line if you don't want to use dynamic frameworks
@@ -10,5 +10,7 @@ target 'WaittingRoom' do
   pod 'SideMenu'
   pod 'Socket.IO-Client-Swift', '~> 16.0.0'
   pod 'Alamofire'
+  pod 'AlertsAndPickers'
+  pod 'Spring', :git => 'https://github.com/MengTo/Spring.git'
 
 end

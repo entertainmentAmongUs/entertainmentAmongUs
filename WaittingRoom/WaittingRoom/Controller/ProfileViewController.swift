@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Alamofire
 
 class ProfileViewController: UIViewController {
     
@@ -168,22 +169,22 @@ class ProfileViewController: UIViewController {
         
         /* 레이블에 유저 프로필 정보 입력 */
         
-        /*
-        self.profileImage.image = userProfile.image
-        self.nicknameLabel.text = "닉네임: \(userProfile.nickname)"
-        self.victoryRateLabel.text = "승률: " + String(format: "%.2f", userProfile.victoryRate) + "%"
-        self.winCountLabel.text = "이긴 횟수: \(userProfile.winCount)회"
-        self.loseCountLabel.text = "진 횟수: \(userProfile.loseCount)회"
-        self.scoreLabel.text = "점수: \(userProfile.score)"
-        */
-        
-        self.profileImage.image = nil
-        self.nicknameLabel.text = "닉네임: 미구현"
-        self.victoryRateLabel.text = "승률: 100%"
-        self.winCountLabel.text = "이긴 횟수: 0회"
-        self.loseCountLabel.text = "진 횟수: 0)회"
-        self.scoreLabel.text = "점수: 1000"
-        
+        AF.request(baseURL + "profile/\(userId)/mypage").validate().response { [weak self] response in
+            
+            guard let data = response.data else { return }
+            
+            guard let profile = try? JSONDecoder().decode(Profile.self, from: data) else { return }
+            
+            DispatchQueue.main.async {
+                self?.profileImage.image = UIImage(named: "ic_user_loading")
+                self?.nicknameLabel.text = "닉네임: \(profile.nickName)"
+                self?.victoryRateLabel.text = "승률: \(Int(profile.victoryRate))%"
+                self?.winCountLabel.text = "이긴 횟수: \(profile.winCount)회"
+                self?.loseCountLabel.text = "진 횟수: \(profile.loseCount)회"
+                self?.scoreLabel.text = "점수: \(profile.score)점"
+            }
+            
+        }
         
     }
     
@@ -264,19 +265,6 @@ class ProfileViewController: UIViewController {
     }
     
     @objc func touchKickButton(_ sender: UIButton) {
-        /*
-        guard let waittingRoom = self.presentingViewController as? WaittingRoom else {return}
-        guard let collection = waittingRoom.waitUserCollection else { return }
-        
-        /* 현재 보고있는 프로필의 유저 강퇴 */
-        if let index = collection.indexPath(for: self.userCell) {
-            if Myroom.users[index.row].userID == userProfile.userID {
-                waittingRoom.exile(index.row)
-            }
-        }
-        
-        self.dismiss(animated: true, completion: nil)
-        */
         
         SocketIOManager.shared.kick(roomId: roomId, userId: userId)
         

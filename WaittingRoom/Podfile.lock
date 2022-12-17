@@ -1,28 +1,44 @@
 PODS:
   - Alamofire (5.6.1)
+  - AlertsAndPickers (2.0.2)
   - SideMenu (6.5.0)
   - Socket.IO-Client-Swift (16.0.1):
     - Starscream (~> 4.0)
+  - Spring (1.0.6)
   - Starscream (4.0.4)
 
 DEPENDENCIES:
   - Alamofire
+  - AlertsAndPickers
   - SideMenu
   - Socket.IO-Client-Swift (~> 16.0.0)
+  - Spring (from `https://github.com/MengTo/Spring.git`)
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
     - Alamofire
+    - AlertsAndPickers
     - SideMenu
     - Socket.IO-Client-Swift
     - Starscream
 
+EXTERNAL SOURCES:
+  Spring:
+    :git: https://github.com/MengTo/Spring.git
+
+CHECKOUT OPTIONS:
+  Spring:
+    :commit: 50d92a5b9e08848387ae95bf44c6ad20834f7083
+    :git: https://github.com/MengTo/Spring.git
+
 SPEC CHECKSUMS:
   Alamofire: 87bd8c952f9a4454320fce00d9cc3de57bcadaf5
+  AlertsAndPickers: 2a9cabfadaa2f4d52066bd842a7a1b1b2327a248
   SideMenu: f583187d21c5b1dd04c72002be544b555a2627a2
   Socket.IO-Client-Swift: c116d6dc9fd6be9c259bacfe143f8725bce7d79e
+  Spring: 3d113f14575ef79aec9c5f906dfa4f5001c03254
   Starscream: 5178aed56b316f13fa3bc55694e583d35dd414d9
 
-PODFILE CHECKSUM: d0af80d6a5cc1d9443c7cd5e2b6012dec6cea2da
+PODFILE CHECKSUM: d1ede70505ceb8648169e9126d79250730cbe2d7
 
 COCOAPODS: 1.11.3
